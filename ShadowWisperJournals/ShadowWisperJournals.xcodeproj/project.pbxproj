@@ -7,40 +7,40 @@
 	objects = {
 
 /* Begin PBXContainerItemProxy section */
-		F935F8A72D26815000157EA3 /* PBXContainerItemProxy */ = {
+		F935F8DE2D268C7000157EA3 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = F935F88D2D26814D00157EA3 /* Project object */;
+			containerPortal = F935F8C42D268C6E00157EA3 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = F935F8942D26814D00157EA3;
+			remoteGlobalIDString = F935F8CB2D268C6E00157EA3;
 			remoteInfo = ShadowWisperJournals;
 		};
-		F935F8B12D26815000157EA3 /* PBXContainerItemProxy */ = {
+		F935F8E82D268C7000157EA3 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = F935F88D2D26814D00157EA3 /* Project object */;
+			containerPortal = F935F8C42D268C6E00157EA3 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = F935F8942D26814D00157EA3;
+			remoteGlobalIDString = F935F8CB2D268C6E00157EA3;
 			remoteInfo = ShadowWisperJournals;
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		F935F8952D26814D00157EA3 /* ShadowWisperJournals.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ShadowWisperJournals.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		F935F8A62D26815000157EA3 /* ShadowWisperJournalsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ShadowWisperJournalsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		F935F8B02D26815000157EA3 /* ShadowWisperJournalsUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ShadowWisperJournalsUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		F935F8CC2D268C6E00157EA3 /* ShadowWisperJournals.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ShadowWisperJournals.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		F935F8DD2D268C7000157EA3 /* ShadowWisperJournalsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ShadowWisperJournalsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		F935F8E72D268C7000157EA3 /* ShadowWisperJournalsUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ShadowWisperJournalsUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		F935F8972D26814D00157EA3 /* ShadowWisperJournals */ = {
+		F935F8CE2D268C6E00157EA3 /* ShadowWisperJournals */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = ShadowWisperJournals;
 			sourceTree = "<group>";
 		};
-		F935F8A92D26815000157EA3 /* ShadowWisperJournalsTests */ = {
+		F935F8E02D268C7000157EA3 /* ShadowWisperJournalsTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = ShadowWisperJournalsTests;
 			sourceTree = "<group>";
 		};
-		F935F8B32D26815000157EA3 /* ShadowWisperJournalsUITests */ = {
+		F935F8EA2D268C7000157EA3 /* ShadowWisperJournalsUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = ShadowWisperJournalsUITests;
 			sourceTree = "<group>";
@@ -48,21 +48,21 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		F935F8922D26814D00157EA3 /* Frameworks */ = {
+		F935F8C92D268C6E00157EA3 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		F935F8A32D26815000157EA3 /* Frameworks */ = {
+		F935F8DA2D268C7000157EA3 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		F935F8AD2D26815000157EA3 /* Frameworks */ = {
+		F935F8E42D268C7000157EA3 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -72,22 +72,22 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		F935F88C2D26814D00157EA3 = {
+		F935F8C32D268C6E00157EA3 = {
 			isa = PBXGroup;
 			children = (
-				F935F8972D26814D00157EA3 /* ShadowWisperJournals */,
-				F935F8A92D26815000157EA3 /* ShadowWisperJournalsTests */,
-				F935F8B32D26815000157EA3 /* ShadowWisperJournalsUITests */,
-				F935F8962D26814D00157EA3 /* Products */,
+				F935F8CE2D268C6E00157EA3 /* ShadowWisperJournals */,
+				F935F8E02D268C7000157EA3 /* ShadowWisperJournalsTests */,
+				F935F8EA2D268C7000157EA3 /* ShadowWisperJournalsUITests */,
+				F935F8CD2D268C6E00157EA3 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		F935F8962D26814D00157EA3 /* Products */ = {
+		F935F8CD2D268C6E00157EA3 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				F935F8952D26814D00157EA3 /* ShadowWisperJournals.app */,
-				F935F8A62D26815000157EA3 /* ShadowWisperJournalsTests.xctest */,
-				F935F8B02D26815000157EA3 /* ShadowWisperJournalsUITests.xctest */,
+				F935F8CC2D268C6E00157EA3 /* ShadowWisperJournals.app */,
+				F935F8DD2D268C7000157EA3 /* ShadowWisperJournalsTests.xctest */,
+				F935F8E72D268C7000157EA3 /* ShadowWisperJournalsUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -95,134 +95,134 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		F935F8942D26814D00157EA3 /* ShadowWisperJournals */ = {
+		F935F8CB2D268C6E00157EA3 /* ShadowWisperJournals */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = F935F8BA2D26815000157EA3 /* Build configuration list for PBXNativeTarget "ShadowWisperJournals" */;
+			buildConfigurationList = F935F8F12D268C7000157EA3 /* Build configuration list for PBXNativeTarget "ShadowWisperJournals" */;
 			buildPhases = (
-				F935F8912D26814D00157EA3 /* Sources */,
-				F935F8922D26814D00157EA3 /* Frameworks */,
-				F935F8932D26814D00157EA3 /* Resources */,
+				F935F8C82D268C6E00157EA3 /* Sources */,
+				F935F8C92D268C6E00157EA3 /* Frameworks */,
+				F935F8CA2D268C6E00157EA3 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				F935F8972D26814D00157EA3 /* ShadowWisperJournals */,
+				F935F8CE2D268C6E00157EA3 /* ShadowWisperJournals */,
 			);
 			name = ShadowWisperJournals;
 			packageProductDependencies = (
 			);
 			productName = ShadowWisperJournals;
-			productReference = F935F8952D26814D00157EA3 /* ShadowWisperJournals.app */;
+			productReference = F935F8CC2D268C6E00157EA3 /* ShadowWisperJournals.app */;
 			productType = "com.apple.product-type.application";
 		};
-		F935F8A52D26815000157EA3 /* ShadowWisperJournalsTests */ = {
+		F935F8DC2D268C7000157EA3 /* ShadowWisperJournalsTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = F935F8BD2D26815000157EA3 /* Build configuration list for PBXNativeTarget "ShadowWisperJournalsTests" */;
+			buildConfigurationList = F935F8F42D268C7000157EA3 /* Build configuration list for PBXNativeTarget "ShadowWisperJournalsTests" */;
 			buildPhases = (
-				F935F8A22D26815000157EA3 /* Sources */,
-				F935F8A32D26815000157EA3 /* Frameworks */,
-				F935F8A42D26815000157EA3 /* Resources */,
+				F935F8D92D268C7000157EA3 /* Sources */,
+				F935F8DA2D268C7000157EA3 /* Frameworks */,
+				F935F8DB2D268C7000157EA3 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				F935F8A82D26815000157EA3 /* PBXTargetDependency */,
+				F935F8DF2D268C7000157EA3 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				F935F8A92D26815000157EA3 /* ShadowWisperJournalsTests */,
+				F935F8E02D268C7000157EA3 /* ShadowWisperJournalsTests */,
 			);
 			name = ShadowWisperJournalsTests;
 			packageProductDependencies = (
 			);
 			productName = ShadowWisperJournalsTests;
-			productReference = F935F8A62D26815000157EA3 /* ShadowWisperJournalsTests.xctest */;
+			productReference = F935F8DD2D268C7000157EA3 /* ShadowWisperJournalsTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		F935F8AF2D26815000157EA3 /* ShadowWisperJournalsUITests */ = {
+		F935F8E62D268C7000157EA3 /* ShadowWisperJournalsUITests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = F935F8C02D26815000157EA3 /* Build configuration list for PBXNativeTarget "ShadowWisperJournalsUITests" */;
+			buildConfigurationList = F935F8F72D268C7000157EA3 /* Build configuration list for PBXNativeTarget "ShadowWisperJournalsUITests" */;
 			buildPhases = (
-				F935F8AC2D26815000157EA3 /* Sources */,
-				F935F8AD2D26815000157EA3 /* Frameworks */,
-				F935F8AE2D26815000157EA3 /* Resources */,
+				F935F8E32D268C7000157EA3 /* Sources */,
+				F935F8E42D268C7000157EA3 /* Frameworks */,
+				F935F8E52D268C7000157EA3 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				F935F8B22D26815000157EA3 /* PBXTargetDependency */,
+				F935F8E92D268C7000157EA3 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				F935F8B32D26815000157EA3 /* ShadowWisperJournalsUITests */,
+				F935F8EA2D268C7000157EA3 /* ShadowWisperJournalsUITests */,
 			);
 			name = ShadowWisperJournalsUITests;
 			packageProductDependencies = (
 			);
 			productName = ShadowWisperJournalsUITests;
-			productReference = F935F8B02D26815000157EA3 /* ShadowWisperJournalsUITests.xctest */;
+			productReference = F935F8E72D268C7000157EA3 /* ShadowWisperJournalsUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		F935F88D2D26814D00157EA3 /* Project object */ = {
+		F935F8C42D268C6E00157EA3 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1620;
 				LastUpgradeCheck = 1620;
 				TargetAttributes = {
-					F935F8942D26814D00157EA3 = {
+					F935F8CB2D268C6E00157EA3 = {
 						CreatedOnToolsVersion = 16.2;
 					};
-					F935F8A52D26815000157EA3 = {
+					F935F8DC2D268C7000157EA3 = {
 						CreatedOnToolsVersion = 16.2;
-						TestTargetID = F935F8942D26814D00157EA3;
+						TestTargetID = F935F8CB2D268C6E00157EA3;
 					};
-					F935F8AF2D26815000157EA3 = {
+					F935F8E62D268C7000157EA3 = {
 						CreatedOnToolsVersion = 16.2;
-						TestTargetID = F935F8942D26814D00157EA3;
+						TestTargetID = F935F8CB2D268C6E00157EA3;
 					};
 				};
 			};
-			buildConfigurationList = F935F8902D26814D00157EA3 /* Build configuration list for PBXProject "ShadowWisperJournals" */;
+			buildConfigurationList = F935F8C72D268C6E00157EA3 /* Build configuration list for PBXProject "ShadowWisperJournals" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 				Base,
 			);
-			mainGroup = F935F88C2D26814D00157EA3;
+			mainGroup = F935F8C32D268C6E00157EA3;
 			minimizedProjectReferenceProxies = 1;
 			preferredProjectObjectVersion = 77;
-			productRefGroup = F935F8962D26814D00157EA3 /* Products */;
+			productRefGroup = F935F8CD2D268C6E00157EA3 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				F935F8942D26814D00157EA3 /* ShadowWisperJournals */,
-				F935F8A52D26815000157EA3 /* ShadowWisperJournalsTests */,
-				F935F8AF2D26815000157EA3 /* ShadowWisperJournalsUITests */,
+				F935F8CB2D268C6E00157EA3 /* ShadowWisperJournals */,
+				F935F8DC2D268C7000157EA3 /* ShadowWisperJournalsTests */,
+				F935F8E62D268C7000157EA3 /* ShadowWisperJournalsUITests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		F935F8932D26814D00157EA3 /* Resources */ = {
+		F935F8CA2D268C6E00157EA3 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		F935F8A42D26815000157EA3 /* Resources */ = {
+		F935F8DB2D268C7000157EA3 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		F935F8AE2D26815000157EA3 /* Resources */ = {
+		F935F8E52D268C7000157EA3 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -232,21 +232,21 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		F935F8912D26814D00157EA3 /* Sources */ = {
+		F935F8C82D268C6E00157EA3 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		F935F8A22D26815000157EA3 /* Sources */ = {
+		F935F8D92D268C7000157EA3 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		F935F8AC2D26815000157EA3 /* Sources */ = {
+		F935F8E32D268C7000157EA3 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -256,20 +256,20 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		F935F8A82D26815000157EA3 /* PBXTargetDependency */ = {
+		F935F8DF2D268C7000157EA3 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = F935F8942D26814D00157EA3 /* ShadowWisperJournals */;
-			targetProxy = F935F8A72D26815000157EA3 /* PBXContainerItemProxy */;
+			target = F935F8CB2D268C6E00157EA3 /* ShadowWisperJournals */;
+			targetProxy = F935F8DE2D268C7000157EA3 /* PBXContainerItemProxy */;
 		};
-		F935F8B22D26815000157EA3 /* PBXTargetDependency */ = {
+		F935F8E92D268C7000157EA3 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = F935F8942D26814D00157EA3 /* ShadowWisperJournals */;
-			targetProxy = F935F8B12D26815000157EA3 /* PBXContainerItemProxy */;
+			target = F935F8CB2D268C6E00157EA3 /* ShadowWisperJournals */;
+			targetProxy = F935F8E82D268C7000157EA3 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		F935F8B82D26815000157EA3 /* Debug */ = {
+		F935F8EF2D268C7000157EA3 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -330,7 +330,7 @@
 			};
 			name = Debug;
 		};
-		F935F8B92D26815000157EA3 /* Release */ = {
+		F935F8F02D268C7000157EA3 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -383,7 +383,7 @@
 			};
 			name = Release;
 		};
-		F935F8BB2D26815000157EA3 /* Debug */ = {
+		F935F8F22D268C7000157EA3 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -420,7 +420,7 @@
 			};
 			name = Debug;
 		};
-		F935F8BC2D26815000157EA3 /* Release */ = {
+		F935F8F32D268C7000157EA3 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -457,7 +457,7 @@
 			};
 			name = Release;
 		};
-		F935F8BE2D26815000157EA3 /* Debug */ = {
+		F935F8F52D268C7000157EA3 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -479,7 +479,7 @@
 			};
 			name = Debug;
 		};
-		F935F8BF2D26815000157EA3 /* Release */ = {
+		F935F8F62D268C7000157EA3 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -501,7 +501,7 @@
 			};
 			name = Release;
 		};
-		F935F8C12D26815000157EA3 /* Debug */ = {
+		F935F8F82D268C7000157EA3 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
@@ -522,7 +522,7 @@
 			};
 			name = Debug;
 		};
-		F935F8C22D26815000157EA3 /* Release */ = {
+		F935F8F92D268C7000157EA3 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
@@ -546,43 +546,43 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		F935F8902D26814D00157EA3 /* Build configuration list for PBXProject "ShadowWisperJournals" */ = {
+		F935F8C72D268C6E00157EA3 /* Build configuration list for PBXProject "ShadowWisperJournals" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				F935F8B82D26815000157EA3 /* Debug */,
-				F935F8B92D26815000157EA3 /* Release */,
+				F935F8EF2D268C7000157EA3 /* Debug */,
+				F935F8F02D268C7000157EA3 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		F935F8BA2D26815000157EA3 /* Build configuration list for PBXNativeTarget "ShadowWisperJournals" */ = {
+		F935F8F12D268C7000157EA3 /* Build configuration list for PBXNativeTarget "ShadowWisperJournals" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				F935F8BB2D26815000157EA3 /* Debug */,
-				F935F8BC2D26815000157EA3 /* Release */,
+				F935F8F22D268C7000157EA3 /* Debug */,
+				F935F8F32D268C7000157EA3 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		F935F8BD2D26815000157EA3 /* Build configuration list for PBXNativeTarget "ShadowWisperJournalsTests" */ = {
+		F935F8F42D268C7000157EA3 /* Build configuration list for PBXNativeTarget "ShadowWisperJournalsTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				F935F8BE2D26815000157EA3 /* Debug */,
-				F935F8BF2D26815000157EA3 /* Release */,
+				F935F8F52D268C7000157EA3 /* Debug */,
+				F935F8F62D268C7000157EA3 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		F935F8C02D26815000157EA3 /* Build configuration list for PBXNativeTarget "ShadowWisperJournalsUITests" */ = {
+		F935F8F72D268C7000157EA3 /* Build configuration list for PBXNativeTarget "ShadowWisperJournalsUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				F935F8C12D26815000157EA3 /* Debug */,
-				F935F8C22D26815000157EA3 /* Release */,
+				F935F8F82D268C7000157EA3 /* Debug */,
+				F935F8F92D268C7000157EA3 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = F935F88D2D26814D00157EA3 /* Project object */;
+	rootObject = F935F8C42D268C6E00157EA3 /* Project object */;
 }
