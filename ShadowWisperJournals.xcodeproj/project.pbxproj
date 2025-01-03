@@ -19,6 +19,7 @@
 
 /* Begin PBXFileReference section */
 		F935F8CC2D268C6E00157EA3 /* ShadowWisperJournals.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ShadowWisperJournals.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		F9DD75D62D2837470001E32B /* ShadowWisperJournals.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = ShadowWisperJournals.xcodeproj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -70,6 +71,13 @@
 			children = (
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		F9DD75D72D2837470001E32B /* Products */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -135,6 +143,12 @@
 			preferredProjectObjectVersion = 77;
 			productRefGroup = F935F8CD2D268C6E00157EA3 /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = F9DD75D72D2837470001E32B /* Products */;
+					ProjectRef = F9DD75D62D2837470001E32B /* ShadowWisperJournals.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				F935F8CB2D268C6E00157EA3 /* ShadowWisperJournals */,
