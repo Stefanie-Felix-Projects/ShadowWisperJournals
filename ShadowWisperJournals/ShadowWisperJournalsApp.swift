@@ -6,12 +6,20 @@
 //
 
 import SwiftUI
+import Firebase
 
 @main
 struct ShadowWisperJournalsApp: App {
+    @StateObject private var userViewModel = ShadowWisperUserViewModel()
+
+    init() {
+        FirebaseApp.configure()
+    }
+
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            RootView()
+                .environmentObject(userViewModel)
         }
     }
 }

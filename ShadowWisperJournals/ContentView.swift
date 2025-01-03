@@ -8,17 +8,25 @@
 import SwiftUI
 
 struct ContentView: View {
+    @EnvironmentObject var userViewModel: ShadowWisperUserViewModel
+
     var body: some View {
         VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+            Text("Willkommen, \(userViewModel.displayName ?? "Benutzer")!")
+                .font(.largeTitle)
+                .padding()
+
+            Button("Abmelden") {
+                userViewModel.logoutShadowWisperUser()
+            }
+            .padding()
+            .background(Color.red)
+            .foregroundColor(.white)
+            .cornerRadius(8)
+
+            Text("Hier könnte das Shadowrun-Kampagnenmanagement starten...")
+                .padding()
         }
         .padding()
     }
-}
-
-#Preview {
-    ContentView()
 }
