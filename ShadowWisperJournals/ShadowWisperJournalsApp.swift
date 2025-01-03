@@ -4,7 +4,7 @@
 //
 //  Created by Stefanie Seeck on 02.01.25.
 //
-//Test
+
 
 import SwiftUI
 import Firebase
