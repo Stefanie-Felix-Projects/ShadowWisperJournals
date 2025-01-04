@@ -55,5 +55,6 @@ struct ShadowWisperRegisterView: View {
             .cornerRadius(8)
         }
         .padding()
+
     }
 }

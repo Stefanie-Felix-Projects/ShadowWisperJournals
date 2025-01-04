@@ -17,7 +17,13 @@ class ShadowWisperUserViewModel: ObservableObject {
     @Published var displayName: String?
     @Published var isAuthenticated: Bool = false
     @Published var isCheckingAuth: Bool = true
-
+    
+    @Published var shouldShowRegistration: Bool = false
+    
+    // MARK: - Neue Property
+    // Zeigt an, ob die Registrierung erfolgreich war (für Alert in der UI)
+    @Published var registrationSuccess: Bool = false
+    
     private let db = Firestore.firestore()
     private var journalViewModel: ShadowWisperJournalViewModel?
 
@@ -68,6 +74,10 @@ class ShadowWisperUserViewModel: ObservableObject {
                 return
             }
             guard let authResult = authResult else { return }
+            
+            // Sobald die Anlage in FirebaseAuth geklappt hat, betrachten wir die Registrierung als erfolgreich
+            // (Erstmal "lokal" -- unabhängig davon, ob Firestore-User auch erfolgreich angelegt wird)
+            self.registrationSuccess = true
 
             self.createShadowWisperUser(
                 id: authResult.user.uid,
@@ -111,7 +121,8 @@ class ShadowWisperUserViewModel: ObservableObject {
                 return
             }
             guard let document = document, document.exists else {
-                self.errorMessage = "Benutzer nicht gefunden."
+                self.errorMessage = "Benutzer nicht gefunden, bitte registrieren."
+                self.shouldShowRegistration = true
                 return
             }
 
@@ -146,6 +157,9 @@ class ShadowWisperUserViewModel: ObservableObject {
             self.user = nil
             self.displayName = nil
             self.isAuthenticated = false
+            self.shouldShowRegistration = false
+            // Beim Ausloggen auch wieder zurücksetzen, damit der Alert nicht erneut angezeigt wird
+            self.registrationSuccess = false
             journalViewModel?.removeListener()
         } catch {
             self.errorMessage = "Abmeldung fehlgeschlagen: \(error.localizedDescription)"
