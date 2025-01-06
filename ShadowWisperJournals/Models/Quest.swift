@@ -9,14 +9,11 @@ import Foundation
 import FirebaseFirestore
 
 struct Quest: Identifiable, Codable {
-    @DocumentID var id: String?    // Firestore Dokument-ID
+    @DocumentID var id: String?    
     var title: String
     var description: String
-    var status: String             // z.B. "aktiv" oder "abgeschlossen"
+    var status: String
     var createdAt: Date
-    var userId: String             // Referenz auf den User
-    var reward: String?            // z.B. "500 Nuyen" oder "exp + item"
-    
-    // Für Filter:
-    // Du kannst weitere Felder ergänzen, wenn du nach Datum etc. filtern möchtest
+    var userId: String
+    var reward: String?
 }

@@ -15,7 +15,6 @@ struct RootView: View {
             if userViewModel.shouldShowRegistration {
                 ShadowWisperRegisterView()
             } else if userViewModel.isAuthenticated {
-                // Anstatt ContentView => ShadowWisperHomeView
                 ShadowWisperHomeView()
             } else {
                 ShadowWisperLoginView()

@@ -12,7 +12,6 @@ class QuestLogViewModel: ObservableObject {
     
     @Published var quests: [Quest] = []
     
-    // Filter
     @Published var selectedStatus: String = "alle"
     @Published var startDate: Date = Calendar.current.date(byAdding: .month, value: -1, to: Date()) ?? Date()
     @Published var endDate: Date = Date()

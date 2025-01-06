@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-// MARK: - QuestDetailView
 struct QuestDetailView: View {
     @Environment(\.dismiss) var dismiss
     @EnvironmentObject var userViewModel: ShadowWisperUserViewModel
@@ -16,7 +15,6 @@ struct QuestDetailView: View {
     
     var quest: Quest
     
-    // Editierbare Felder
     @State private var title: String
     @State private var description: String
     @State private var status: String
@@ -24,7 +22,6 @@ struct QuestDetailView: View {
     
     init(quest: Quest) {
         self.quest = quest
-        // Initialwerte setzen
         _title = State(initialValue: quest.title)
         _description = State(initialValue: quest.description)
         _status = State(initialValue: quest.status)
@@ -70,7 +67,6 @@ struct QuestDetailView: View {
         }
         .navigationTitle("Quest bearbeiten")
         .onAppear {
-            // Damit wir im questLogVM überhaupt was haben (z.B. if needed)
             if let uid = userViewModel.userId {
                 questLogVM.fetchQuests(for: uid)
             }
