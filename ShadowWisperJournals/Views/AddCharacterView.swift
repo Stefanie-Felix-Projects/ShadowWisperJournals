@@ -18,7 +18,6 @@ struct AddCharacterView: View {
     @State private var intelligence: Int = 0
     @State private var backstory: String = ""
     
-    // Neu:
     @State private var equipmentString: String = ""
     @State private var skillsString: String = ""
     

@@ -19,11 +19,10 @@ class QuestLogViewModel: ObservableObject {
     private let db = Firestore.firestore()
     private var listener: ListenerRegistration?
     
-    func fetchQuests(for userId: String) {
+    func fetchAllQuests() {
         removeListener()
         
         listener = db.collection("quests")
-            .whereField("userId", isEqualTo: userId)
             .order(by: "createdAt", descending: true)
             .addSnapshotListener { snapshot, error in
                 if let error = error {
@@ -61,7 +60,16 @@ class QuestLogViewModel: ObservableObject {
         }
     }
     
-    func addQuest(title: String, description: String, status: String, reward: String?, userId: String) {
+    // +++ NEU: assignedCharacterIds optional
+    func addQuest(
+        title: String,
+        description: String,
+        status: String,
+        reward: String?,
+        userId: String,
+        creatorDisplayName: String? = nil,
+        assignedCharacterIds: [String]? = nil  // <--- NEU
+    ) {
         let newQuest = Quest(
             id: nil,
             title: title,
@@ -69,7 +77,9 @@ class QuestLogViewModel: ObservableObject {
             status: status,
             createdAt: Date(),
             userId: userId,
-            reward: reward
+            reward: reward,
+            creatorDisplayName: creatorDisplayName,
+            assignedCharacterIds: assignedCharacterIds // <--- direkt setzen
         )
         
         do {
@@ -95,6 +105,29 @@ class QuestLogViewModel: ObservableObject {
             if let error = error {
                 print("Fehler beim Löschen der Quest: \(error.localizedDescription)")
             }
+        }
+    }
+    
+    func assignCharactersToQuest(quest: Quest, characterIds: [String]) {
+        guard let questId = quest.id else { return }
+        
+        var newAssigned = quest.assignedCharacterIds ?? []
+        
+        for cid in characterIds {
+            if !newAssigned.contains(cid) {
+                newAssigned.append(cid)
+            }
+        }
+        
+        var updatedQuest = quest
+        updatedQuest.assignedCharacterIds = newAssigned
+        
+        do {
+            try db.collection("quests")
+                .document(questId)
+                .setData(from: updatedQuest, merge: true)
+        } catch {
+            print("Fehler beim Zuweisen der Charaktere: \(error.localizedDescription)")
         }
     }
 }

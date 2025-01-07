@@ -14,6 +14,26 @@ class CharacterViewModel: ObservableObject {
     let db = Firestore.firestore()
     private var listenerRegistration: ListenerRegistration?
     
+    func fetchAllCharacters() {
+        removeListener()
+        
+        listenerRegistration = db.collection("characters")
+            .order(by: "createdAt", descending: true)
+            .addSnapshotListener { snapshot, error in
+                if let error = error {
+                    print("Fehler beim Abrufen aller Charaktere: \(error.localizedDescription)")
+                    return
+                }
+                guard let documents = snapshot?.documents else { return }
+                
+                DispatchQueue.main.async {
+                    self.characters = documents.compactMap {
+                        try? $0.data(as: Character.self)
+                    }
+                }
+            }
+    }
+    
     func fetchCharacters(for userId: String) {
         removeListener()
         
@@ -28,25 +48,6 @@ class CharacterViewModel: ObservableObject {
                 
                 guard let documents = snapshot?.documents else { return }
                 
-                DispatchQueue.main.async {
-                    self.characters = documents.compactMap {
-                        try? $0.data(as: Character.self)
-                    }
-                }
-            }
-    }
-    
-    func fetchAllCharacters() {
-        removeListener()
-        
-        listenerRegistration = db.collection("characters")
-            .order(by: "createdAt", descending: true)
-            .addSnapshotListener { snapshot, error in
-                if let error = error {
-                    print("Fehler beim Abrufen aller Charaktere: \(error.localizedDescription)")
-                    return
-                }
-                guard let documents = snapshot?.documents else { return }
                 DispatchQueue.main.async {
                     self.characters = documents.compactMap {
                         try? $0.data(as: Character.self)

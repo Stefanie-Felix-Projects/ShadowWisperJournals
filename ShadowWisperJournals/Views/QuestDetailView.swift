@@ -11,7 +11,12 @@ struct QuestDetailView: View {
     @Environment(\.dismiss) var dismiss
     @EnvironmentObject var userViewModel: ShadowWisperUserViewModel
     
-    @StateObject private var questLogVM = QuestLogViewModel()
+    // Das QuestViewModel
+    @ObservedObject var questLogVM: QuestLogViewModel
+    
+    // +++ NEU: Wir binden das CharacterViewModel als Environment-Object ein,
+    //          das wir in QuestLogDashboardView via .environmentObject(...) übergeben haben.
+    @EnvironmentObject var characterVM: CharacterViewModel
     
     var quest: Quest
     
@@ -20,8 +25,12 @@ struct QuestDetailView: View {
     @State private var status: String
     @State private var reward: String
     
-    init(quest: Quest) {
+    @State private var showAssignCharactersSheet = false
+    
+    init(quest: Quest, questLogVM: QuestLogViewModel) {
         self.quest = quest
+        self._questLogVM = ObservedObject(wrappedValue: questLogVM)
+        
         _title = State(initialValue: quest.title)
         _description = State(initialValue: quest.description)
         _status = State(initialValue: quest.status)
@@ -43,6 +52,39 @@ struct QuestDetailView: View {
                 TextField("Belohnung", text: $reward)
             }
             
+            if let creatorName = quest.creatorDisplayName {
+                Section("Erstellt von") {
+                    Text(creatorName)
+                        .font(.headline)
+                }
+            }
+            
+            Section("Zugewiesene Charaktere") {
+                // Hier zeigen wir statt ID -> Name
+                if let assignedCharacterIds = quest.assignedCharacterIds,
+                   !assignedCharacterIds.isEmpty {
+                    
+                    ForEach(assignedCharacterIds, id: \.self) { charId in
+                        
+                        // Versuche, diesen Charakter in characterVM zu finden
+                        if let foundChar = characterVM.characters.first(where: { $0.id == charId }) {
+                            Text(foundChar.name)  // <-- Name statt "Character ID"
+                        } else {
+                            // Fallback, wenn wir ihn nicht gefunden haben
+                            Text("Unbekannter Charakter (ID: \(charId))")
+                                .foregroundColor(.gray)
+                        }
+                    }
+                } else {
+                    Text("Keine Charaktere zugewiesen.")
+                        .foregroundColor(.gray)
+                }
+                
+                Button("Charaktere zuweisen") {
+                    showAssignCharactersSheet = true
+                }
+            }
+            
             Section {
                 Button("Speichern") {
                     let updatedQuest = Quest(
@@ -52,7 +94,9 @@ struct QuestDetailView: View {
                         status: status,
                         createdAt: quest.createdAt,
                         userId: quest.userId,
-                        reward: reward.isEmpty ? nil : reward
+                        reward: reward.isEmpty ? nil : reward,
+                        creatorDisplayName: quest.creatorDisplayName,
+                        assignedCharacterIds: quest.assignedCharacterIds
                     )
                     questLogVM.updateQuest(updatedQuest)
                     dismiss()
@@ -66,10 +110,12 @@ struct QuestDetailView: View {
             }
         }
         .navigationTitle("Quest bearbeiten")
-        .onAppear {
-            if let uid = userViewModel.userId {
-                questLogVM.fetchQuests(for: uid)
-            }
+        .sheet(isPresented: $showAssignCharactersSheet) {
+            // Bei Bedarf das selbe characterVM für die AssignCharactersView
+            AssignCharactersView(quest: quest)
+                .environmentObject(questLogVM)
+                .environmentObject(characterVM)
+                .environmentObject(userViewModel)
         }
     }
 }

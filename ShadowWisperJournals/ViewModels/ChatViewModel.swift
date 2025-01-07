@@ -99,7 +99,7 @@ class ChatViewModel: ObservableObject {
             
             _ = try messagesRef.addDocument(from: newMessage)
             
-            try chatDocRef.setData([
+            chatDocRef.setData([
                 "lastMessage": text,
                 "updatedAt": Date()
             ], merge: true)

@@ -7,9 +7,12 @@
 
 import SwiftUI
 
-// MARK: - AddQuestView
 struct AddQuestView: View {
     @Environment(\.dismiss) var dismiss
+    
+    @EnvironmentObject var userViewModel: ShadowWisperUserViewModel
+    @EnvironmentObject var characterVM: CharacterViewModel
+
     @ObservedObject var questLogVM: QuestLogViewModel
     let userId: String
     
@@ -17,6 +20,9 @@ struct AddQuestView: View {
     @State private var description: String = ""
     @State private var status: String = "aktiv"
     @State private var reward: String = ""
+    
+    // Mehrfachauswahl
+    @State private var selectedCharacterIds: [String] = []
     
     var body: some View {
         NavigationStack {
@@ -33,15 +39,45 @@ struct AddQuestView: View {
                     .pickerStyle(.segmented)
                 }
                 
+                // Charaktere zuweisen (Liste aller Characters)
+                Section("Charaktere zuweisen") {
+                    let availableCharacters = characterVM.characters
+                    
+                    if availableCharacters.isEmpty {
+                        Text("Keine Charaktere verfügbar.")
+                            .foregroundColor(.gray)
+                    } else {
+                        List(availableCharacters, id: \.id) { character in
+                            let cId = character.id ?? ""
+                            
+                            MultipleSelectionRow(
+                                title: character.name,
+                                isSelected: selectedCharacterIds.contains(cId)
+                            ) {
+                                if selectedCharacterIds.contains(cId) {
+                                    selectedCharacterIds.removeAll { $0 == cId }
+                                } else {
+                                    selectedCharacterIds.append(cId)
+                                }
+                            }
+                        }
+                        .frame(minHeight: 200)
+                    }
+                }
+                
                 Button("Quest hinzufügen") {
                     guard !title.isEmpty, !description.isEmpty else { return }
+                    
                     questLogVM.addQuest(
                         title: title,
                         description: description,
                         status: status,
                         reward: reward.isEmpty ? nil : reward,
-                        userId: userId
+                        userId: userId,
+                        creatorDisplayName: userViewModel.user?.displayName,
+                        assignedCharacterIds: selectedCharacterIds.isEmpty ? nil : selectedCharacterIds
                     )
+                    
                     dismiss()
                 }
             }
