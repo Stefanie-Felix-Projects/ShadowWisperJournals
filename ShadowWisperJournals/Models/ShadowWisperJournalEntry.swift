@@ -5,8 +5,8 @@
 //  Created by Stefanie Seeck on 02.01.25.
 //
 
-import Foundation
 import FirebaseFirestore
+import Foundation
 
 struct ShadowWisperJournalEntry: Identifiable, Codable {
     @DocumentID var id: String?

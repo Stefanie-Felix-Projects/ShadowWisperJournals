@@ -9,31 +9,33 @@ import SwiftUI
 
 struct NewChatView: View {
     @Environment(\.dismiss) var dismiss
-    
+
     @ObservedObject var chatVM: ChatViewModel
     @EnvironmentObject var userViewModel: ShadowWisperUserViewModel
-    
+
     @StateObject private var characterVM = CharacterViewModel()
-    
+
     @State private var searchText: String = ""
     @State private var selectedCharacterId: String? = nil
-    
+
     @State private var initialMessage: String = ""
-    
+
     var body: some View {
         NavigationStack {
             Form {
                 Section("Charakter auswählen") {
                     TextField("Suche nach Charakter...", text: $searchText)
-                    
-                    let filteredCharacters = characterVM.characters.filter { char in
+
+                    let filteredCharacters = characterVM.characters.filter {
+                        char in
                         if char.userId == userViewModel.userId {
                             return false
                         }
                         if searchText.isEmpty { return true }
-                        return char.name.localizedCaseInsensitiveContains(searchText)
+                        return char.name.localizedCaseInsensitiveContains(
+                            searchText)
                     }
-                    
+
                     List(filteredCharacters) { character in
                         HStack {
                             Text(character.name)
@@ -53,11 +55,11 @@ struct NewChatView: View {
                     }
                     .frame(minHeight: 200)
                 }
-                
+
                 Section("Erste Nachricht (optional)") {
                     TextField("Hey, wie geht's?", text: $initialMessage)
                 }
-                
+
                 Button("Chat erstellen") {
                     createChat()
                 }
@@ -72,29 +74,33 @@ struct NewChatView: View {
                 }
             }
             .onAppear {
-                if let _ = userViewModel.userId {
+                if userViewModel.userId != nil {
                     characterVM.fetchAllCharacters()
                 }
             }
         }
     }
-    
+
     private func createChat() {
         guard let myUserId = userViewModel.userId else { return }
         guard let otherCharId = selectedCharacterId else { return }
-        
-        guard let otherChar = characterVM.characters.first(where: { $0.id == otherCharId }) else { return }
-        
+
+        guard
+            let otherChar = characterVM.characters.first(where: {
+                $0.id == otherCharId
+            })
+        else { return }
+
         let otherUserId = otherChar.userId
-        
+
         let participants = [myUserId, otherUserId]
-        
+
         chatVM.createNewChat(
             participants: participants,
             initialMessage: initialMessage,
             senderId: myUserId
         )
-        
+
         dismiss()
     }
 }

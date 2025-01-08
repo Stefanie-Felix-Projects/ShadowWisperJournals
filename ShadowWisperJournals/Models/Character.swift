@@ -5,8 +5,8 @@
 //  Created by Stefanie Seeck on 06.01.25.
 //
 
-import Foundation
 import FirebaseFirestore
+import Foundation
 
 struct Character: Identifiable, Codable {
     @DocumentID var id: String?

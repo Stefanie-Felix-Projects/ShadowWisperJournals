@@ -5,11 +5,11 @@
 //  Created by Stefanie Seeck on 02.01.25.
 //
 
-import Foundation
 import FirebaseFirestore
+import Foundation
 
 class ShadowWisperJournalViewModel: ObservableObject {
-  
+
     @Published var journalEntries: [ShadowWisperJournalEntry] = []
 
     private let db = Firestore.firestore()
@@ -23,14 +23,18 @@ class ShadowWisperJournalViewModel: ObservableObject {
             .order(by: "createdAt", descending: true)
             .addSnapshotListener { querySnapshot, error in
                 if let error = error {
-                    print("Fehler beim Abrufen der Journal-Einträge: \(error.localizedDescription)")
+                    print(
+                        "Fehler beim Abrufen der Journal-Einträge: \(error.localizedDescription)"
+                    )
                     return
                 }
 
                 DispatchQueue.main.async {
-                    self.journalEntries = querySnapshot?.documents.compactMap { document in
-                        try? document.data(as: ShadowWisperJournalEntry.self)
-                    } ?? []
+                    self.journalEntries =
+                        querySnapshot?.documents.compactMap { document in
+                            try? document.data(
+                                as: ShadowWisperJournalEntry.self)
+                        } ?? []
                 }
             }
     }
@@ -48,9 +52,12 @@ class ShadowWisperJournalViewModel: ObservableObject {
         }
 
         do {
-            try db.collection("journalEntries").document(entryId).setData(from: entry)
+            try db.collection("journalEntries").document(entryId).setData(
+                from: entry)
         } catch {
-            print("Fehler beim Aktualisieren des Journal-Eintrags: \(error.localizedDescription)")
+            print(
+                "Fehler beim Aktualisieren des Journal-Eintrags: \(error.localizedDescription)"
+            )
         }
     }
 
@@ -76,7 +83,9 @@ class ShadowWisperJournalViewModel: ObservableObject {
         do {
             _ = try db.collection("journalEntries").addDocument(from: newEntry)
         } catch {
-            print("Fehler beim Hinzufügen des Journal-Eintrags: \(error.localizedDescription)")
+            print(
+                "Fehler beim Hinzufügen des Journal-Eintrags: \(error.localizedDescription)"
+            )
         }
     }
 
@@ -87,7 +96,9 @@ class ShadowWisperJournalViewModel: ObservableObject {
 
         db.collection("journalEntries").document(entryId).delete { error in
             if let error = error {
-                print("Fehler beim Löschen des Journal-Eintrags: \(error.localizedDescription)")
+                print(
+                    "Fehler beim Löschen des Journal-Eintrags: \(error.localizedDescription)"
+                )
             }
         }
     }

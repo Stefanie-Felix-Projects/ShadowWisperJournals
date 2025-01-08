@@ -9,17 +9,16 @@ import SwiftUI
 
 struct AssignCharactersView: View {
     @Environment(\.dismiss) var dismiss
-    
+
     let quest: Quest
-    
+
     @EnvironmentObject var questLogVM: QuestLogViewModel
-    
-    // Du hast hier dein eigenes CharacterViewModel:
+
     @StateObject private var characterVM = CharacterViewModel()
     @State private var selectedCharacterIds: [String] = []
-    
+
     @EnvironmentObject var userViewModel: ShadowWisperUserViewModel
-    
+
     var body: some View {
         NavigationStack {
             Form {
@@ -27,7 +26,7 @@ struct AssignCharactersView: View {
                     let otherUsersCharacters = characterVM.characters.filter {
                         $0.userId != userViewModel.userId
                     }
-                    
+
                     if otherUsersCharacters.isEmpty {
                         Text("Keine Charaktere anderer Nutzer vorhanden.")
                             .foregroundColor(.gray)
@@ -35,14 +34,15 @@ struct AssignCharactersView: View {
                         List(otherUsersCharacters, id: \.id) { character in
                             MultipleSelectionRow(
                                 title: character.name,
-                                isSelected: selectedCharacterIds.contains(character.id ?? "")
+                                isSelected: selectedCharacterIds.contains(
+                                    character.id ?? "")
                             ) {
                                 toggleSelection(for: character.id ?? "")
                             }
                         }
                     }
                 }
-                
+
                 Section {
                     Button("Zuweisen") {
                         questLogVM.assignCharactersToQuest(
@@ -67,7 +67,7 @@ struct AssignCharactersView: View {
             }
         }
     }
-    
+
     private func toggleSelection(for characterId: String) {
         if selectedCharacterIds.contains(characterId) {
             selectedCharacterIds.removeAll { $0 == characterId }
@@ -76,4 +76,3 @@ struct AssignCharactersView: View {
         }
     }
 }
-

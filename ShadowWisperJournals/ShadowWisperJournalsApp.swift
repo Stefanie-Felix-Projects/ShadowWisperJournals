@@ -5,8 +5,8 @@
 //  Created by Stefanie Seeck on 02.01.25.
 //
 
-import SwiftUI
 import Firebase
+import SwiftUI
 
 @main
 struct ShadowWisperJournalsApp: App {

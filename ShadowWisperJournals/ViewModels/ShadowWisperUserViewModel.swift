@@ -5,10 +5,10 @@
 //  Created by Stefanie Seeck on 02.01.25.
 //
 
-import Foundation
 import Firebase
 import FirebaseAuth
 import FirebaseFirestore
+import Foundation
 
 class ShadowWisperUserViewModel: ObservableObject {
 
@@ -17,11 +17,11 @@ class ShadowWisperUserViewModel: ObservableObject {
     @Published var displayName: String?
     @Published var isAuthenticated: Bool = false
     @Published var isCheckingAuth: Bool = true
-    
+
     @Published var shouldShowRegistration: Bool = false
-    
+
     @Published var registrationSuccess: Bool = false
-    
+
     private let db = Firestore.firestore()
     private var journalViewModel: ShadowWisperJournalViewModel?
 
@@ -43,9 +43,11 @@ class ShadowWisperUserViewModel: ObservableObject {
             return
         }
 
-        Auth.auth().signIn(withEmail: email, password: password) { authResult, error in
+        Auth.auth().signIn(withEmail: email, password: password) {
+            authResult, error in
             if let error = error {
-                self.errorMessage = "Anmeldung fehlgeschlagen: \(error.localizedDescription)"
+                self.errorMessage =
+                    "Anmeldung fehlgeschlagen: \(error.localizedDescription)"
                 return
             }
             guard let authResult = authResult else { return }
@@ -66,13 +68,15 @@ class ShadowWisperUserViewModel: ObservableObject {
             return
         }
 
-        Auth.auth().createUser(withEmail: email, password: password) { authResult, error in
+        Auth.auth().createUser(withEmail: email, password: password) {
+            authResult, error in
             if let error = error {
-                self.errorMessage = "Registrierung fehlgeschlagen: \(error.localizedDescription)"
+                self.errorMessage =
+                    "Registrierung fehlgeschlagen: \(error.localizedDescription)"
                 return
             }
             guard let authResult = authResult else { return }
-            
+
             self.registrationSuccess = true
 
             self.createShadowWisperUser(
@@ -106,18 +110,21 @@ class ShadowWisperUserViewModel: ObservableObject {
         do {
             try db.collection("users").document(id).setData(from: fireUser)
         } catch {
-            self.errorMessage = "Fehler beim Speichern der Benutzerdaten: \(error.localizedDescription)"
+            self.errorMessage =
+                "Fehler beim Speichern der Benutzerdaten: \(error.localizedDescription)"
         }
     }
 
     func fetchShadowWisperUser(id: String) {
         db.collection("users").document(id).getDocument { document, error in
             if let error = error {
-                self.errorMessage = "Fehler beim Laden der Benutzerdaten: \(error.localizedDescription)"
+                self.errorMessage =
+                    "Fehler beim Laden der Benutzerdaten: \(error.localizedDescription)"
                 return
             }
             guard let document = document, document.exists else {
-                self.errorMessage = "Benutzer nicht gefunden, bitte registrieren."
+                self.errorMessage =
+                    "Benutzer nicht gefunden, bitte registrieren."
                 self.shouldShowRegistration = true
                 return
             }
@@ -126,12 +133,13 @@ class ShadowWisperUserViewModel: ObservableObject {
                 self.user = try document.data(as: FireUser.self)
                 self.displayName = self.user?.displayName
                 self.isAuthenticated = true
-                
+
                 if let userId = self.user?.id {
                     self.journalViewModel?.fetchJournalEntries(for: userId)
                 }
             } catch {
-                self.errorMessage = "Fehler beim Konvertieren der Benutzerdaten: \(error.localizedDescription)"
+                self.errorMessage =
+                    "Fehler beim Konvertieren der Benutzerdaten: \(error.localizedDescription)"
             }
         }
     }
@@ -154,11 +162,12 @@ class ShadowWisperUserViewModel: ObservableObject {
             self.displayName = nil
             self.isAuthenticated = false
             self.shouldShowRegistration = false
-          
+
             self.registrationSuccess = false
             journalViewModel?.removeListener()
         } catch {
-            self.errorMessage = "Abmeldung fehlgeschlagen: \(error.localizedDescription)"
+            self.errorMessage =
+                "Abmeldung fehlgeschlagen: \(error.localizedDescription)"
         }
     }
 }

@@ -10,18 +10,18 @@ import SwiftUI
 struct ChatDetailView: View {
     @EnvironmentObject var userViewModel: ShadowWisperUserViewModel
     @StateObject private var chatVM = ChatViewModel()
-    
+
     let chat: Chat
-    
+
     @State private var newMessageText: String = ""
-    
+
     var body: some View {
         VStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 8) {
-                    
+
                     ForEach(chatVM.messages) { message in
-                        
+
                         if message.senderId == userViewModel.userId {
                             HStack {
                                 Spacer()
@@ -30,30 +30,36 @@ struct ChatDetailView: View {
                                         .padding(8)
                                         .background(Color.blue.opacity(0.2))
                                         .cornerRadius(8)
-                                    
-                                    if isMessageReadByAll(message: message, chat: chat) {
+
+                                    if isMessageReadByAll(
+                                        message: message, chat: chat)
+                                    {
                                         Text("Gelesen von allen")
                                             .font(.caption2)
                                             .foregroundColor(.gray)
-                                    } else if message.readBy.contains(userViewModel.userId ?? "") {
+                                    } else if message.readBy.contains(
+                                        userViewModel.userId ?? "")
+                                    {
                                         Text("Gelesen von dir")
                                             .font(.caption2)
                                             .foregroundColor(.gray)
                                     }
                                 }
                             }
-                            
+
                         } else {
                             VStack(alignment: .leading) {
                                 Text(message.text)
                                     .padding(8)
                                     .background(Color.green.opacity(0.2))
                                     .cornerRadius(8)
-                                
+
                             }
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .onAppear {
-                                if !message.readBy.contains(userViewModel.userId ?? "") {
+                                if !message.readBy.contains(
+                                    userViewModel.userId ?? "")
+                                {
                                     chatVM.markMessageAsRead(
                                         message,
                                         by: userViewModel.userId ?? "",
@@ -63,15 +69,15 @@ struct ChatDetailView: View {
                             }
                         }
                     }
-                    
+
                 }
                 .padding()
             }
-            
+
             HStack {
                 TextField("Nachricht eingeben", text: $newMessageText)
                     .textFieldStyle(.roundedBorder)
-                
+
                 Button {
                     sendMessage()
                 } label: {
@@ -91,13 +97,13 @@ struct ChatDetailView: View {
             chatVM.removeMessagesListener()
         }
     }
-    
+
     private func sendMessage() {
         guard let userId = userViewModel.userId else { return }
         chatVM.sendMessage(to: chat, senderId: userId, text: newMessageText)
         newMessageText = ""
     }
-    
+
     private func isMessageReadByAll(message: ChatMessage, chat: Chat) -> Bool {
         for participant in chat.participants {
             if !message.readBy.contains(participant) {

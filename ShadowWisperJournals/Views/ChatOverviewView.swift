@@ -10,32 +10,36 @@ import SwiftUI
 struct ChatOverviewView: View {
     @EnvironmentObject var userViewModel: ShadowWisperUserViewModel
     @StateObject private var chatVM = ChatViewModel()
-    
+
     @State private var showNewChatSheet = false
-    
+
     var body: some View {
         NavigationStack {
             VStack {
                 TextField("Chats suchen...", text: $chatVM.searchText)
                     .textFieldStyle(.roundedBorder)
                     .padding(.horizontal)
-                
+
                 List(chatVM.filteredChats) { chat in
                     NavigationLink(destination: ChatDetailView(chat: chat)) {
                         VStack(alignment: .leading, spacing: 4) {
-                            Text("Teilnehmer-IDs: \(chat.participants.joined(separator: ", "))")
-                                .font(.headline)
+                            Text(
+                                "Teilnehmer-IDs: \(chat.participants.joined(separator: ", "))"
+                            )
+                            .font(.headline)
                             Text(chat.lastMessage ?? "Keine Nachrichten")
                                 .font(.subheadline)
                                 .foregroundColor(.gray)
-                            Text("Aktualisiert am \(chat.updatedAt.formatted())")
-                                .font(.footnote)
-                                .foregroundColor(.gray)
+                            Text(
+                                "Aktualisiert am \(chat.updatedAt.formatted())"
+                            )
+                            .font(.footnote)
+                            .foregroundColor(.gray)
                         }
                     }
                 }
                 .listStyle(.plain)
-                
+
                 Button("Neuen Chat starten") {
                     showNewChatSheet = true
                 }

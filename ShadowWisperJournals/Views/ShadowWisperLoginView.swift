@@ -38,7 +38,8 @@ struct ShadowWisperLoginView: View {
                 .cornerRadius(8)
 
             Button(action: {
-                userViewModel.loginShadowWisperUser(email: email, password: password)
+                userViewModel.loginShadowWisperUser(
+                    email: email, password: password)
             }) {
                 Text("Login")
                     .padding()

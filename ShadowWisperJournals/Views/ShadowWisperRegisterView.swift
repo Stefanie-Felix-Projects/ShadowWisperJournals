@@ -19,24 +19,24 @@ struct ShadowWisperRegisterView: View {
             Text("Registrieren (ShadowWisperJournals)")
                 .font(.largeTitle)
                 .bold()
-            
+
             if let errorMessage = userViewModel.errorMessage {
                 Text(errorMessage)
                     .foregroundColor(.red)
                     .padding()
             }
-            
+
             TextField("E-Mail", text: $email)
                 .padding()
                 .background(Color.gray.opacity(0.2))
                 .cornerRadius(8)
                 .keyboardType(.emailAddress)
-            
+
             SecureField("Passwort", text: $password)
                 .padding()
                 .background(Color.gray.opacity(0.2))
                 .cornerRadius(8)
-            
+
             TextField("Anzeigename", text: $displayName)
                 .padding()
                 .background(Color.gray.opacity(0.2))
