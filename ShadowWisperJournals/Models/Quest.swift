@@ -18,4 +18,5 @@ struct Quest: Identifiable, Codable {
     var reward: String?
     var creatorDisplayName: String?
     var assignedCharacterIds: [String]?
+    var imageURLs: [String]? 
 }
