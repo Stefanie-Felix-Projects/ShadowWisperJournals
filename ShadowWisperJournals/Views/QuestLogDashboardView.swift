@@ -58,15 +58,14 @@ struct QuestLogDashboardView: View {
                 Image(systemName: "plus")
             }
         }
-
         .onAppear {
             characterVM.fetchAllCharacters()
             questLogVM.fetchAllQuests()
         }
-
         .sheet(isPresented: $showNewQuestSheet) {
             AddQuestView(
-                questLogVM: questLogVM, userId: userViewModel.userId ?? ""
+                questLogVM: questLogVM,
+                userId: userViewModel.userId ?? ""
             )
             .environmentObject(userViewModel)
             .environmentObject(characterVM)
@@ -106,24 +105,18 @@ struct QuestLogDashboardView: View {
         guard let uid = userViewModel.userId else { return [] }
 
         let myCharacterIDs = characterVM.characters.compactMap { $0.id }
-
         let allQuests = questLogVM.quests
-
+        
         let visibleQuests = allQuests.filter { quest in
             let isOwner = (quest.userId == uid)
-
             let assignedIds = quest.assignedCharacterIds ?? []
-            let isAssignedToMe =
-                !assignedIds.isEmpty
-                && assignedIds.contains(where: myCharacterIDs.contains)
-
+            let isAssignedToMe = !assignedIds.isEmpty && assignedIds.contains(where: myCharacterIDs.contains)
             return isOwner || isAssignedToMe
         }
 
         return visibleQuests.filter { quest in
-            let isInRange =
-                (quest.createdAt >= questLogVM.startDate
-                    && quest.createdAt <= questLogVM.endDate)
+            let isInRange = (quest.createdAt >= questLogVM.startDate &&
+                             quest.createdAt <= questLogVM.endDate)
 
             switch questLogVM.selectedStatus {
             case "aktiv":
@@ -148,10 +141,12 @@ struct QuestLogDashboardView: View {
             HStack {
                 DatePicker(
                     "Von:", selection: $questLogVM.startDate,
-                    displayedComponents: .date)
+                    displayedComponents: .date
+                )
                 DatePicker(
                     "Bis:", selection: $questLogVM.endDate,
-                    displayedComponents: .date)
+                    displayedComponents: .date
+                )
             }
             .font(.footnote)
             .padding(.top, 4)

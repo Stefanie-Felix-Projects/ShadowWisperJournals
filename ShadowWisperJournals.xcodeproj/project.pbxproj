@@ -15,6 +15,7 @@
 		F935F94D2D26BC4900157EA3 /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = F935F94C2D26BC4900157EA3 /* FirebaseDatabase */; };
 		F935F9512D26BC4900157EA3 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = F935F9502D26BC4900157EA3 /* FirebaseFirestore */; };
 		F935F9652D26BC4900157EA3 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = F935F9642D26BC4900157EA3 /* FirebaseStorage */; };
+		F9EC78362D3432E900AD1626 /* GoogleMaps in Frameworks */ = {isa = PBXBuildFile; productRef = F9EC78352D3432E900AD1626 /* GoogleMaps */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -39,6 +40,7 @@
 				F935F93B2D26BC4800157EA3 /* FirebaseAnalytics in Frameworks */,
 				F935F9512D26BC4900157EA3 /* FirebaseFirestore in Frameworks */,
 				F935F93F2D26BC4800157EA3 /* FirebaseAnalyticsWithoutAdIdSupport in Frameworks */,
+				F9EC78362D3432E900AD1626 /* GoogleMaps in Frameworks */,
 				F935F9652D26BC4900157EA3 /* FirebaseStorage in Frameworks */,
 				F935F9492D26BC4800157EA3 /* FirebaseCore in Frameworks */,
 				F935F93D2D26BC4800157EA3 /* FirebaseAnalyticsOnDeviceConversion in Frameworks */,
@@ -100,6 +102,7 @@
 				F935F94C2D26BC4900157EA3 /* FirebaseDatabase */,
 				F935F9502D26BC4900157EA3 /* FirebaseFirestore */,
 				F935F9642D26BC4900157EA3 /* FirebaseStorage */,
+				F9EC78352D3432E900AD1626 /* GoogleMaps */,
 			);
 			productName = ShadowWisperJournals;
 			productReference = F935F8CC2D268C6E00157EA3 /* ShadowWisperJournals.app */;
@@ -131,6 +134,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				F935F91C2D26BA0D00157EA3 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				F9EC78342D3432E900AD1626 /* XCRemoteSwiftPackageReference "ios-maps-sdk" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = F935F8CD2D268C6E00157EA3 /* Products */;
@@ -387,6 +391,14 @@
 				minimumVersion = 11.6.0;
 			};
 		};
+		F9EC78342D3432E900AD1626 /* XCRemoteSwiftPackageReference "ios-maps-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/googlemaps/ios-maps-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 9.2.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -429,6 +441,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = F935F91C2D26BA0D00157EA3 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseStorage;
+		};
+		F9EC78352D3432E900AD1626 /* GoogleMaps */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F9EC78342D3432E900AD1626 /* XCRemoteSwiftPackageReference "ios-maps-sdk" */;
+			productName = GoogleMaps;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

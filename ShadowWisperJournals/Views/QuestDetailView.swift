@@ -7,6 +7,7 @@
 
 import SwiftUI
 import UniformTypeIdentifiers
+
 struct QuestDetailView: View {
     @Environment(\.dismiss) var dismiss
     @EnvironmentObject var userViewModel: ShadowWisperUserViewModel
@@ -23,21 +24,29 @@ struct QuestDetailView: View {
     
     @State private var showAssignCharactersSheet = false
     @State private var showImagePicker = false
-    
     @State private var localSelectedImage: UIImage?
-
-    @State private var isDropTargeted: Bool = false
-    
     @State private var errorMessage: String?
+
+    @State private var localLocationString: String
     
+    @State private var personalNotes: String
+    @State private var localImageURLs: [String] = []
+
+    @State private var selectedImageURL: URL?
+    @State private var showFullScreenImage: Bool = false
+
     init(quest: Quest, questLogVM: QuestLogViewModel) {
         self.quest = quest
         self._questLogVM = ObservedObject(wrappedValue: questLogVM)
-        
+
         _title = State(initialValue: quest.title)
         _description = State(initialValue: quest.description)
         _status = State(initialValue: quest.status)
         _reward = State(initialValue: quest.reward ?? "")
+        _localLocationString = State(initialValue: quest.locationString ?? "")
+        _personalNotes = State(initialValue: quest.personalNotes ?? "")
+        
+        _localImageURLs = State(initialValue: quest.imageURLs ?? [])
     }
     
     var body: some View {
@@ -53,6 +62,16 @@ struct QuestDetailView: View {
                 .pickerStyle(.segmented)
                 
                 TextField("Belohnung", text: $reward)
+            }
+            
+            Section("Meine Notizen") {
+                TextEditor(text: $personalNotes)
+                    .frame(minHeight: 100)
+                
+                Button("Notizen kopieren") {
+                    UIPasteboard.general.string = personalNotes
+                }
+                .font(.footnote)
             }
             
             if let creatorName = quest.creatorDisplayName {
@@ -84,33 +103,39 @@ struct QuestDetailView: View {
             }
             
             Section("Bisher hochgeladene Bilder") {
-                if let imageURLs = quest.imageURLs, !imageURLs.isEmpty {
+                if !localImageURLs.isEmpty {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack {
-                            ForEach(imageURLs, id: \.self) { urlString in
+                            ForEach(localImageURLs, id: \.self) { urlString in
                                 if let url = URL(string: urlString) {
-                                    AsyncImage(url: url) { phase in
-                                        switch phase {
-                                        case .empty:
-                                            ProgressView()
-                                                .frame(width: 100, height: 100)
-                                        case .success(let image):
-                                            image
-                                                .resizable()
-                                                .scaledToFill()
-                                                .frame(width: 100, height: 100)
-                                                .clipped()
-                                                .cornerRadius(8)
-                                        case .failure:
-                                            Image(systemName: "photo.fill")
-                                                .resizable()
-                                                .scaledToFit()
-                                                .frame(width: 100, height: 100)
-                                                .foregroundColor(.gray)
-                                        @unknown default:
-                                            EmptyView()
+                                    Button {
+                                        selectedImageURL = url
+                                        showFullScreenImage = true
+                                    } label: {
+                                        AsyncImage(url: url) { phase in
+                                            switch phase {
+                                            case .empty:
+                                                ProgressView()
+                                                    .frame(width: 100, height: 100)
+                                            case .success(let image):
+                                                image
+                                                    .resizable()
+                                                    .scaledToFill()
+                                                    .frame(width: 100, height: 100)
+                                                    .clipped()
+                                                    .cornerRadius(8)
+                                            case .failure:
+                                                Image(systemName: "photo.fill")
+                                                    .resizable()
+                                                    .scaledToFit()
+                                                    .frame(width: 100, height: 100)
+                                                    .foregroundColor(.gray)
+                                            @unknown default:
+                                                EmptyView()
+                                            }
                                         }
                                     }
+                                    .buttonStyle(.plain)
                                 }
                             }
                         }
@@ -123,54 +148,13 @@ struct QuestDetailView: View {
             }
             
             Section("Neues Bild hinzufügen") {
-                
                 Button("Bild aus Fotobibliothek") {
                     showImagePicker = true
                 }
                 .sheet(isPresented: $showImagePicker) {
                     ImagePicker { selectedImage in
-
                         self.localSelectedImage = selectedImage
                     }
-                }
-                
-                VStack {
-                    Text("Oder hier ein Bild reinziehen:")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                    
-                    Rectangle()
-                        .fill(isDropTargeted ? Color.blue.opacity(0.3) : Color.gray.opacity(0.2))
-                        .frame(height: 100)
-                        .overlay(
-                            Text("Drag & Drop Zone")
-                                .foregroundColor(.blue)
-                        )
-                        .cornerRadius(8)
-                        .onDrop(
-                            of: [UTType.image.identifier],
-                            isTargeted: $isDropTargeted
-                        ) { providers in
-                            guard let provider = providers.first else { return false }
-                            provider.loadItem(
-                                forTypeIdentifier: UTType.image.identifier,
-                                options: nil
-                            ) { item, error in
-                                if let error = error {
-                                    errorMessage = "Fehler beim Drag & Drop: \(error.localizedDescription)"
-                                    return
-                                }
-                                if let url = item as? URL,
-                                   let data = try? Data(contentsOf: url),
-                                   let droppedImage = UIImage(data: data) {
-                                    // Bild nur lokal speichern
-                                    DispatchQueue.main.async {
-                                        self.localSelectedImage = droppedImage
-                                    }
-                                }
-                            }
-                            return true
-                        }
                 }
                 
                 if let localImage = localSelectedImage {
@@ -189,6 +173,14 @@ struct QuestDetailView: View {
                         .foregroundColor(.gray)
                 }
             }
+
+            Section("Standort / Karte") {
+                TextField("Standort-Adresse", text: $localLocationString)
+                    .textInputAutocapitalization(.never)
+                
+                GoogleMapView(locationString: localLocationString)
+                    .frame(height: 200)
+            }
             
             if let errorMessage = errorMessage {
                 Text(errorMessage)
@@ -197,22 +189,18 @@ struct QuestDetailView: View {
             
             Section {
                 Button("Speichern") {
-                    print("SPEICHERN BEGINNT: Lokales Bild = \(String(describing: localSelectedImage))")
-                    
                     if let image = localSelectedImage {
-                        print("UPLOAD VORBEREITET: Bild wird hochgeladen...")
                         questLogVM.uploadImage(image, for: quest) { result in
                             switch result {
-                            case .success(let url):
-                                print("UPLOAD ERFOLGREICH: Bild-URL = \(url)")
+                            case .success(let uploadedURLString):
+                                localImageURLs.append(uploadedURLString)
                                 saveQuestData()
+                                
                             case .failure(let error):
-                                print("UPLOAD ERROR: \(error.localizedDescription)")
                                 errorMessage = "Fehler beim Hochladen: \(error.localizedDescription)"
                             }
                         }
                     } else {
-                        print("KEIN LOKALES BILD: Speichere nur Quest-Daten")
                         saveQuestData()
                     }
                 }
@@ -231,6 +219,11 @@ struct QuestDetailView: View {
                 .environmentObject(characterVM)
                 .environmentObject(userViewModel)
         }
+        .sheet(isPresented: $showFullScreenImage) {
+            if let imageURL = selectedImageURL {
+                LargeImageView(imageURL: imageURL, title: quest.title)
+            }
+        }
     }
     
     private func saveQuestData() {
@@ -244,10 +237,53 @@ struct QuestDetailView: View {
             reward: reward.isEmpty ? nil : reward,
             creatorDisplayName: quest.creatorDisplayName,
             assignedCharacterIds: quest.assignedCharacterIds,
-            imageURLs: quest.imageURLs // URLs sicherstellen
+            imageURLs: localImageURLs,
+            locationString: localLocationString,
+            personalNotes: personalNotes
         )
         
         questLogVM.updateQuest(updatedQuest)
         dismiss()
+    }
+}
+
+struct LargeImageView: View {
+    let imageURL: URL
+    let title: String
+    
+    @Environment(\.dismiss) var dismiss
+    
+    var body: some View {
+        NavigationView {
+            AsyncImage(url: imageURL) { phase in
+                switch phase {
+                case .empty:
+                    ProgressView()
+                        .scaleEffect(1.5)
+                case .success(let image):
+                    image
+                        .resizable()
+                        .scaledToFit()
+                        .background(Color.black)
+                        .ignoresSafeArea(edges: .bottom)
+                case .failure:
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .resizable()
+                        .scaledToFit()
+                        .foregroundColor(.red)
+                @unknown default:
+                    EmptyView()
+                }
+            }
+            .navigationTitle(title)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Schließen") {
+                        dismiss()
+                    }
+                }
+            }
+        }
     }
 }
