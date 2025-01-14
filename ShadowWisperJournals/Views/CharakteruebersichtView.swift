@@ -18,17 +18,48 @@ struct CharakteruebersichtView: View {
                 if let userId = userViewModel.user?.id {
                     List(characterVM.characters) { character in
                         NavigationLink(
-                            destination: CharacterDetailView(
-                                character: character)
+                            destination: CharacterDetailView(character: character)
                         ) {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text(character.name)
-                                    .font(.headline)
-                                Text(
-                                    "Erstellt am \(character.createdAt.formatted(date: .abbreviated, time: .omitted))"
-                                )
-                                .font(.subheadline)
-                                .foregroundColor(.gray)
+                            HStack(spacing: 12) {
+                                if let profileURL = character.profileImageURL,
+                                   let url = URL(string: profileURL)
+                                {
+                                    AsyncImage(url: url) { phase in
+                                        switch phase {
+                                        case .empty:
+                                            ProgressView()
+                                                .frame(width: 40, height: 40)
+                                        case .success(let image):
+                                            image
+                                                .resizable()
+                                                .scaledToFill()
+                                                .frame(width: 40, height: 40)
+                                                .clipShape(Circle())
+                                        case .failure:
+                                            Image(systemName: "person.crop.circle.fill")
+                                                .resizable()
+                                                .scaledToFit()
+                                                .frame(width: 40, height: 40)
+                                                .foregroundColor(.gray)
+                                        @unknown default:
+                                            EmptyView()
+                                        }
+                                    }
+                                } else {
+                                    Image(systemName: "person.crop.circle.fill")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 40, height: 40)
+                                        .foregroundColor(.gray)
+                                }
+
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(character.name)
+                                        .font(.headline)
+                                    Text("Erstellt am \(character.createdAt.formatted(date: .abbreviated, time: .omitted))")
+                                        .font(.subheadline)
+                                        .foregroundColor(.gray)
+                                }
                             }
                         }
                     }
@@ -42,8 +73,7 @@ struct CharakteruebersichtView: View {
                         }
                     }
                     .sheet(isPresented: $showAddCharacterSheet) {
-                        AddCharacterView(
-                            characterVM: characterVM, userId: userId)
+                        AddCharacterView(characterVM: characterVM, userId: userId)
                     }
                     .onAppear {
                         characterVM.fetchCharacters(for: userId)
@@ -55,6 +85,7 @@ struct CharakteruebersichtView: View {
         }
     }
 }
+
 #Preview {
     CharakteruebersichtView()
 }

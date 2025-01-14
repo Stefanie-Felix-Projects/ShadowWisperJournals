@@ -13,4 +13,5 @@ struct Chat: Identifiable, Codable {
     var participants: [String]
     var lastMessage: String?
     var updatedAt: Date
+    var participantsSortedKey: String?
 }

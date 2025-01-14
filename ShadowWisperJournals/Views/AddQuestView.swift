@@ -63,7 +63,7 @@ struct AddQuestView: View {
                                 }
                             }
                         }
-                        .frame(minHeight: 200)
+                        .frame(minHeight: 30)
                     }
                 }
 

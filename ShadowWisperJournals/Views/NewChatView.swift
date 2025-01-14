@@ -11,59 +11,88 @@ struct NewChatView: View {
     @Environment(\.dismiss) var dismiss
 
     @ObservedObject var chatVM: ChatViewModel
-    @EnvironmentObject var userViewModel: ShadowWisperUserViewModel
 
+    let onSuccess: (() -> Void)?
+
+    @EnvironmentObject var userViewModel: ShadowWisperUserViewModel
     @StateObject private var characterVM = CharacterViewModel()
 
-    @State private var searchText: String = ""
-    @State private var selectedCharacterId: String? = nil
+    @State private var mySelectedCharId: String? = nil
+    @State private var otherSelectedCharId: String? = nil
 
+    @State private var searchText: String = ""
     @State private var initialMessage: String = ""
+
+    private var myCharacters: [Character] {
+        guard let userId = userViewModel.userId else { return [] }
+        return characterVM.characters.filter { $0.userId == userId }
+    }
+
+    private var otherCharacters: [Character] {
+        guard let userId = userViewModel.userId else { return characterVM.characters }
+        return characterVM.characters.filter { $0.userId != userId }
+    }
 
     var body: some View {
         NavigationStack {
             Form {
-                Section("Charakter auswählen") {
-                    TextField("Suche nach Charakter...", text: $searchText)
-
-                    let filteredCharacters = characterVM.characters.filter {
-                        char in
-                        if char.userId == userViewModel.userId {
-                            return false
-                        }
-                        if searchText.isEmpty { return true }
-                        return char.name.localizedCaseInsensitiveContains(
-                            searchText)
-                    }
-
-                    List(filteredCharacters) { character in
+                Section("Mit welchem meiner Charaktere schreibe ich?") {
+                    List(myCharacters, id: \.id) { ch in
                         HStack {
-                            Text(character.name)
+                            Text(ch.name)
                             Spacer()
-                            if selectedCharacterId == character.id {
+                            if mySelectedCharId == ch.id {
                                 Image(systemName: "checkmark")
                             }
                         }
                         .contentShape(Rectangle())
                         .onTapGesture {
-                            if selectedCharacterId == character.id {
-                                selectedCharacterId = nil
+                            if mySelectedCharId == ch.id {
+                                mySelectedCharId = nil
                             } else {
-                                selectedCharacterId = character.id
+                                mySelectedCharId = ch.id
                             }
                         }
                     }
-                    .frame(minHeight: 200)
+                }
+
+                Section("Wen möchtest du kontaktieren?") {
+                    TextField("Suche nach fremden Charakter...", text: $searchText)
+
+                    let filteredOthers = otherCharacters.filter { char in
+                        if searchText.isEmpty { return true }
+                        return char.name.localizedCaseInsensitiveContains(searchText)
+                    }
+
+                    List(filteredOthers, id: \.id) { ch in
+                        HStack {
+                            Text(ch.name)
+                            Spacer()
+                            if otherSelectedCharId == ch.id {
+                                Image(systemName: "checkmark")
+                            }
+                        }
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            if otherSelectedCharId == ch.id {
+                                otherSelectedCharId = nil
+                            } else {
+                                otherSelectedCharId = ch.id
+                            }
+                        }
+                    }
                 }
 
                 Section("Erste Nachricht (optional)") {
                     TextField("Hey, wie geht's?", text: $initialMessage)
                 }
 
-                Button("Chat erstellen") {
-                    createChat()
+                Section {
+                    Button("Chat erstellen") {
+                        createChatOrOpenExisting()
+                    }
+                    .disabled(mySelectedCharId == nil || otherSelectedCharId == nil)
                 }
-                .disabled(selectedCharacterId == nil)
             }
             .navigationTitle("Neuen Chat starten")
             .toolbar {
@@ -74,33 +103,28 @@ struct NewChatView: View {
                 }
             }
             .onAppear {
-                if userViewModel.userId != nil {
-                    characterVM.fetchAllCharacters()
-                }
+                characterVM.fetchAllCharacters()
             }
         }
     }
 
-    private func createChat() {
-        guard let myUserId = userViewModel.userId else { return }
-        guard let otherCharId = selectedCharacterId else { return }
+    private func createChatOrOpenExisting() {
+        guard let myCharId = mySelectedCharId else { return }
+        guard let otherCharId = otherSelectedCharId else { return }
 
-        guard
-            let otherChar = characterVM.characters.first(where: {
-                $0.id == otherCharId
-            })
-        else { return }
-
-        let otherUserId = otherChar.userId
-
-        let participants = [myUserId, otherUserId]
+        let participants = [myCharId, otherCharId]
 
         chatVM.createNewChat(
             participants: participants,
             initialMessage: initialMessage,
-            senderId: myUserId
-        )
+            senderCharId: myCharId
+        ) { chat in
+            if chat != nil {
+                self.dismiss()
 
-        dismiss()
+            } else {
+                self.dismiss()
+            }
+        }
     }
 }

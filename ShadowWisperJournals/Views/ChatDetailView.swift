@@ -8,68 +8,50 @@
 import SwiftUI
 
 struct ChatDetailView: View {
-    @EnvironmentObject var userViewModel: ShadowWisperUserViewModel
-    @StateObject private var chatVM = ChatViewModel()
+    @ObservedObject var chatVM: ChatViewModel
+    @StateObject private var characterVM = CharacterViewModel()
 
     let chat: Chat
-
     @State private var newMessageText: String = ""
+
+    @EnvironmentObject var userViewModel: ShadowWisperUserViewModel
+
+    private var myCharIdInThisChat: String? {
+        guard let userId = userViewModel.userId else { return nil }
+        let myChars = characterVM.characters.filter { $0.userId == userId }
+        return myChars.first(where: { chat.participants.contains($0.id ?? "") })?.id
+    }
+
+    private var messageViews: [AnyView] {
+        chatVM.messages.map { msg in
+            let allHaveRead = isMessageReadByAll(message: msg, chat: chat)
+            let readByMe = myCharIdInThisChat.map { msg.readBy.contains($0) } ?? false
+            let isMine = (msg.senderId == myCharIdInThisChat)
+
+            let subview = MessageBubbleView(
+                message: msg,
+                isMine: isMine,
+                allHaveRead: allHaveRead,
+                readByMe: readByMe,
+                onAppearAction: {
+                    guard !isMine, let me = myCharIdInThisChat else { return }
+                    if !msg.readBy.contains(me) {
+                        chatVM.markMessageAsRead(msg, by: me, in: chat.id ?? "")
+                    }
+                }
+            )
+            return AnyView(subview)
+        }
+    }
 
     var body: some View {
         VStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 8) {
-
-                    ForEach(chatVM.messages) { message in
-
-                        if message.senderId == userViewModel.userId {
-                            HStack {
-                                Spacer()
-                                VStack(alignment: .trailing) {
-                                    Text(message.text)
-                                        .padding(8)
-                                        .background(Color.blue.opacity(0.2))
-                                        .cornerRadius(8)
-
-                                    if isMessageReadByAll(
-                                        message: message, chat: chat)
-                                    {
-                                        Text("Gelesen von allen")
-                                            .font(.caption2)
-                                            .foregroundColor(.gray)
-                                    } else if message.readBy.contains(
-                                        userViewModel.userId ?? "")
-                                    {
-                                        Text("Gelesen von dir")
-                                            .font(.caption2)
-                                            .foregroundColor(.gray)
-                                    }
-                                }
-                            }
-
-                        } else {
-                            VStack(alignment: .leading) {
-                                Text(message.text)
-                                    .padding(8)
-                                    .background(Color.green.opacity(0.2))
-                                    .cornerRadius(8)
-
-                            }
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .onAppear {
-                                if !message.readBy.contains(
-                                    userViewModel.userId ?? "")
-                                {
-                                    chatVM.markMessageAsRead(
-                                        message,
-                                        by: userViewModel.userId ?? "",
-                                        in: chat.id ?? ""
-                                    )
-                                }
-                            }
-                        }
+                    // Wir durchlaufen die Indizes
+                    ForEach(messageViews.indices, id: \.self) { i in
+                        messageViews[i]
                     }
-
                 }
                 .padding()
             }
@@ -83,7 +65,7 @@ struct ChatDetailView: View {
                 } label: {
                     Image(systemName: "paperplane.fill")
                 }
-                .disabled(newMessageText.isEmpty)
+                .disabled(newMessageText.isEmpty || myCharIdInThisChat == nil)
             }
             .padding()
         }
@@ -92,6 +74,7 @@ struct ChatDetailView: View {
             if let chatId = chat.id {
                 chatVM.fetchMessages(for: chatId)
             }
+            characterVM.fetchAllCharacters()
         }
         .onDisappear {
             chatVM.removeMessagesListener()
@@ -99,14 +82,14 @@ struct ChatDetailView: View {
     }
 
     private func sendMessage() {
-        guard let userId = userViewModel.userId else { return }
-        chatVM.sendMessage(to: chat, senderId: userId, text: newMessageText)
+        guard let myCharId = myCharIdInThisChat else { return }
+        chatVM.sendMessage(to: chat, senderCharId: myCharId, text: newMessageText)
         newMessageText = ""
     }
 
     private func isMessageReadByAll(message: ChatMessage, chat: Chat) -> Bool {
-        for participant in chat.participants {
-            if !message.readBy.contains(participant) {
+        for participantCharId in chat.participants {
+            if !message.readBy.contains(participantCharId) {
                 return false
             }
         }
