@@ -3,7 +3,7 @@
 //  ShadowWisperJournals
 //
 //  Created by Stefanie Seeck on 12.01.25.
-//
+// Test
 
 import UIKit
 import GoogleMaps
