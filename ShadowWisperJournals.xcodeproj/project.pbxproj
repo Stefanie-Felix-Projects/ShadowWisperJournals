@@ -23,7 +23,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		F935F8CE2D268C6E00157EA3 /* ShadowWisperJournals */ = {
+		F9EC791A2D368B2300AD1626 /* ShadowWisperJournals */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = ShadowWisperJournals;
 			sourceTree = "<group>";
@@ -53,7 +53,7 @@
 		F935F8C32D268C6E00157EA3 = {
 			isa = PBXGroup;
 			children = (
-				F935F8CE2D268C6E00157EA3 /* ShadowWisperJournals */,
+				F9EC791A2D368B2300AD1626 /* ShadowWisperJournals */,
 				F935F9802D26C6D200157EA3 /* Frameworks */,
 				F935F8CD2D268C6E00157EA3 /* Products */,
 			);
@@ -90,7 +90,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				F935F8CE2D268C6E00157EA3 /* ShadowWisperJournals */,
+				F9EC791A2D368B2300AD1626 /* ShadowWisperJournals */,
 			);
 			name = ShadowWisperJournals;
 			packageProductDependencies = (
@@ -294,6 +294,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"ShadowWisperJournals/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
@@ -332,6 +333,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"ShadowWisperJournals/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;

@@ -28,3 +28,9 @@ struct YouTubePlayerView: UIViewRepresentable {
         uiView.load(request)
     }
 }
+
+struct YouTubePlayerView_Previews: PreviewProvider {
+    static var previews: some View {
+        YouTubePlayerView(videoID: "T2QZpy07j4s")
+    }
+}
