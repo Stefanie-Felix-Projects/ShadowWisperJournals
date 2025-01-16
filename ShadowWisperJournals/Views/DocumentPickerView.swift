@@ -9,41 +9,35 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 struct DocumentPickerView: UIViewControllerRepresentable {
-    
-    let onPicked: (URL) -> Void
-    
+    var onPick: (URL) -> Void
+
     func makeCoordinator() -> Coordinator {
-        Coordinator(onPicked: onPicked)
+        Coordinator(self, onPick: onPick)
     }
-    
+
     func makeUIViewController(context: Context) -> UIDocumentPickerViewController {
-        let picker = UIDocumentPickerViewController(forOpeningContentTypes: [UTType.audio])
-        picker.allowsMultipleSelection = false
+        let supportedTypes: [UTType] = [.audio]
+        let picker = UIDocumentPickerViewController(forOpeningContentTypes: supportedTypes, asCopy: true)
         picker.delegate = context.coordinator
+        picker.allowsMultipleSelection = false
         return picker
     }
-    
-    func updateUIViewController(_ uiViewController: UIDocumentPickerViewController, context: Context) {
-    }
-    
-    class Coordinator: NSObject, UIDocumentPickerDelegate {
-        
-        let onPicked: (URL) -> Void
-        
-        init(onPicked: @escaping (URL) -> Void) {
-            self.onPicked = onPicked
-        }
-        
-        func documentPicker(_ controller: UIDocumentPickerViewController,
-                            didPickDocumentsAt urls: [URL]) {
-            guard let url = urls.first else { return }
-            onPicked(url)
-        }
-    }
-}
 
-struct DocumentPickerView_Previews: PreviewProvider {
-    static var previews: some View {
-        DocumentPickerView { _ in }
+    func updateUIViewController(_ uiViewController: UIDocumentPickerViewController, context: Context) {}
+
+    class Coordinator: NSObject, UIDocumentPickerDelegate {
+        let parent: DocumentPickerView
+        let onPick: (URL) -> Void
+
+        init(_ parent: DocumentPickerView, onPick: @escaping (URL) -> Void) {
+            self.parent = parent
+            self.onPick = onPick
+        }
+
+        func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
+            if let url = urls.first {
+                onPick(url)
+            }
+        }
     }
 }

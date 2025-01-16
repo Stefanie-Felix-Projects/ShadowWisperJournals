@@ -42,7 +42,6 @@ struct YouTubePlayerView: UIViewRepresentable {
     }
 
     class Coordinator: NSObject, WKNavigationDelegate {
-        // Hier kannst du weitere Navigation Delegate Methoden implementieren, falls nötig
     }
 }
 

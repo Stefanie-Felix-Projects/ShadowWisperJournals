@@ -9,7 +9,7 @@ import SwiftUI
 import Firebase
 import FirebaseAuth
 import FirebaseFirestore
-import AVFoundation // Hinzugefügt
+import AVFoundation
 
 @MainActor
 class SoundViewModel: ObservableObject {
@@ -24,7 +24,8 @@ class SoundViewModel: ObservableObject {
     @Published var favoriteVideos: [FavoriteVideo] = []
     @Published var ownSounds: [URL] = []
     @Published var showingDocumentPicker: Bool = false
-    @Published var audioPlayer = AudioPlayer() // Hinzugefügt
+    @Published var audioPlayer = AudioPlayer()
+    @Published var loopStates: [URL: Bool] = [:]
     
     private let youTubeService: YouTubeService
     private let db = Firestore.firestore()
@@ -43,13 +44,12 @@ class SoundViewModel: ObservableObject {
 
         authenticateUser()
         loadOwnSounds()
-        loadTestSounds() // Hinzugefügt
+        loadTestSounds()
     }
-    
-    // Neue Methode zum Laden von Test-Sounds
+
     private func loadTestSounds() {
-        let soundNames = ["Flesh Monster", "Desert Ash", "Chill Relax"] // Ersetze mit deinen tatsächlichen Sound-Dateinamen ohne Erweiterung
-        let extensions = ["mp3", "wav"] // Liste der unterstützten Erweiterungen
+        let soundNames = ["Flesh Monster", "Desert Ash", "Chill Relax"]
+        let extensions = ["mp3", "wav"]
 
         for soundName in soundNames {
             var soundFound = false
@@ -57,13 +57,30 @@ class SoundViewModel: ObservableObject {
                 if let url = Bundle.main.url(forResource: soundName, withExtension: ext) {
                     ownSounds.append(url)
                     soundFound = true
-                    break // Stoppe die Schleife, wenn die Datei gefunden wurde
+                    break
                 }
             }
             if !soundFound {
                 print("Sound \(soundName) mit den Erweiterungen \(extensions.joined(separator: ", ")) nicht gefunden.")
             }
         }
+    }
+    
+    func playOwnSound(url: URL) {
+        audioPlayer.playSound(url: url, loop: loopStates[url] ?? false)
+    }
+
+    func pauseOwnSound(url: URL) {
+        audioPlayer.pauseSound(url: url)
+    }
+
+    func stopOwnSound(url: URL) {
+        audioPlayer.stopSound(url: url)
+    }
+
+    func toggleLoopOwnSound(url: URL) {
+        let isLooping = audioPlayer.toggleLoop(url: url)
+        loopStates[url] = isLooping
     }
 
     func authenticateUser() {
@@ -122,11 +139,6 @@ class SoundViewModel: ObservableObject {
         saveOwnSounds()
     }
     
-    // Neue Methode zum Abspielen eigener Sounds
-    func playOwnSound(url: URL) {
-        audioPlayer.playSound(url: url)
-    }
-
     private func loadFavorites() {
         guard let userID = userID else { return }
         db.collection("users").document(userID).getDocument { [weak self] document, error in

@@ -11,7 +11,7 @@ import UniformTypeIdentifiers
 
 struct SoundView: View {
     @StateObject private var viewModel = SoundViewModel()
-    @State private var isSearchResultsExpanded: Bool = false // Neuer State für Ein-/Ausklappen
+    @State private var isSearchResultsExpanded: Bool = false
 
     var body: some View {
         NavigationStack {
@@ -143,57 +143,87 @@ struct SoundView: View {
                 }
 
                 Section(header: Text("Eigene Sounds")) {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Button {
-                            viewModel.showingDocumentPicker = true
-                        } label: {
-                            Label("Datei auswählen", systemImage: "paperclip")
-                                .frame(maxWidth: .infinity, alignment: .center)
-                        }
-                        .buttonStyle(.bordered)
+                                    VStack(alignment: .leading, spacing: 8) {
+                                        Button {
+                                            viewModel.showingDocumentPicker = true
+                                        } label: {
+                                            Label("Datei auswählen", systemImage: "paperclip")
+                                                .frame(maxWidth: .infinity, alignment: .center)
+                                        }
+                                        .buttonStyle(.bordered)
 
-                        if viewModel.ownSounds.isEmpty {
-                            Text("Noch keine eigenen Sounds hinzugefügt.")
-                                .font(.footnote)
-                                .foregroundColor(.gray)
-                                .frame(maxWidth: .infinity, alignment: .center)
-                                .padding(.top, 5)
-                        } else {
-                            ForEach(viewModel.ownSounds, id: \.self) { soundURL in
-                                HStack {
-                                    Text(soundURL.lastPathComponent)
-                                        .padding(.vertical, 5)
-                                        .frame(maxWidth: .infinity, alignment: .leading)
-                                        .background(Color(UIColor.secondarySystemBackground))
-                                        .cornerRadius(6)
-                                    
-                                    Button(action: {
-                                        viewModel.playOwnSound(url: soundURL)
-                                    }) {
-                                        Image(systemName: "play.circle")
-                                            .font(.title2)
+                                        if viewModel.ownSounds.isEmpty {
+                                            Text("Noch keine eigenen Sounds hinzugefügt.")
+                                                .font(.footnote)
+                                                .foregroundColor(.gray)
+                                                .frame(maxWidth: .infinity, alignment: .center)
+                                                .padding(.top, 5)
+                                        } else {
+                                            ForEach(viewModel.ownSounds, id: \.self) { soundURL in
+                                                VStack(alignment: .leading) {
+                                                    HStack {
+                                                        Text(soundURL.lastPathComponent)
+                                                            .padding(.vertical, 5)
+                                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                                            .background(Color(UIColor.secondarySystemBackground))
+                                                            .cornerRadius(6)
+                                                        
+                                                        HStack(spacing: 20) {
+                                                            Button(action: {
+                                                                viewModel.playOwnSound(url: soundURL)
+                                                            }) {
+                                                                Image(systemName: "play.circle")
+                                                                    .font(.title2)
+                                                            }
+                                                            .buttonStyle(PlainButtonStyle())
+
+                                                            Button(action: {
+                                                                viewModel.pauseOwnSound(url: soundURL)
+                                                            }) {
+                                                                Image(systemName: "pause.circle")
+                                                                    .font(.title2)
+                                                            }
+                                                            .buttonStyle(PlainButtonStyle())
+
+                                                            Button(action: {
+                                                                viewModel.stopOwnSound(url: soundURL)
+                                                            }) {
+                                                                Image(systemName: "stop.circle")
+                                                                    .font(.title2)
+                                                            }
+                                                            .buttonStyle(PlainButtonStyle())
+
+                                                            Button(action: {
+                                                                viewModel.toggleLoopOwnSound(url: soundURL)
+                                                            }) {
+                                                                Image(systemName: viewModel.loopStates[soundURL] == true ? "repeat.circle.fill" : "repeat.circle")
+                                                                    .font(.title2)
+                                                                    .foregroundColor(viewModel.loopStates[soundURL] == true ? .blue : .primary)
+                                                            }
+                                                            .buttonStyle(PlainButtonStyle())
+                                                        }
+                                                    }
+                                                    .padding(.vertical, 2)
+                                                }
+                                            }
+                                        }
                                     }
-                                    .buttonStyle(PlainButtonStyle())
+                                }
+                            }
+                            .listStyle(InsetGroupedListStyle())
+                            .navigationTitle("Soundbereich")
+                            .navigationBarTitleDisplayMode(.inline)
+                            .sheet(isPresented: $viewModel.showingDocumentPicker) {
+                                DocumentPickerView { url in
+                                    viewModel.addOwnSound(url: url)
                                 }
                             }
                         }
                     }
                 }
-            }
-            .listStyle(InsetGroupedListStyle())
-            .navigationTitle("Soundbereich")
-            .navigationBarTitleDisplayMode(.inline)
-            .sheet(isPresented: $viewModel.showingDocumentPicker) {
-                DocumentPickerView { url in
-                    viewModel.addOwnSound(url: url)
-                }
-            }
-        }
-    }
-}
 
-struct SoundView_Previews: PreviewProvider {
-    static var previews: some View {
-        SoundView()
-    }
-}
+                struct SoundView_Previews: PreviewProvider {
+                    static var previews: some View {
+                        SoundView()
+                    }
+                }
