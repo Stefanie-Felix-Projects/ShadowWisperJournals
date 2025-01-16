@@ -160,11 +160,21 @@ struct SoundView: View {
                                 .padding(.top, 5)
                         } else {
                             ForEach(viewModel.ownSounds, id: \.self) { soundURL in
-                                Text(soundURL.lastPathComponent)
-                                    .padding(.vertical, 5)
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                    .background(Color(UIColor.secondarySystemBackground))
-                                    .cornerRadius(6)
+                                HStack {
+                                    Text(soundURL.lastPathComponent)
+                                        .padding(.vertical, 5)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                        .background(Color(UIColor.secondarySystemBackground))
+                                        .cornerRadius(6)
+                                    
+                                    Button(action: {
+                                        viewModel.playOwnSound(url: soundURL)
+                                    }) {
+                                        Image(systemName: "play.circle")
+                                            .font(.title2)
+                                    }
+                                    .buttonStyle(PlainButtonStyle())
+                                }
                             }
                         }
                     }
@@ -179,5 +189,11 @@ struct SoundView: View {
                 }
             }
         }
+    }
+}
+
+struct SoundView_Previews: PreviewProvider {
+    static var previews: some View {
+        SoundView()
     }
 }

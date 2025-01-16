@@ -9,6 +9,7 @@ import SwiftUI
 import Firebase
 import FirebaseAuth
 import FirebaseFirestore
+import AVFoundation // Hinzugefügt
 
 @MainActor
 class SoundViewModel: ObservableObject {
@@ -23,7 +24,8 @@ class SoundViewModel: ObservableObject {
     @Published var favoriteVideos: [FavoriteVideo] = []
     @Published var ownSounds: [URL] = []
     @Published var showingDocumentPicker: Bool = false
-
+    @Published var audioPlayer = AudioPlayer() // Hinzugefügt
+    
     private let youTubeService: YouTubeService
     private let db = Firestore.firestore()
     private var userID: String?
@@ -36,11 +38,32 @@ class SoundViewModel: ObservableObject {
            let key = dict["YouTubeAPIKey"] as? String {
             self.youTubeService = YouTubeService(apiKey: key)
         } else {
-            fatalError("YouTube API Key not found in GoogleService-Info.plist")
+            fatalError("YouTube API Key nicht in GoogleService-Info.plist gefunden")
         }
 
         authenticateUser()
         loadOwnSounds()
+        loadTestSounds() // Hinzugefügt
+    }
+    
+    // Neue Methode zum Laden von Test-Sounds
+    private func loadTestSounds() {
+        let soundNames = ["Flesh Monster", "Desert Ash", "Chill Relax"] // Ersetze mit deinen tatsächlichen Sound-Dateinamen ohne Erweiterung
+        let extensions = ["mp3", "wav"] // Liste der unterstützten Erweiterungen
+
+        for soundName in soundNames {
+            var soundFound = false
+            for ext in extensions {
+                if let url = Bundle.main.url(forResource: soundName, withExtension: ext) {
+                    ownSounds.append(url)
+                    soundFound = true
+                    break // Stoppe die Schleife, wenn die Datei gefunden wurde
+                }
+            }
+            if !soundFound {
+                print("Sound \(soundName) mit den Erweiterungen \(extensions.joined(separator: ", ")) nicht gefunden.")
+            }
+        }
     }
 
     func authenticateUser() {
@@ -97,6 +120,11 @@ class SoundViewModel: ObservableObject {
     func addOwnSound(url: URL) {
         ownSounds.append(url)
         saveOwnSounds()
+    }
+    
+    // Neue Methode zum Abspielen eigener Sounds
+    func playOwnSound(url: URL) {
+        audioPlayer.playSound(url: url)
     }
 
     private func loadFavorites() {
