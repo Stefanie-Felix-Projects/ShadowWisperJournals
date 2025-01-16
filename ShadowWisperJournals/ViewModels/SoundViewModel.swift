@@ -5,8 +5,10 @@
 //  Created by Stefanie Seeck on 14.01.25.
 //
 
-import Foundation
 import SwiftUI
+import Firebase
+import FirebaseAuth
+import FirebaseFirestore
 
 @MainActor
 class SoundViewModel: ObservableObject {
@@ -19,7 +21,8 @@ class SoundViewModel: ObservableObject {
     @Published var showingDocumentPicker: Bool = false
 
     private let youTubeService: YouTubeService
-
+    private let db = Firestore.firestore()
+    private var userID: String?
 
     init() {
         if let path = Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist"),
@@ -30,8 +33,24 @@ class SoundViewModel: ObservableObject {
             fatalError("YouTube API Key not found in GoogleService-Info.plist")
         }
 
-        loadFavorites()
+        authenticateUser()
         loadOwnSounds()
+    }
+
+    func authenticateUser() {
+        if let user = Auth.auth().currentUser {
+            self.userID = user.uid
+            loadFavorites()
+        } else {
+            Auth.auth().signInAnonymously { [weak self] authResult, error in
+                if let error = error {
+                    print("Fehler bei der anonymen Anmeldung: \(error)")
+                    return
+                }
+                self?.userID = authResult?.user.uid
+                self?.loadFavorites()
+            }
+        }
     }
 
     func searchOnYouTube() async {
@@ -49,9 +68,18 @@ class SoundViewModel: ObservableObject {
     }
 
     func addToFavorites(videoId: String) {
+        guard let userID = userID else { return }
         if !favoriteVideos.contains(videoId) {
             favoriteVideos.append(videoId)
-            saveFavorites()
+            saveFavoritesToFirestore()
+        }
+    }
+
+    func removeFromFavorites(videoId: String) {
+        guard let userID = userID else { return }
+        if let index = favoriteVideos.firstIndex(of: videoId) {
+            favoriteVideos.remove(at: index)
+            saveFavoritesToFirestore()
         }
     }
 
@@ -60,17 +88,30 @@ class SoundViewModel: ObservableObject {
         saveOwnSounds()
     }
 
-    private let favoritesKey = "FavoriteVideos"
     private let ownSoundsKey = "OwnSounds"
 
     private func loadFavorites() {
-        if let savedFavorites = UserDefaults.standard.array(forKey: favoritesKey) as? [String] {
-            self.favoriteVideos = savedFavorites
+        guard let userID = userID else { return }
+        db.collection("users").document(userID).getDocument { [weak self] document, error in
+            if let error = error {
+                print("Fehler beim Laden der Favoriten: \(error)")
+                return
+            }
+            if let data = document?.data(), let favorites = data["favoriteVideos"] as? [String] {
+                self?.favoriteVideos = favorites
+            }
         }
     }
 
-    private func saveFavorites() {
-        UserDefaults.standard.set(favoriteVideos, forKey: favoritesKey)
+    private func saveFavoritesToFirestore() {
+        guard let userID = userID else { return }
+        db.collection("users").document(userID).setData([
+            "favoriteVideos": favoriteVideos
+        ], merge: true) { error in
+            if let error = error {
+                print("Fehler beim Speichern der Favoriten: \(error)")
+            }
+        }
     }
 
     private func loadOwnSounds() {
