@@ -22,7 +22,6 @@ struct AddQuestView: View {
     @State private var reward: String = ""
 
     @State private var selectedCharacterIds: [String] = []
-    
     @State private var showImagePicker = false
     @State private var localSelectedImage: UIImage?
     @State private var errorMessage: String?
@@ -31,18 +30,6 @@ struct AddQuestView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Quest-Daten") {
-                    TextField("Titel", text: $title)
-                    TextField("Beschreibung", text: $description)
-                    TextField("Belohnung (optional)", text: $reward)
-
-                    Picker("Status", selection: $status) {
-                        Text("Aktiv").tag("aktiv")
-                        Text("Abgeschlossen").tag("abgeschlossen")
-                    }
-                    .pickerStyle(.segmented)
-                }
-
                 Section("Charaktere zuweisen") {
                     let availableCharacters = characterVM.characters
 
@@ -52,18 +39,18 @@ struct AddQuestView: View {
                     } else {
                         List(availableCharacters, id: \.id) { character in
                             let cId = character.id ?? ""
-                            MultipleSelectionRow(
-                                title: character.name,
-                                isSelected: selectedCharacterIds.contains(cId)
-                            ) {
-                                if selectedCharacterIds.contains(cId) {
-                                    selectedCharacterIds.removeAll { $0 == cId }
-                                } else {
-                                    selectedCharacterIds.append(cId)
+                            CharacterRow(
+                                character: character,
+                                isSelected: selectedCharacterIds.contains(cId),
+                                toggleSelection: {
+                                    if selectedCharacterIds.contains(cId) {
+                                        selectedCharacterIds.removeAll { $0 == cId }
+                                    } else {
+                                        selectedCharacterIds.append(cId)
+                                    }
                                 }
-                            }
+                            )
                         }
-                        .frame(minHeight: 30)
                     }
                 }
 
@@ -97,7 +84,7 @@ struct AddQuestView: View {
                 Section("Standort") {
                     TextField("Adresse / Ort eingeben", text: $locationString)
                         .textInputAutocapitalization(.never)
-                    
+
                     GoogleMapView(locationString: locationString)
                         .frame(height: 200)
                 }

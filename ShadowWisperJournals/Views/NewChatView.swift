@@ -38,21 +38,17 @@ struct NewChatView: View {
             Form {
                 Section("Mit welchem meiner Charaktere schreibe ich?") {
                     List(myCharacters, id: \.id) { ch in
-                        HStack {
-                            Text(ch.name)
-                            Spacer()
-                            if mySelectedCharId == ch.id {
-                                Image(systemName: "checkmark")
+                        SelectableCharacterRow(
+                            character: ch,
+                            isSelected: mySelectedCharId == ch.id,
+                            toggleSelection: {
+                                if mySelectedCharId == ch.id {
+                                    mySelectedCharId = nil
+                                } else {
+                                    mySelectedCharId = ch.id
+                                }
                             }
-                        }
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            if mySelectedCharId == ch.id {
-                                mySelectedCharId = nil
-                            } else {
-                                mySelectedCharId = ch.id
-                            }
-                        }
+                        )
                     }
                 }
 
@@ -65,21 +61,17 @@ struct NewChatView: View {
                     }
 
                     List(filteredOthers, id: \.id) { ch in
-                        HStack {
-                            Text(ch.name)
-                            Spacer()
-                            if otherSelectedCharId == ch.id {
-                                Image(systemName: "checkmark")
+                        SelectableCharacterRow(
+                            character: ch,
+                            isSelected: otherSelectedCharId == ch.id,
+                            toggleSelection: {
+                                if otherSelectedCharId == ch.id {
+                                    otherSelectedCharId = nil
+                                } else {
+                                    otherSelectedCharId = ch.id
+                                }
                             }
-                        }
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            if otherSelectedCharId == ch.id {
-                                otherSelectedCharId = nil
-                            } else {
-                                otherSelectedCharId = ch.id
-                            }
-                        }
+                        )
                     }
                 }
 

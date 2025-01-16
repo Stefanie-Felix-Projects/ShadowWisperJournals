@@ -86,7 +86,47 @@ struct QuestDetailView: View {
                    !assignedCharacterIds.isEmpty {
                     ForEach(assignedCharacterIds, id: \.self) { charId in
                         if let foundChar = characterVM.characters.first(where: { $0.id == charId }) {
-                            Text(foundChar.name)
+                            HStack {
+                                if let profileImageURL = foundChar.profileImageURL, let url = URL(string: profileImageURL) {
+                                    AsyncImage(url: url) { phase in
+                                        switch phase {
+                                        case .empty:
+                                            ProgressView()
+                                                .frame(width: 40, height: 40)
+                                        case .success(let image):
+                                            image
+                                                .resizable()
+                                                .scaledToFill()
+                                                .frame(width: 40, height: 40)
+                                                .clipShape(Circle())
+                                        case .failure:
+                                            Image(systemName: "person.crop.circle.fill")
+                                                .resizable()
+                                                .scaledToFit()
+                                                .frame(width: 40, height: 40)
+                                                .foregroundColor(.gray)
+                                        @unknown default:
+                                            EmptyView()
+                                        }
+                                    }
+                                } else {
+                                    Image(systemName: "person.crop.circle.fill")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 40, height: 40)
+                                        .foregroundColor(.gray)
+                                }
+
+                                VStack(alignment: .leading) {
+                                    Text(foundChar.name)
+                                        .font(.headline)
+                                    if let metaType = foundChar.metaType {
+                                        Text(metaType)
+                                            .font(.subheadline)
+                                            .foregroundColor(.gray)
+                                    }
+                                }
+                            }
                         } else {
                             Text("Unbekannter Charakter (ID: \(charId))")
                                 .foregroundColor(.gray)
@@ -96,7 +136,7 @@ struct QuestDetailView: View {
                     Text("Keine Charaktere zugewiesen.")
                         .foregroundColor(.gray)
                 }
-                
+
                 Button("Charaktere zuweisen") {
                     showAssignCharactersSheet = true
                 }

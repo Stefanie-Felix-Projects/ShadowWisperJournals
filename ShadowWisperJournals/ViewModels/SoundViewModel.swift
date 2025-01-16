@@ -16,11 +16,13 @@ class SoundViewModel: ObservableObject {
     @Published var searchQuery: String = ""
     @Published var searchResults: [VideoItem] = []
     @Published var isLoading: Bool = false
-    @Published var videoID: String = UserDefaults.standard.string(forKey: "LastPlayedVideoID") ?? "T2QZpy07j4s" {
+    @Published var videoID: String = "" {
         didSet {
-            UserDefaults.standard.set(videoID, forKey: lastPlayedVideoKey)
+            guard let userID = userID else { return }
+            UserDefaults.standard.set(videoID, forKey: "\(userID)_LastPlayedVideoID")
         }
     }
+    
     @Published var favoriteVideos: [FavoriteVideo] = []
     @Published var ownSounds: [URL] = []
     @Published var showingDocumentPicker: Bool = false
@@ -38,6 +40,7 @@ class SoundViewModel: ObservableObject {
            let dict = NSDictionary(contentsOfFile: path),
            let key = dict["YouTubeAPIKey"] as? String {
             self.youTubeService = YouTubeService(apiKey: key)
+            self.videoID = UserDefaults.standard.string(forKey: "\(Auth.auth().currentUser?.uid ?? "unknown")_LastPlayedVideoID") ?? "T2QZpy07j4s"
         } else {
             fatalError("YouTube API Key nicht in GoogleService-Info.plist gefunden")
         }
@@ -87,6 +90,7 @@ class SoundViewModel: ObservableObject {
         if let user = Auth.auth().currentUser {
             self.userID = user.uid
             loadFavorites()
+            loadOwnSounds() // Ergänzt
         } else {
             Auth.auth().signInAnonymously { [weak self] authResult, error in
                 if let error = error {
@@ -95,6 +99,7 @@ class SoundViewModel: ObservableObject {
                 }
                 self?.userID = authResult?.user.uid
                 self?.loadFavorites()
+                self?.loadOwnSounds()
             }
         }
     }
@@ -114,7 +119,7 @@ class SoundViewModel: ObservableObject {
     }
 
     func addToFavorites(video: VideoItem) {
-        guard let userID = userID else { return }
+        guard userID != nil else { return }
         if !favoriteVideos.contains(where: { $0.id == video.idInfo.videoId }) {
             let favorite = FavoriteVideo(id: video.idInfo.videoId, title: video.snippet.title)
             favoriteVideos.append(favorite)
@@ -123,7 +128,7 @@ class SoundViewModel: ObservableObject {
     }
 
     func removeFromFavorites(videoId: String) {
-        guard let userID = userID else { return }
+        guard userID != nil else { return }
         if let index = favoriteVideos.firstIndex(where: { $0.id == videoId }) {
             favoriteVideos.remove(at: index)
             saveFavoritesToFirestore()
@@ -148,11 +153,13 @@ class SoundViewModel: ObservableObject {
             }
             if let data = document?.data(),
                let favoritesData = data["favoriteVideos"] as? [[String: String]] {
-                self?.favoriteVideos = favoritesData.compactMap { dict in
-                    if let id = dict["id"], let title = dict["title"] {
-                        return FavoriteVideo(id: id, title: title)
+                DispatchQueue.main.async {
+                    self?.favoriteVideos = favoritesData.compactMap { dict in
+                        if let id = dict["id"], let title = dict["title"] {
+                            return FavoriteVideo(id: id, title: title)
+                        }
+                        return nil
                     }
-                    return nil
                 }
             }
         }
@@ -171,13 +178,16 @@ class SoundViewModel: ObservableObject {
     }
     
     private func loadOwnSounds() {
-        if let savedSounds = UserDefaults.standard.array(forKey: ownSoundsKey) as? [String] {
+        let ownSoundsKeyForUser = "\(Auth.auth().currentUser?.uid ?? "unknown")_OwnSounds"
+        if let savedSounds = UserDefaults.standard.array(forKey: ownSoundsKeyForUser) as? [String] {
             self.ownSounds = savedSounds.compactMap { URL(string: $0) }
         }
     }
 
     private func saveOwnSounds() {
+        guard let userID = userID else { return }
+        let ownSoundsKeyForUser = "\(userID)_OwnSounds"
         let urlStrings = ownSounds.map { $0.absoluteString }
-        UserDefaults.standard.set(urlStrings, forKey: ownSoundsKey)
+        UserDefaults.standard.set(urlStrings, forKey: ownSoundsKeyForUser)
     }
 }
