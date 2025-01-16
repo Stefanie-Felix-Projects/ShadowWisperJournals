@@ -15,7 +15,11 @@ class SoundViewModel: ObservableObject {
     @Published var searchQuery: String = ""
     @Published var searchResults: [VideoItem] = []
     @Published var isLoading: Bool = false
-    @Published var videoID: String = "T2QZpy07j4s"
+    @Published var videoID: String = UserDefaults.standard.string(forKey: "LastPlayedVideoID") ?? "T2QZpy07j4s" {
+        didSet {
+            UserDefaults.standard.set(videoID, forKey: lastPlayedVideoKey)
+        }
+    }
     @Published var favoriteVideos: [String] = []
     @Published var ownSounds: [URL] = []
     @Published var showingDocumentPicker: Bool = false
@@ -23,6 +27,8 @@ class SoundViewModel: ObservableObject {
     private let youTubeService: YouTubeService
     private let db = Firestore.firestore()
     private var userID: String?
+    private let ownSoundsKey = "OwnSounds"
+    private let lastPlayedVideoKey = "LastPlayedVideoID"
 
     init() {
         if let path = Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist"),
@@ -83,12 +89,14 @@ class SoundViewModel: ObservableObject {
         }
     }
 
+    func playFavoriteVideo(videoId: String) {
+        videoID = videoId
+    }
+
     func addOwnSound(url: URL) {
         ownSounds.append(url)
         saveOwnSounds()
     }
-
-    private let ownSoundsKey = "OwnSounds"
 
     private func loadFavorites() {
         guard let userID = userID else { return }
