@@ -9,9 +9,6 @@
 import SwiftUI
 import UniformTypeIdentifiers
 
-import SwiftUI
-import UniformTypeIdentifiers
-
 struct SoundView: View {
     @StateObject private var viewModel = SoundViewModel()
     @State private var isSearchResultsExpanded: Bool = false // Neuer State für Ein-/Ausklappen
@@ -19,13 +16,6 @@ struct SoundView: View {
     var body: some View {
         NavigationStack {
             List {
-                Section {
-                    Text("Soundbereich")
-                        .font(.title2)
-                        .frame(maxWidth: .infinity, alignment: .center)
-                        .padding(.vertical, 10)
-                }
-
                 Section(header: Text("Suche")) {
                     HStack {
                         TextField("Nach Schlagworten suchen...", text: $viewModel.searchQuery)
@@ -97,7 +87,7 @@ struct SoundView: View {
                                 }
                                 .swipeActions(edge: .trailing) {
                                     Button {
-                                        viewModel.addToFavorites(videoId: item.idInfo.videoId)
+                                        viewModel.addToFavorites(video: item)
                                     } label: {
                                         Label("Favorit", systemImage: "heart.fill")
                                     }
@@ -119,17 +109,30 @@ struct SoundView: View {
                     Section(header: Text("Deine Favoriten")) {
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: 10) {
-                                ForEach(viewModel.favoriteVideos, id: \.self) { favID in
-                                    Button {
-                                        viewModel.playFavoriteVideo(videoId: favID)
-                                    } label: {
-                                        VStack {
-                                            YouTubePlayerView(videoID: favID)
-                                                .frame(width: 200, height: 150)
-                                                .cornerRadius(8)
-                                            Text("Video ID: \(favID)")
-                                                .font(.footnote)
-                                                .foregroundColor(.gray)
+                                ForEach(viewModel.favoriteVideos) { favorite in
+                                    VStack {
+                                        Button {
+                                            viewModel.playFavoriteVideo(videoId: favorite.id)
+                                        } label: {
+                                            VStack {
+                                                YouTubePlayerView(videoID: favorite.id)
+                                                    .frame(width: 200, height: 150)
+                                                    .cornerRadius(8)
+                                                Text(favorite.title)
+                                                    .font(.footnote)
+                                                    .foregroundColor(.primary)
+                                                    .lineLimit(1) // Nur eine Zeile anzeigen
+                                                    .truncationMode(.tail) // Mit "..." abschneiden
+                                                    .frame(maxWidth: 180) // Breite des Textes einschränken
+                                                    .multilineTextAlignment(.center) // Text zentrieren
+                                            }
+                                        }
+                                        Button(role: .destructive) {
+                                            viewModel.removeFromFavorites(videoId: favorite.id)
+                                        } label: {
+                                            Label("Löschen", systemImage: "trash")
+                                                .font(.caption)
+                                                .foregroundColor(.red)
                                         }
                                     }
                                 }
@@ -175,12 +178,6 @@ struct SoundView: View {
                     viewModel.addOwnSound(url: url)
                 }
             }
-        }
-    }
-
-    struct SoundView_Previews: PreviewProvider {
-        static var previews: some View {
-            SoundView()
         }
     }
 }

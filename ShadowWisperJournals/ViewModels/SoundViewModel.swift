@@ -20,7 +20,7 @@ class SoundViewModel: ObservableObject {
             UserDefaults.standard.set(videoID, forKey: lastPlayedVideoKey)
         }
     }
-    @Published var favoriteVideos: [String] = []
+    @Published var favoriteVideos: [FavoriteVideo] = []
     @Published var ownSounds: [URL] = []
     @Published var showingDocumentPicker: Bool = false
 
@@ -73,17 +73,18 @@ class SoundViewModel: ObservableObject {
         isLoading = false
     }
 
-    func addToFavorites(videoId: String) {
+    func addToFavorites(video: VideoItem) {
         guard let userID = userID else { return }
-        if !favoriteVideos.contains(videoId) {
-            favoriteVideos.append(videoId)
+        if !favoriteVideos.contains(where: { $0.id == video.idInfo.videoId }) {
+            let favorite = FavoriteVideo(id: video.idInfo.videoId, title: video.snippet.title)
+            favoriteVideos.append(favorite)
             saveFavoritesToFirestore()
         }
     }
 
     func removeFromFavorites(videoId: String) {
         guard let userID = userID else { return }
-        if let index = favoriteVideos.firstIndex(of: videoId) {
+        if let index = favoriteVideos.firstIndex(where: { $0.id == videoId }) {
             favoriteVideos.remove(at: index)
             saveFavoritesToFirestore()
         }
@@ -105,23 +106,30 @@ class SoundViewModel: ObservableObject {
                 print("Fehler beim Laden der Favoriten: \(error)")
                 return
             }
-            if let data = document?.data(), let favorites = data["favoriteVideos"] as? [String] {
-                self?.favoriteVideos = favorites
+            if let data = document?.data(),
+               let favoritesData = data["favoriteVideos"] as? [[String: String]] {
+                self?.favoriteVideos = favoritesData.compactMap { dict in
+                    if let id = dict["id"], let title = dict["title"] {
+                        return FavoriteVideo(id: id, title: title)
+                    }
+                    return nil
+                }
             }
         }
     }
 
     private func saveFavoritesToFirestore() {
         guard let userID = userID else { return }
+        let favoritesData = favoriteVideos.map { ["id": $0.id, "title": $0.title] }
         db.collection("users").document(userID).setData([
-            "favoriteVideos": favoriteVideos
+            "favoriteVideos": favoritesData
         ], merge: true) { error in
             if let error = error {
                 print("Fehler beim Speichern der Favoriten: \(error)")
             }
         }
     }
-
+    
     private func loadOwnSounds() {
         if let savedSounds = UserDefaults.standard.array(forKey: ownSoundsKey) as? [String] {
             self.ownSounds = savedSounds.compactMap { URL(string: $0) }
