@@ -3,21 +3,21 @@
 //  ShadowWisperJournals
 //
 //  Created by Stefanie Seeck on 02.01.25.
-// Test
+// 
 
 import FirebaseFirestore
 import Foundation
 
 class ShadowWisperJournalViewModel: ObservableObject {
-
+    
     @Published var journalEntries: [ShadowWisperJournalEntry] = []
-
+    
     private let db = Firestore.firestore()
     private var listenerRegistration: ListenerRegistration?
-
+    
     func fetchJournalEntries(for userId: String) {
         removeListener()
-
+        
         listenerRegistration = db.collection("journalEntries")
             .whereField("userId", isEqualTo: userId)
             .order(by: "createdAt", descending: true)
@@ -28,29 +28,29 @@ class ShadowWisperJournalViewModel: ObservableObject {
                     )
                     return
                 }
-
+                
                 DispatchQueue.main.async {
                     self.journalEntries =
-                        querySnapshot?.documents.compactMap { document in
-                            try? document.data(
-                                as: ShadowWisperJournalEntry.self)
-                        } ?? []
+                    querySnapshot?.documents.compactMap { document in
+                        try? document.data(
+                            as: ShadowWisperJournalEntry.self)
+                    } ?? []
                 }
             }
     }
-
+    
     func removeListener() {
         listenerRegistration?.remove()
         listenerRegistration = nil
     }
-
+    
     func updateJournalEntry(entry: ShadowWisperJournalEntry) {
         guard let entryId = entry.id else { return }
-
+        
         if let index = journalEntries.firstIndex(where: { $0.id == entry.id }) {
             journalEntries[index] = entry
         }
-
+        
         do {
             try db.collection("journalEntries").document(entryId).setData(
                 from: entry)
@@ -60,7 +60,7 @@ class ShadowWisperJournalViewModel: ObservableObject {
             )
         }
     }
-
+    
     func addJournalEntry(
         title: String,
         description: String,
@@ -77,9 +77,9 @@ class ShadowWisperJournalViewModel: ObservableObject {
             userId: userId,
             categoryId: categoryId
         )
-
+        
         journalEntries.insert(newEntry, at: 0)
-
+        
         do {
             _ = try db.collection("journalEntries").addDocument(from: newEntry)
         } catch {
@@ -88,12 +88,12 @@ class ShadowWisperJournalViewModel: ObservableObject {
             )
         }
     }
-
+    
     func deleteJournalEntry(entry: ShadowWisperJournalEntry) {
         guard let entryId = entry.id else { return }
-
+        
         journalEntries.removeAll { $0.id == entryId }
-
+        
         db.collection("journalEntries").document(entryId).delete { error in
             if let error = error {
                 print(

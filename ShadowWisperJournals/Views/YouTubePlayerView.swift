@@ -3,14 +3,14 @@
 //  ShadowWisperJournals
 //
 //  Created by Stefanie Seeck on 06.01.25.
-// Test
+//
 
 import SwiftUI
 import WebKit
 
 struct YouTubePlayerView: UIViewRepresentable {
     let videoID: String
-
+    
     func makeUIView(context: Context) -> WKWebView {
         let configuration = WKWebViewConfiguration()
         configuration.allowsInlineMediaPlayback = true
@@ -25,14 +25,14 @@ struct YouTubePlayerView: UIViewRepresentable {
         webView.navigationDelegate = context.coordinator
         return webView
     }
-
+    
     func updateUIView(_ uiView: WKWebView, context: Context) {
         guard
             let url = URL(
                 string: "https://www.youtube.com/embed/\(videoID)?playsinline=1&fs=0"
             )
         else { return }
-
+        
         let request = URLRequest(url: url)
         uiView.load(request)
     }
@@ -40,7 +40,7 @@ struct YouTubePlayerView: UIViewRepresentable {
     func makeCoordinator() -> Coordinator {
         Coordinator()
     }
-
+    
     class Coordinator: NSObject, WKNavigationDelegate {
     }
 }

@@ -3,7 +3,7 @@
 //  ShadowWisperJournals
 //
 //  Created by Stefanie Seeck on 13.01.25.
-// Test
+// 
 
 import SwiftUI
 
@@ -13,7 +13,7 @@ struct MessageBubbleView: View {
     let allHaveRead: Bool
     let readByMe: Bool
     let onAppearAction: () -> Void
-
+    
     var body: some View {
         Group {
             if isMine {
@@ -24,7 +24,7 @@ struct MessageBubbleView: View {
                             .padding(8)
                             .background(Color.blue.opacity(0.2))
                             .cornerRadius(8)
-
+                        
                         if allHaveRead {
                             Text("Gelesen von allen")
                                 .font(.caption2)

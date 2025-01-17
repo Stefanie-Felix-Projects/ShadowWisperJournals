@@ -3,7 +3,7 @@
 //  ShadowWisperJournals
 //
 //  Created by Stefanie Seeck on 05.01.25.
-// test
+//
 
 import SwiftUI
 import UniformTypeIdentifiers
@@ -26,19 +26,19 @@ struct QuestDetailView: View {
     @State private var showImagePicker = false
     @State private var localSelectedImage: UIImage?
     @State private var errorMessage: String?
-
+    
     @State private var localLocationString: String
     
     @State private var personalNotes: String
     @State private var localImageURLs: [String] = []
-
+    
     @State private var selectedImageURL: URL?
     @State private var showFullScreenImage: Bool = false
-
+    
     init(quest: Quest, questLogVM: QuestLogViewModel) {
         self.quest = quest
         self._questLogVM = ObservedObject(wrappedValue: questLogVM)
-
+        
         _title = State(initialValue: quest.title)
         _description = State(initialValue: quest.description)
         _status = State(initialValue: quest.status)
@@ -116,7 +116,7 @@ struct QuestDetailView: View {
                                         .frame(width: 40, height: 40)
                                         .foregroundColor(.gray)
                                 }
-
+                                
                                 VStack(alignment: .leading) {
                                     Text(foundChar.name)
                                         .font(.headline)
@@ -136,7 +136,7 @@ struct QuestDetailView: View {
                     Text("Keine Charaktere zugewiesen.")
                         .foregroundColor(.gray)
                 }
-
+                
                 Button("Charaktere zuweisen") {
                     showAssignCharactersSheet = true
                 }
@@ -213,7 +213,7 @@ struct QuestDetailView: View {
                         .foregroundColor(.gray)
                 }
             }
-
+            
             Section("Standort / Karte") {
                 TextField("Standort-Adresse", text: $localLocationString)
                     .textInputAutocapitalization(.never)

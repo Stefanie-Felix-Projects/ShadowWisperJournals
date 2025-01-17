@@ -3,7 +3,7 @@
 //  ShadowWisperJournals
 //
 //  Created by Stefanie Seeck on 12.01.25.
-// test
+//
 
 import SwiftUI
 import GoogleMaps
@@ -11,7 +11,7 @@ import CoreLocation
 
 struct GoogleMapView: UIViewRepresentable {
     var locationString: String?
-
+    
     func makeUIView(context: Context) -> GMSMapView {
         let camera = GMSCameraPosition.camera(withLatitude: 51.0, longitude: 10.0, zoom: 5.0)
         

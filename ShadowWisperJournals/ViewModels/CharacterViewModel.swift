@@ -3,7 +3,7 @@
 //  ShadowWisperJournals
 //
 //  Created by Stefanie Seeck on 06.01.25.
-// Test
+// 
 
 import FirebaseFirestore
 import FirebaseStorage
@@ -138,7 +138,7 @@ class CharacterViewModel: ObservableObject {
             }
         }
     }
-
+    
     func uploadImage(
         _ image: UIImage,
         for character: Character,
@@ -148,36 +148,36 @@ class CharacterViewModel: ObservableObject {
             completion(.failure(NSError(domain: "Character hat keine ID", code: 0)))
             return
         }
-
+        
         let storage = Storage.storage()
         let fileName = "images/characters/\(charId)/\(UUID().uuidString).jpg"
         let storageRef = storage.reference().child(fileName)
-
+        
         guard let imageData = image.jpegData(compressionQuality: 0.8) else {
             completion(.failure(NSError(domain: "Bild-Konvertierung fehlgeschlagen", code: 0)))
             return
         }
-
+        
         let metadata = StorageMetadata()
         metadata.contentType = "image/jpeg"
-
+        
         storageRef.putData(imageData, metadata: metadata) { metadata, error in
             if let error = error {
                 completion(.failure(error))
                 return
             }
-
+            
             storageRef.downloadURL { url, error in
                 if let error = error {
                     completion(.failure(error))
                     return
                 }
-
+                
                 guard let downloadURL = url else {
                     completion(.failure(NSError(domain: "Keine URL zurückgegeben", code: 0)))
                     return
                 }
-
+                
                 self.db.collection("characters").document(charId).updateData([
                     "imageURLs": FieldValue.arrayUnion([downloadURL.absoluteString])
                 ]) { error in
@@ -185,13 +185,13 @@ class CharacterViewModel: ObservableObject {
                         completion(.failure(error))
                         return
                     }
-
+                    
                     completion(.success(downloadURL.absoluteString))
                 }
             }
         }
     }
-
+    
     func uploadProfileImage(
         _ image: UIImage,
         for character: Character,
@@ -201,36 +201,36 @@ class CharacterViewModel: ObservableObject {
             completion(.failure(NSError(domain: "Character hat keine ID", code: 0)))
             return
         }
-
+        
         let storage = Storage.storage()
         let fileName = "images/characters/\(charId)/profile.jpg"
         let storageRef = storage.reference().child(fileName)
-
+        
         guard let imageData = image.jpegData(compressionQuality: 0.8) else {
             completion(.failure(NSError(domain: "Bild-Konvertierung fehlgeschlagen", code: 0)))
             return
         }
-
+        
         let metadata = StorageMetadata()
         metadata.contentType = "image/jpeg"
-
+        
         storageRef.putData(imageData, metadata: metadata) { metadata, error in
             if let error = error {
                 completion(.failure(error))
                 return
             }
-
+            
             storageRef.downloadURL { url, error in
                 if let error = error {
                     completion(.failure(error))
                     return
                 }
-
+                
                 guard let downloadURL = url else {
                     completion(.failure(NSError(domain: "Keine URL zurückgegeben", code: 0)))
                     return
                 }
-
+                
                 self.db.collection("characters").document(charId).updateData([
                     "profileImageURL": downloadURL.absoluteString
                 ]) { error in
@@ -238,7 +238,7 @@ class CharacterViewModel: ObservableObject {
                         completion(.failure(error))
                         return
                     }
-
+                    
                     completion(.success(downloadURL.absoluteString))
                 }
             }

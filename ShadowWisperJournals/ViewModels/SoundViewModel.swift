@@ -34,7 +34,7 @@ class SoundViewModel: ObservableObject {
     private var userID: String?
     private let ownSoundsKey = "OwnSounds"
     private let lastPlayedVideoKey = "LastPlayedVideoID"
-
+    
     init() {
         if let path = Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist"),
            let dict = NSDictionary(contentsOfFile: path),
@@ -44,16 +44,16 @@ class SoundViewModel: ObservableObject {
         } else {
             fatalError("YouTube API Key nicht in GoogleService-Info.plist gefunden")
         }
-
+        
         authenticateUser()
         loadOwnSounds()
         loadTestSounds()
     }
-
+    
     private func loadTestSounds() {
         let soundNames = ["Flesh Monster", "Desert Ash", "Chill Relax"]
         let extensions = ["mp3", "wav"]
-
+        
         for soundName in soundNames {
             var soundFound = false
             for ext in extensions {
@@ -72,25 +72,25 @@ class SoundViewModel: ObservableObject {
     func playOwnSound(url: URL) {
         audioPlayer.playSound(url: url, loop: loopStates[url] ?? false)
     }
-
+    
     func pauseOwnSound(url: URL) {
         audioPlayer.pauseSound(url: url)
     }
-
+    
     func stopOwnSound(url: URL) {
         audioPlayer.stopSound(url: url)
     }
-
+    
     func toggleLoopOwnSound(url: URL) {
         let isLooping = audioPlayer.toggleLoop(url: url)
         loopStates[url] = isLooping
     }
-
+    
     func authenticateUser() {
         if let user = Auth.auth().currentUser {
             self.userID = user.uid
             loadFavorites()
-            loadOwnSounds() // Ergänzt
+            loadOwnSounds()
         } else {
             Auth.auth().signInAnonymously { [weak self] authResult, error in
                 if let error = error {
@@ -103,21 +103,21 @@ class SoundViewModel: ObservableObject {
             }
         }
     }
-
+    
     func searchOnYouTube() async {
         guard !searchQuery.isEmpty else { return }
         isLoading = true
-
+        
         do {
             let results = try await youTubeService.searchVideos(keyword: searchQuery)
             searchResults = results
         } catch {
             print("Fehler bei der YouTube-Suche:", error)
         }
-
+        
         isLoading = false
     }
-
+    
     func addToFavorites(video: VideoItem) {
         guard userID != nil else { return }
         if !favoriteVideos.contains(where: { $0.id == video.idInfo.videoId }) {
@@ -126,7 +126,7 @@ class SoundViewModel: ObservableObject {
             saveFavoritesToFirestore()
         }
     }
-
+    
     func removeFromFavorites(videoId: String) {
         guard userID != nil else { return }
         if let index = favoriteVideos.firstIndex(where: { $0.id == videoId }) {
@@ -134,11 +134,11 @@ class SoundViewModel: ObservableObject {
             saveFavoritesToFirestore()
         }
     }
-
+    
     func playFavoriteVideo(videoId: String) {
         videoID = videoId
     }
-
+    
     func addOwnSound(url: URL) {
         ownSounds.append(url)
         saveOwnSounds()
@@ -164,7 +164,7 @@ class SoundViewModel: ObservableObject {
             }
         }
     }
-
+    
     private func saveFavoritesToFirestore() {
         guard let userID = userID else { return }
         let favoritesData = favoriteVideos.map { ["id": $0.id, "title": $0.title] }
@@ -183,7 +183,7 @@ class SoundViewModel: ObservableObject {
             self.ownSounds = savedSounds.compactMap { URL(string: $0) }
         }
     }
-
+    
     private func saveOwnSounds() {
         guard let userID = userID else { return }
         let ownSoundsKeyForUser = "\(userID)_OwnSounds"

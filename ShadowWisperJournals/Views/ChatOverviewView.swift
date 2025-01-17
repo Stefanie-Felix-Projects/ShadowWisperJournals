@@ -3,25 +3,25 @@
 //  ShadowWisperJournals
 //
 //  Created by Stefanie Seeck on 06.01.25.
-// Test
+//
 
 import SwiftUI
 
 struct ChatOverviewView: View {
     @EnvironmentObject var userViewModel: ShadowWisperUserViewModel
-
+    
     @StateObject private var chatVM = ChatViewModel()
     @StateObject private var characterVM = CharacterViewModel()
-
+    
     @State private var showNewChatSheet = false
-
+    
     var body: some View {
         NavigationStack {
             VStack {
                 TextField("Chats suchen...", text: $chatVM.searchText)
                     .textFieldStyle(.roundedBorder)
                     .padding(.horizontal)
-
+                
                 List {
                     ForEach(chatVM.filteredChats) { chat in
                         NavigationLink(
@@ -37,16 +37,16 @@ struct ChatOverviewView: View {
                                     }
                                 }
                                 .padding(.trailing, 8)
-
+                                
                                 VStack(alignment: .leading, spacing: 4) {
                                     let joinedNames = participantData.map { $0.0 }.joined(separator: ", ")
                                     Text("Teilnehmer: \(joinedNames)")
                                         .font(.headline)
-
+                                    
                                     Text(chat.lastMessage ?? "Keine Nachrichten")
                                         .font(.subheadline)
                                         .foregroundColor(.gray)
-
+                                    
                                     Text("Aktualisiert am \(chat.updatedAt.formatted())")
                                         .font(.footnote)
                                         .foregroundColor(.gray)
@@ -63,7 +63,7 @@ struct ChatOverviewView: View {
                     }
                 }
                 .listStyle(.plain)
-
+                
                 Button("Neuen Chat starten") {
                     showNewChatSheet = true
                 }
@@ -71,10 +71,8 @@ struct ChatOverviewView: View {
             }
             .navigationTitle("Chat-Übersicht")
             .onAppear {
-                // Characters laden
                 characterVM.fetchAllCharacters()
-
-                // Chats filtern
+                
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                     if let userId = userViewModel.userId {
                         let myCharIDs = characterVM.characters
@@ -95,7 +93,7 @@ struct ChatOverviewView: View {
             }
         }
     }
-
+    
     private func participantProfiles(_ participantCharIds: [String]) -> [(String, String?)] {
         participantCharIds.map { charId -> (String, String?) in
             if let foundChar = characterVM.characters.first(where: { $0.id == charId }) {
@@ -105,7 +103,7 @@ struct ChatOverviewView: View {
             }
         }
     }
-
+    
     @ViewBuilder
     private func profileImageView(urlString: String?) -> some View {
         if let urlString = urlString, let url = URL(string: urlString) {

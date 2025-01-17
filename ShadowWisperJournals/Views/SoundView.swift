@@ -3,8 +3,7 @@
 //  ShadowWisperJournals
 //
 //  Created by Stefanie Seeck on 04.01.25.
-// test
-
+//
 
 import SwiftUI
 import UniformTypeIdentifiers
@@ -12,7 +11,7 @@ import UniformTypeIdentifiers
 struct SoundView: View {
     @StateObject private var viewModel = SoundViewModel()
     @State private var isSearchResultsExpanded: Bool = false
-
+    
     var body: some View {
         NavigationStack {
             List {
@@ -22,7 +21,7 @@ struct SoundView: View {
                             .textFieldStyle(RoundedBorderTextFieldStyle())
                             .disableAutocorrection(true)
                             .autocapitalization(.none)
-
+                        
                         Button("Suchen") {
                             Task {
                                 await viewModel.searchOnYouTube()
@@ -31,7 +30,7 @@ struct SoundView: View {
                         .buttonStyle(.borderedProminent)
                         .disabled(viewModel.searchQuery.isEmpty)
                     }
-
+                    
                     if viewModel.isLoading {
                         HStack {
                             Spacer()
@@ -41,7 +40,7 @@ struct SoundView: View {
                         .padding(.vertical, 5)
                     }
                 }
-
+                
                 if !viewModel.searchResults.isEmpty {
                     Section {
                         HStack {
@@ -59,7 +58,7 @@ struct SoundView: View {
                             }
                         }
                         .padding(.vertical, 5)
-
+                        
                         if isSearchResultsExpanded {
                             ForEach(viewModel.searchResults) { item in
                                 Button {
@@ -73,7 +72,7 @@ struct SoundView: View {
                                         }
                                         .frame(width: 80, height: 60)
                                         .cornerRadius(8)
-
+                                        
                                         VStack(alignment: .leading, spacing: 5) {
                                             Text(item.snippet.title)
                                                 .font(.headline)
@@ -97,14 +96,14 @@ struct SoundView: View {
                         }
                     }
                 }
-
+                
                 Section(header: Text("Aktuelles Video")) {
                     YouTubePlayerView(videoID: viewModel.videoID)
                         .frame(height: 200)
                         .cornerRadius(8)
                         .padding(.vertical, 5)
                 }
-
+                
                 if !viewModel.favoriteVideos.isEmpty {
                     Section(header: Text("Deine Favoriten")) {
                         ScrollView(.horizontal, showsIndicators: false) {
@@ -121,10 +120,10 @@ struct SoundView: View {
                                                 Text(favorite.title)
                                                     .font(.footnote)
                                                     .foregroundColor(.primary)
-                                                    .lineLimit(1) // Nur eine Zeile anzeigen
-                                                    .truncationMode(.tail) // Mit "..." abschneiden
-                                                    .frame(maxWidth: 180) // Breite des Textes einschränken
-                                                    .multilineTextAlignment(.center) // Text zentrieren
+                                                    .lineLimit(1)
+                                                    .truncationMode(.tail)
+                                                    .frame(maxWidth: 180)
+                                                    .multilineTextAlignment(.center)
                                             }
                                         }
                                         Button(role: .destructive) {
@@ -141,89 +140,89 @@ struct SoundView: View {
                         }
                     }
                 }
-
+                
                 Section(header: Text("Eigene Sounds")) {
-                                    VStack(alignment: .leading, spacing: 8) {
-                                        Button {
-                                            viewModel.showingDocumentPicker = true
-                                        } label: {
-                                            Label("Datei auswählen", systemImage: "paperclip")
-                                                .frame(maxWidth: .infinity, alignment: .center)
-                                        }
-                                        .buttonStyle(.bordered)
-
-                                        if viewModel.ownSounds.isEmpty {
-                                            Text("Noch keine eigenen Sounds hinzugefügt.")
-                                                .font(.footnote)
-                                                .foregroundColor(.gray)
-                                                .frame(maxWidth: .infinity, alignment: .center)
-                                                .padding(.top, 5)
-                                        } else {
-                                            ForEach(viewModel.ownSounds, id: \.self) { soundURL in
-                                                VStack(alignment: .leading) {
-                                                    HStack {
-                                                        Text(soundURL.lastPathComponent)
-                                                            .padding(.vertical, 5)
-                                                            .frame(maxWidth: .infinity, alignment: .leading)
-                                                            .background(Color(UIColor.secondarySystemBackground))
-                                                            .cornerRadius(6)
-                                                        
-                                                        HStack(spacing: 20) {
-                                                            Button(action: {
-                                                                viewModel.playOwnSound(url: soundURL)
-                                                            }) {
-                                                                Image(systemName: "play.circle")
-                                                                    .font(.title2)
-                                                            }
-                                                            .buttonStyle(PlainButtonStyle())
-
-                                                            Button(action: {
-                                                                viewModel.pauseOwnSound(url: soundURL)
-                                                            }) {
-                                                                Image(systemName: "pause.circle")
-                                                                    .font(.title2)
-                                                            }
-                                                            .buttonStyle(PlainButtonStyle())
-
-                                                            Button(action: {
-                                                                viewModel.stopOwnSound(url: soundURL)
-                                                            }) {
-                                                                Image(systemName: "stop.circle")
-                                                                    .font(.title2)
-                                                            }
-                                                            .buttonStyle(PlainButtonStyle())
-
-                                                            Button(action: {
-                                                                viewModel.toggleLoopOwnSound(url: soundURL)
-                                                            }) {
-                                                                Image(systemName: viewModel.loopStates[soundURL] == true ? "repeat.circle.fill" : "repeat.circle")
-                                                                    .font(.title2)
-                                                                    .foregroundColor(viewModel.loopStates[soundURL] == true ? .blue : .primary)
-                                                            }
-                                                            .buttonStyle(PlainButtonStyle())
-                                                        }
-                                                    }
-                                                    .padding(.vertical, 2)
-                                                }
+                    VStack(alignment: .leading, spacing: 8) {
+                        Button {
+                            viewModel.showingDocumentPicker = true
+                        } label: {
+                            Label("Datei auswählen", systemImage: "paperclip")
+                                .frame(maxWidth: .infinity, alignment: .center)
+                        }
+                        .buttonStyle(.bordered)
+                        
+                        if viewModel.ownSounds.isEmpty {
+                            Text("Noch keine eigenen Sounds hinzugefügt.")
+                                .font(.footnote)
+                                .foregroundColor(.gray)
+                                .frame(maxWidth: .infinity, alignment: .center)
+                                .padding(.top, 5)
+                        } else {
+                            ForEach(viewModel.ownSounds, id: \.self) { soundURL in
+                                VStack(alignment: .leading) {
+                                    HStack {
+                                        Text(soundURL.lastPathComponent)
+                                            .padding(.vertical, 5)
+                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                            .background(Color(UIColor.secondarySystemBackground))
+                                            .cornerRadius(6)
+                                        
+                                        HStack(spacing: 20) {
+                                            Button(action: {
+                                                viewModel.playOwnSound(url: soundURL)
+                                            }) {
+                                                Image(systemName: "play.circle")
+                                                    .font(.title2)
                                             }
+                                            .buttonStyle(PlainButtonStyle())
+                                            
+                                            Button(action: {
+                                                viewModel.pauseOwnSound(url: soundURL)
+                                            }) {
+                                                Image(systemName: "pause.circle")
+                                                    .font(.title2)
+                                            }
+                                            .buttonStyle(PlainButtonStyle())
+                                            
+                                            Button(action: {
+                                                viewModel.stopOwnSound(url: soundURL)
+                                            }) {
+                                                Image(systemName: "stop.circle")
+                                                    .font(.title2)
+                                            }
+                                            .buttonStyle(PlainButtonStyle())
+                                            
+                                            Button(action: {
+                                                viewModel.toggleLoopOwnSound(url: soundURL)
+                                            }) {
+                                                Image(systemName: viewModel.loopStates[soundURL] == true ? "repeat.circle.fill" : "repeat.circle")
+                                                    .font(.title2)
+                                                    .foregroundColor(viewModel.loopStates[soundURL] == true ? .blue : .primary)
+                                            }
+                                            .buttonStyle(PlainButtonStyle())
                                         }
                                     }
-                                }
-                            }
-                            .listStyle(InsetGroupedListStyle())
-                            .navigationTitle("Soundbereich")
-                            .navigationBarTitleDisplayMode(.inline)
-                            .sheet(isPresented: $viewModel.showingDocumentPicker) {
-                                DocumentPickerView { url in
-                                    viewModel.addOwnSound(url: url)
+                                    .padding(.vertical, 2)
                                 }
                             }
                         }
                     }
                 }
-
-                struct SoundView_Previews: PreviewProvider {
-                    static var previews: some View {
-                        SoundView()
-                    }
+            }
+            .listStyle(InsetGroupedListStyle())
+            .navigationTitle("Soundbereich")
+            .navigationBarTitleDisplayMode(.inline)
+            .sheet(isPresented: $viewModel.showingDocumentPicker) {
+                DocumentPickerView { url in
+                    viewModel.addOwnSound(url: url)
                 }
+            }
+        }
+    }
+}
+
+struct SoundView_Previews: PreviewProvider {
+    static var previews: some View {
+        SoundView()
+    }
+}

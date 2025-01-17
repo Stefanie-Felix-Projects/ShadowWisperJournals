@@ -3,36 +3,36 @@
 //  ShadowWisperJournals
 //
 //  Created by Stefanie Seeck on 05.01.25.
-// Test
+// 
 
 import SwiftUI
 
 struct AddQuestView: View {
     @Environment(\.dismiss) var dismiss
-
+    
     @EnvironmentObject var userViewModel: ShadowWisperUserViewModel
     @EnvironmentObject var characterVM: CharacterViewModel
-
+    
     @ObservedObject var questLogVM: QuestLogViewModel
     let userId: String
-
+    
     @State private var title: String = ""
     @State private var description: String = ""
     @State private var status: String = "aktiv"
     @State private var reward: String = ""
-
+    
     @State private var selectedCharacterIds: [String] = []
     @State private var showImagePicker = false
     @State private var localSelectedImage: UIImage?
     @State private var errorMessage: String?
     @State private var locationString: String = ""
-
+    
     var body: some View {
         NavigationStack {
             Form {
                 Section("Charaktere zuweisen") {
                     let availableCharacters = characterVM.characters
-
+                    
                     if availableCharacters.isEmpty {
                         Text("Keine Charaktere verfügbar.")
                             .foregroundColor(.gray)
@@ -53,7 +53,7 @@ struct AddQuestView: View {
                         }
                     }
                 }
-
+                
                 Section("Bild hinzufügen") {
                     Button("Bild aus Fotobibliothek") {
                         showImagePicker = true
@@ -63,12 +63,12 @@ struct AddQuestView: View {
                             self.localSelectedImage = selectedImage
                         }
                     }
-
+                    
                     if let localImage = localSelectedImage {
                         Text("Vorschau (noch nicht hochgeladen):")
                             .font(.footnote)
                             .foregroundColor(.secondary)
-
+                        
                         Image(uiImage: localImage)
                             .resizable()
                             .scaledToFit()
@@ -80,23 +80,23 @@ struct AddQuestView: View {
                             .foregroundColor(.gray)
                     }
                 }
-
+                
                 Section("Standort") {
                     TextField("Adresse / Ort eingeben", text: $locationString)
                         .textInputAutocapitalization(.never)
-
+                    
                     GoogleMapView(locationString: locationString)
                         .frame(height: 200)
                 }
-
+                
                 if let errorMessage = errorMessage {
                     Text(errorMessage)
                         .foregroundColor(.red)
                 }
-
+                
                 Button("Quest hinzufügen") {
                     guard !title.isEmpty, !description.isEmpty else { return }
-
+                    
                     questLogVM.addQuest(
                         title: title,
                         description: description,
@@ -134,7 +134,7 @@ struct AddQuestView: View {
                             } else {
                                 dismiss()
                             }
-
+                            
                         case .failure(let error):
                             errorMessage = "Fehler beim Hinzufügen der Quest: \(error.localizedDescription)"
                         }

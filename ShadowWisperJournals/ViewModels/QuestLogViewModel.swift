@@ -3,7 +3,7 @@
 //  ShadowWisperJournals
 //
 //  Created by Stefanie Seeck on 05.01.25.
-// Test
+// 
 
 import FirebaseFirestore
 import FirebaseStorage
@@ -64,7 +64,7 @@ class QuestLogViewModel: ObservableObject {
         creatorDisplayName: String? = nil,
         assignedCharacterIds: [String]? = nil,
         locationString: String? = nil,
-        personalNotes: String? = nil, // <- Neu
+        personalNotes: String? = nil,
         completion: @escaping (Result<String, Error>) -> Void
     ) {
         print("DEBUG: addQuest() aufgerufen mit userId = \(userId)")
@@ -189,16 +189,16 @@ class QuestLogViewModel: ObservableObject {
             completion(.failure(NSError(domain: "Quest hat keine ID", code: 0)))
             return
         }
-
+        
         let storage = Storage.storage()
         let fileName = "images/quests/\(questId)/\(UUID().uuidString).jpg"
         let storageRef = storage.reference().child(fileName)
-
+        
         guard let imageData = image.jpegData(compressionQuality: 0.8) else {
             completion(.failure(NSError(domain: "Bild-Konvertierung fehlgeschlagen", code: 0)))
             return
         }
-
+        
         let metadata = StorageMetadata()
         metadata.contentType = "image/jpeg"
         
@@ -207,18 +207,18 @@ class QuestLogViewModel: ObservableObject {
                 completion(.failure(error))
                 return
             }
-
+            
             storageRef.downloadURL { url, error in
                 if let error = error {
                     completion(.failure(error))
                     return
                 }
-
+                
                 guard let downloadURL = url else {
                     completion(.failure(NSError(domain: "Keine URL zurückgegeben", code: 0)))
                     return
                 }
-
+                
                 self.db.collection("quests").document(questId).updateData([
                     "imageURLs": FieldValue.arrayUnion([downloadURL.absoluteString])
                 ]) { error in
@@ -226,7 +226,7 @@ class QuestLogViewModel: ObservableObject {
                         completion(.failure(error))
                         return
                     }
-
+                    
                     completion(.success(downloadURL.absoluteString))
                 }
             }

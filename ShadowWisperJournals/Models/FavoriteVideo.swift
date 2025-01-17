@@ -8,6 +8,6 @@
 import Foundation
 
 struct FavoriteVideo: Identifiable {
-    let id: String // Video-ID
+    let id: String
     let title: String
 }

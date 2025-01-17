@@ -3,31 +3,31 @@
 //  ShadowWisperJournals
 //
 //  Created by Stefanie Seeck on 06.01.25.
-// Test
+//
 
 import SwiftUI
 
 struct ChatDetailView: View {
     @ObservedObject var chatVM: ChatViewModel
     @StateObject private var characterVM = CharacterViewModel()
-
+    
     let chat: Chat
     @State private var newMessageText: String = ""
-
+    
     @EnvironmentObject var userViewModel: ShadowWisperUserViewModel
-
+    
     private var myCharIdInThisChat: String? {
         guard let userId = userViewModel.userId else { return nil }
         let myChars = characterVM.characters.filter { $0.userId == userId }
         return myChars.first(where: { chat.participants.contains($0.id ?? "") })?.id
     }
-
+    
     private var messageViews: [AnyView] {
         chatVM.messages.map { msg in
             let allHaveRead = isMessageReadByAll(message: msg, chat: chat)
             let readByMe = myCharIdInThisChat.map { msg.readBy.contains($0) } ?? false
             let isMine = (msg.senderId == myCharIdInThisChat)
-
+            
             let subview = MessageBubbleView(
                 message: msg,
                 isMine: isMine,
@@ -43,7 +43,7 @@ struct ChatDetailView: View {
             return AnyView(subview)
         }
     }
-
+    
     var body: some View {
         VStack {
             ScrollView {
@@ -55,11 +55,11 @@ struct ChatDetailView: View {
                 }
                 .padding()
             }
-
+            
             HStack {
                 TextField("Nachricht eingeben", text: $newMessageText)
                     .textFieldStyle(.roundedBorder)
-
+                
                 Button {
                     sendMessage()
                 } label: {
@@ -80,13 +80,13 @@ struct ChatDetailView: View {
             chatVM.removeMessagesListener()
         }
     }
-
+    
     private func sendMessage() {
         guard let myCharId = myCharIdInThisChat else { return }
         chatVM.sendMessage(to: chat, senderCharId: myCharId, text: newMessageText)
         newMessageText = ""
     }
-
+    
     private func isMessageReadByAll(message: ChatMessage, chat: Chat) -> Bool {
         for participantCharId in chat.participants {
             if !message.readBy.contains(participantCharId) {

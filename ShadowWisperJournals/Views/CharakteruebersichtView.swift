@@ -3,7 +3,7 @@
 //  ShadowWisperJournals
 //
 //  Created by Stefanie Seeck on 04.01.25.
-// Test
+// 
 
 import SwiftUI
 
@@ -11,7 +11,7 @@ struct CharakteruebersichtView: View {
     @EnvironmentObject var userViewModel: ShadowWisperUserViewModel
     @StateObject private var characterVM = CharacterViewModel()
     @State private var showAddCharacterSheet = false
-
+    
     var body: some View {
         NavigationStack {
             VStack {
@@ -52,7 +52,7 @@ struct CharakteruebersichtView: View {
                                         .frame(width: 40, height: 40)
                                         .foregroundColor(.gray)
                                 }
-
+                                
                                 VStack(alignment: .leading, spacing: 4) {
                                     Text(character.name)
                                         .font(.headline)

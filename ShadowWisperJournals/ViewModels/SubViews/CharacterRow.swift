@@ -11,7 +11,7 @@ struct CharacterRow: View {
     let character: Character
     let isSelected: Bool
     let toggleSelection: () -> Void
-
+    
     var body: some View {
         HStack {
             if let profileImageURL = character.profileImageURL, let url = URL(string: profileImageURL) {
@@ -43,7 +43,7 @@ struct CharacterRow: View {
                     .frame(width: 40, height: 40)
                     .foregroundColor(.gray)
             }
-
+            
             VStack(alignment: .leading) {
                 Text(character.name)
                 if let metaType = character.metaType {
@@ -52,9 +52,9 @@ struct CharacterRow: View {
                         .foregroundColor(.gray)
                 }
             }
-
+            
             Spacer()
-
+            
             Button(action: toggleSelection) {
                 Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
                     .resizable()

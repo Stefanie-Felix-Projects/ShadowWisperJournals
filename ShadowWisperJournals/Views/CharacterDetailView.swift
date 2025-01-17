@@ -3,16 +3,16 @@
 //  ShadowWisperJournals
 //
 //  Created by Stefanie Seeck on 06.01.25.
-// test
+//
 
 import SwiftUI
 
 struct CharacterDetailView: View {
     @Environment(\.dismiss) var dismiss
     @StateObject private var characterVM = CharacterViewModel()
-
+    
     var character: Character
-
+    
     // Allgemeine Daten
     @State private var name: String
     @State private var streetName: String
@@ -27,7 +27,7 @@ struct CharacterDetailView: View {
     @State private var wantedLevel: Int?
     @State private var karma: Int?
     @State private var essence: Double?
-
+    
     // Attribute
     @State private var konstitution: Int
     @State private var geschicklichkeit: Int
@@ -47,7 +47,7 @@ struct CharacterDetailView: View {
     @State private var menschenkenntnis: Int
     @State private var erinnerungsvermoegen: Int
     @State private var hebenTragen: Int
-
+    
     // Skills
     @State private var biotech: Int
     @State private var ersteHilfe: Int
@@ -63,7 +63,7 @@ struct CharacterDetailView: View {
     @State private var steuern: Int
     @State private var wahrnehmung: Int
     @State private var ueberreden: Int
-
+    
     // Ausrüstung, Backstory
     @State private var equipmentString: String
     @State private var backstory: String
@@ -73,13 +73,13 @@ struct CharacterDetailView: View {
     @State private var localProfileImage: UIImage?
     
     // Bild-Upload
-      @State private var localSelectedImage: UIImage?
-      @State private var showImagePicker = false
-      @State private var errorMessage: String?
-
-      @State private var selectedImageURL: URL?
-      @State private var showFullScreenImage: Bool = false
-
+    @State private var localSelectedImage: UIImage?
+    @State private var showImagePicker = false
+    @State private var errorMessage: String?
+    
+    @State private var selectedImageURL: URL?
+    @State private var showFullScreenImage: Bool = false
+    
     init(character: Character) {
         self.character = character
         
@@ -89,7 +89,7 @@ struct CharacterDetailView: View {
         func skillVal(_ key: String) -> Int {
             character.skillPoints?[key] ?? 0
         }
-
+        
         // Allgemeine Daten
         _name = State(initialValue: character.name)
         _streetName = State(initialValue: character.streetName ?? "")
@@ -104,7 +104,7 @@ struct CharacterDetailView: View {
         _wantedLevel = State(initialValue: character.wantedLevel)
         _karma = State(initialValue: character.karma)
         _essence = State(initialValue: character.essence)
-
+        
         // Attribute
         _konstitution = State(initialValue: val("konstitution"))
         _geschicklichkeit = State(initialValue: val("geschicklichkeit"))
@@ -124,7 +124,7 @@ struct CharacterDetailView: View {
         _menschenkenntnis = State(initialValue: val("menschenkenntnis"))
         _erinnerungsvermoegen = State(initialValue: val("erinnerungsvermoegen"))
         _hebenTragen = State(initialValue: val("hebenTragen"))
-
+        
         // Skills
         _biotech = State(initialValue: skillVal("biotech"))
         _ersteHilfe = State(initialValue: skillVal("ersteHilfe"))
@@ -140,72 +140,72 @@ struct CharacterDetailView: View {
         _steuern = State(initialValue: skillVal("steuern"))
         _wahrnehmung = State(initialValue: skillVal("wahrnehmung"))
         _ueberreden = State(initialValue: skillVal("ueberreden"))
-
+        
         // Ausrüstung & Backstory
         _equipmentString = State(initialValue: (character.equipment ?? []).joined(separator: ", "))
         _backstory = State(initialValue: character.backstory ?? "")
     }
-
+    
     var body: some View {
         Form {
-                  Section("Profilbild") {
-                      if let profileURL = character.profileImageURL, let url = URL(string: profileURL) {
-                          AsyncImage(url: url) { phase in
-                              switch phase {
-                              case .empty:
-                                  ProgressView()
-                                      .frame(width: 100, height: 100)
-                              case .success(let image):
-                                  image
-                                      .resizable()
-                                      .scaledToFill()
-                                      .frame(width: 100, height: 100)
-                                      .clipped()
-                                      .cornerRadius(8)
-                              case .failure:
-                                  Image(systemName: "person.crop.circle.fill")
-                                      .resizable()
-                                      .scaledToFit()
-                                      .frame(width: 100, height: 100)
-                                      .foregroundColor(.gray)
-                              @unknown default:
-                                  EmptyView()
-                              }
-                          }
-                      } else {
-                          Image(systemName: "person.crop.circle.fill")
-                              .resizable()
-                              .scaledToFit()
-                              .frame(width: 100, height: 100)
-                              .foregroundColor(.gray)
-                      }
-                      
-                      Button("Neues Profilbild wählen") {
-                          showProfilePicker = true
-                      }
-                      .sheet(isPresented: $showProfilePicker) {
-                          ImagePicker { selectedImage in
-                              self.localProfileImage = selectedImage
-                          }
-                      }
-
-                      if let localImage = localProfileImage {
-                          Text("Vorschau (noch nicht hochgeladen):")
-                              .font(.footnote)
-                              .foregroundColor(.secondary)
-                          
-                          Image(uiImage: localImage)
-                              .resizable()
-                              .scaledToFit()
-                              .frame(height: 120)
-                              .cornerRadius(8)
-                          
-                          Button("Als Profilbild hochladen") {
-                              uploadProfileImageIfNeeded()
-                          }
-                          .buttonStyle(.bordered)
-                      }
-                  }
+            Section("Profilbild") {
+                if let profileURL = character.profileImageURL, let url = URL(string: profileURL) {
+                    AsyncImage(url: url) { phase in
+                        switch phase {
+                        case .empty:
+                            ProgressView()
+                                .frame(width: 100, height: 100)
+                        case .success(let image):
+                            image
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 100, height: 100)
+                                .clipped()
+                                .cornerRadius(8)
+                        case .failure:
+                            Image(systemName: "person.crop.circle.fill")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 100, height: 100)
+                                .foregroundColor(.gray)
+                        @unknown default:
+                            EmptyView()
+                        }
+                    }
+                } else {
+                    Image(systemName: "person.crop.circle.fill")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 100, height: 100)
+                        .foregroundColor(.gray)
+                }
+                
+                Button("Neues Profilbild wählen") {
+                    showProfilePicker = true
+                }
+                .sheet(isPresented: $showProfilePicker) {
+                    ImagePicker { selectedImage in
+                        self.localProfileImage = selectedImage
+                    }
+                }
+                
+                if let localImage = localProfileImage {
+                    Text("Vorschau (noch nicht hochgeladen):")
+                        .font(.footnote)
+                        .foregroundColor(.secondary)
+                    
+                    Image(uiImage: localImage)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(height: 120)
+                        .cornerRadius(8)
+                    
+                    Button("Als Profilbild hochladen") {
+                        uploadProfileImageIfNeeded()
+                    }
+                    .buttonStyle(.bordered)
+                }
+            }
             Section("Allgemeine Daten") {
                 TextField("Name (Realname)", text: $name)
                 TextField("Straßenname", text: $streetName)
@@ -271,7 +271,7 @@ struct CharacterDetailView: View {
                         .multilineTextAlignment(.trailing)
                 }
             }
-
+            
             // Attribute
             Section("Attribute") {
                 Stepper("Konstitution: \(konstitution)", value: $konstitution, in: 0...50)
@@ -293,7 +293,7 @@ struct CharacterDetailView: View {
                 Stepper("Erinnerungsvermögen: \(erinnerungsvermoegen)", value: $erinnerungsvermoegen, in: 0...50)
                 Stepper("Heben/Tragen: \(hebenTragen)", value: $hebenTragen, in: 0...50)
             }
-
+            
             // Skills
             Section("Fertigkeiten") {
                 Stepper("Biotech: \(biotech)", value: $biotech, in: 0...50)
@@ -311,258 +311,257 @@ struct CharacterDetailView: View {
                 Stepper("Wahrnehmung: \(wahrnehmung)", value: $wahrnehmung, in: 0...50)
                 Stepper("Überreden: \(ueberreden)", value: $ueberreden, in: 0...50)
             }
-
+            
             // Ausrüstung
             Section("Ausrüstung") {
                 TextField("Ausrüstung (Kommagetrennt)", text: $equipmentString)
                     .textInputAutocapitalization(.never)
                     .autocorrectionDisabled(true)
             }
-
+            
             // Hintergrundgeschichte
             Section("Hintergrundgeschichte") {
                 TextEditor(text: $backstory)
                     .frame(minHeight: 100)
             }
-
+            
             // Bilder anzeigen
-                        Section("Hochgeladene Bilder") {
-                            if let urls = character.imageURLs, !urls.isEmpty {
-                                ScrollView(.horizontal, showsIndicators: false) {
-                                    HStack {
-                                        ForEach(urls, id: \.self) { urlString in
-                                            if let url = URL(string: urlString) {
-                                                Button {
-                                                    selectedImageURL = url
-                                                    showFullScreenImage = true
-                                                } label: {
-                                                    AsyncImage(url: url) { phase in
-                                                        switch phase {
-                                                        case .empty:
-                                                            ProgressView()
-                                                                .frame(width: 100, height: 100)
-                                                        case .success(let image):
-                                                            image
-                                                                .resizable()
-                                                                .scaledToFill()
-                                                                .frame(width: 100, height: 100)
-                                                                .clipped()
-                                                                .cornerRadius(8)
-                                                        case .failure:
-                                                            Image(systemName: "photo.fill")
-                                                                .resizable()
-                                                                .scaledToFit()
-                                                                .frame(width: 100, height: 100)
-                                                                .foregroundColor(.gray)
-                                                        @unknown default:
-                                                            EmptyView()
-                                                        }
-                                                    }
-                                                }
-                                                .buttonStyle(.plain)
+            Section("Hochgeladene Bilder") {
+                if let urls = character.imageURLs, !urls.isEmpty {
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack {
+                            ForEach(urls, id: \.self) { urlString in
+                                if let url = URL(string: urlString) {
+                                    Button {
+                                        selectedImageURL = url
+                                        showFullScreenImage = true
+                                    } label: {
+                                        AsyncImage(url: url) { phase in
+                                            switch phase {
+                                            case .empty:
+                                                ProgressView()
+                                                    .frame(width: 100, height: 100)
+                                            case .success(let image):
+                                                image
+                                                    .resizable()
+                                                    .scaledToFill()
+                                                    .frame(width: 100, height: 100)
+                                                    .clipped()
+                                                    .cornerRadius(8)
+                                            case .failure:
+                                                Image(systemName: "photo.fill")
+                                                    .resizable()
+                                                    .scaledToFit()
+                                                    .frame(width: 100, height: 100)
+                                                    .foregroundColor(.gray)
+                                            @unknown default:
+                                                EmptyView()
                                             }
                                         }
                                     }
+                                    .buttonStyle(.plain)
                                 }
-                                .frame(height: 120)
-                            } else {
-                                Text("Keine Bilder vorhanden.")
-                                    .foregroundColor(.gray)
-                            }
-                        }
-
-                        // Neues Bild hinzufügen
-                        Section("Neues Bild hinzufügen") {
-                            Button("Bild aus Fotobibliothek") {
-                                showImagePicker = true
-                            }
-                            .sheet(isPresented: $showImagePicker) {
-                                ImagePicker { selectedImage in
-                                    self.localSelectedImage = selectedImage
-                                }
-                            }
-
-                            if let localImage = localSelectedImage {
-                                Text("Vorschau (noch nicht hochgeladen):")
-                                    .font(.footnote)
-                                    .foregroundColor(.secondary)
-                                
-                                Image(uiImage: localImage)
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(height: 120)
-                                    .cornerRadius(8)
-                            }
-
-                            if let errorMessage = errorMessage {
-                                Text(errorMessage)
-                                    .foregroundColor(.red)
-                            }
-
-                            Button("Hochladen") {
-                                uploadImageIfNeeded()
-                            }
-                            .disabled(localSelectedImage == nil)
-                        }
-
-                        Section {
-                            Button("Speichern") {
-                                saveCharacterData()
-                            }
-                            .buttonStyle(.borderedProminent)
-
-                            Button("Löschen", role: .destructive) {
-                                characterVM.deleteCharacter(character)
-                                dismiss()
                             }
                         }
                     }
-                    .navigationTitle("Charakter bearbeiten")
-                    .sheet(isPresented: $showFullScreenImage) {
-                        if let url = selectedImageURL {
-                            LargeImageView(imageURL: url, title: character.name)
-                        }
-                    }
-                    .onAppear {
-                        if !character.userId.isEmpty {
-                            characterVM.fetchCharacters(for: character.userId)
-                        }
+                    .frame(height: 120)
+                } else {
+                    Text("Keine Bilder vorhanden.")
+                        .foregroundColor(.gray)
+                }
+            }
+            
+            // Neues Bild hinzufügen
+            Section("Neues Bild hinzufügen") {
+                Button("Bild aus Fotobibliothek") {
+                    showImagePicker = true
+                }
+                .sheet(isPresented: $showImagePicker) {
+                    ImagePicker { selectedImage in
+                        self.localSelectedImage = selectedImage
                     }
                 }
+                
+                if let localImage = localSelectedImage {
+                    Text("Vorschau (noch nicht hochgeladen):")
+                        .font(.footnote)
+                        .foregroundColor(.secondary)
+                    
+                    Image(uiImage: localImage)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(height: 120)
+                        .cornerRadius(8)
+                }
+                
+                if let errorMessage = errorMessage {
+                    Text(errorMessage)
+                        .foregroundColor(.red)
+                }
+                
+                Button("Hochladen") {
+                    uploadImageIfNeeded()
+                }
+                .disabled(localSelectedImage == nil)
+            }
+            
+            Section {
+                Button("Speichern") {
+                    saveCharacterData()
+                }
+                .buttonStyle(.borderedProminent)
+                
+                Button("Löschen", role: .destructive) {
+                    characterVM.deleteCharacter(character)
+                    dismiss()
+                }
+            }
+        }
+        .navigationTitle("Charakter bearbeiten")
+        .sheet(isPresented: $showFullScreenImage) {
+            if let url = selectedImageURL {
+                LargeImageView(imageURL: url, title: character.name)
+            }
+        }
+        .onAppear {
+            if !character.userId.isEmpty {
+                characterVM.fetchCharacters(for: character.userId)
+            }
+        }
+    }
     
     private func uploadProfileImageIfNeeded() {
         guard let localProfileImage = localProfileImage else { return }
-
+        
         characterVM.uploadProfileImage(localProfileImage, for: character) { result in
             switch result {
             case .success:
                 self.localProfileImage = nil
             case .failure(let error):
-                // errorMessage = ...
                 print("Fehler beim Profilbild hochladen: \(error.localizedDescription)")
             }
         }
     }
+    
+    private func saveCharacterData() {
+        var updatedCharacter = character
+        // Allgemeine Daten
+        updatedCharacter.name = name
+        updatedCharacter.streetName = streetName.isEmpty ? nil : streetName
+        updatedCharacter.metaType = metaType.isEmpty ? nil : metaType
+        updatedCharacter.specialization = specialization.isEmpty ? nil : specialization
+        updatedCharacter.magicOrResonance = magicOrResonance.isEmpty ? nil : magicOrResonance
+        updatedCharacter.gender = gender.isEmpty ? nil : gender
+        updatedCharacter.height = height
+        updatedCharacter.weight = weight
+        updatedCharacter.age = age
+        updatedCharacter.reputation = reputation
+        updatedCharacter.wantedLevel = wantedLevel
+        updatedCharacter.karma = karma
+        updatedCharacter.essence = essence
+        
+        // Attribute
+        updatedCharacter.attributes = [
+            "konstitution": konstitution,
+            "geschicklichkeit": geschicklichkeit,
+            "reaktion": reaktion,
+            "staerke": staerke,
+            "willenskraft": willenskraft,
+            "logik": logik,
+            "intuition": intuition,
+            "charisma": charisma,
+            "edge": edge,
+            "nebenhandlungen": nebenhandlungen,
+            "iniHotCold": iniHotCold,
+            "iniMatrixVR": iniMatrixVR,
+            "iniAstral": iniAstral,
+            "verteidigung": verteidigung,
+            "selbstbeherrschung": selbstbeherrschung,
+            "menschenkenntnis": menschenkenntnis,
+            "erinnerungsvermoegen": erinnerungsvermoegen,
+            "hebenTragen": hebenTragen
+        ]
+        
+        // Skills
+        updatedCharacter.skillPoints = [
+            "biotech": biotech,
+            "ersteHilfe": ersteHilfe,
+            "athletik": athletik,
+            "einfluss": einfluss,
+            "elektronik": elektronik,
+            "hardware": hardware,
+            "feuerwaffen": feuerwaffen,
+            "heimlichkeit": heimlichkeit,
+            "mechanik": mechanik,
+            "nahkampf": nahkampf,
+            "natur": natur,
+            "steuern": steuern,
+            "wahrnehmung": wahrnehmung,
+            "ueberreden": ueberreden
+        ]
+        
+        // Ausrüstung + Backstory
+        let equipmentArray = equipmentString
+            .split(separator: ",")
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+        updatedCharacter.equipment = equipmentArray.isEmpty ? nil : equipmentArray
+        updatedCharacter.backstory = backstory
+        
+        characterVM.updateCharacter(updatedCharacter)
+        dismiss()
+    }
+    
+    private func uploadImageIfNeeded() {
+        guard let image = localSelectedImage else { return }
+        
+        characterVM.uploadImage(image, for: character) { result in
+            switch result {
+            case .success:
+                self.localSelectedImage = nil
+            case .failure(let error):
+                self.errorMessage = "Fehler beim Hochladen: \(error.localizedDescription)"
+            }
+        }
+    }
+}
 
-                private func saveCharacterData() {
-                    var updatedCharacter = character
-                    // ... (Allgemeine Daten)
-                    updatedCharacter.name = name
-                    updatedCharacter.streetName = streetName.isEmpty ? nil : streetName
-                    updatedCharacter.metaType = metaType.isEmpty ? nil : metaType
-                    updatedCharacter.specialization = specialization.isEmpty ? nil : specialization
-                    updatedCharacter.magicOrResonance = magicOrResonance.isEmpty ? nil : magicOrResonance
-                    updatedCharacter.gender = gender.isEmpty ? nil : gender
-                    updatedCharacter.height = height
-                    updatedCharacter.weight = weight
-                    updatedCharacter.age = age
-                    updatedCharacter.reputation = reputation
-                    updatedCharacter.wantedLevel = wantedLevel
-                    updatedCharacter.karma = karma
-                    updatedCharacter.essence = essence
-
-                    // ... (Attribute)
-                    updatedCharacter.attributes = [
-                        "konstitution": konstitution,
-                        "geschicklichkeit": geschicklichkeit,
-                        "reaktion": reaktion,
-                        "staerke": staerke,
-                        "willenskraft": willenskraft,
-                        "logik": logik,
-                        "intuition": intuition,
-                        "charisma": charisma,
-                        "edge": edge,
-                        "nebenhandlungen": nebenhandlungen,
-                        "iniHotCold": iniHotCold,
-                        "iniMatrixVR": iniMatrixVR,
-                        "iniAstral": iniAstral,
-                        "verteidigung": verteidigung,
-                        "selbstbeherrschung": selbstbeherrschung,
-                        "menschenkenntnis": menschenkenntnis,
-                        "erinnerungsvermoegen": erinnerungsvermoegen,
-                        "hebenTragen": hebenTragen
-                    ]
-
-                    // ... (Skills)
-                    updatedCharacter.skillPoints = [
-                        "biotech": biotech,
-                        "ersteHilfe": ersteHilfe,
-                        "athletik": athletik,
-                        "einfluss": einfluss,
-                        "elektronik": elektronik,
-                        "hardware": hardware,
-                        "feuerwaffen": feuerwaffen,
-                        "heimlichkeit": heimlichkeit,
-                        "mechanik": mechanik,
-                        "nahkampf": nahkampf,
-                        "natur": natur,
-                        "steuern": steuern,
-                        "wahrnehmung": wahrnehmung,
-                        "ueberreden": ueberreden
-                    ]
-
-                    // Ausrüstung + Backstory
-                    let equipmentArray = equipmentString
-                        .split(separator: ",")
-                        .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
-                    updatedCharacter.equipment = equipmentArray.isEmpty ? nil : equipmentArray
-                    updatedCharacter.backstory = backstory
-
-                    characterVM.updateCharacter(updatedCharacter)
-                    dismiss()
+struct CharacterLargeImageView: View {
+    let imageURL: URL
+    let title: String
+    
+    @Environment(\.dismiss) var dismiss
+    
+    var body: some View {
+        NavigationView {
+            AsyncImage(url: imageURL) { phase in
+                switch phase {
+                case .empty:
+                    ProgressView()
+                        .scaleEffect(1.5)
+                case .success(let image):
+                    image
+                        .resizable()
+                        .scaledToFit()
+                        .background(Color.black)
+                        .ignoresSafeArea(edges: .bottom)
+                case .failure:
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .resizable()
+                        .scaledToFit()
+                        .foregroundColor(.red)
+                @unknown default:
+                    EmptyView()
                 }
-
-                private func uploadImageIfNeeded() {
-                    guard let image = localSelectedImage else { return }
-
-                    characterVM.uploadImage(image, for: character) { result in
-                        switch result {
-                        case .success:
-                            self.localSelectedImage = nil
-                        case .failure(let error):
-                            self.errorMessage = "Fehler beim Hochladen: \(error.localizedDescription)"
-                        }
+            }
+            .navigationTitle(title)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Schließen") {
+                        dismiss()
                     }
                 }
             }
-
-            struct CharacterLargeImageView: View {
-                let imageURL: URL
-                let title: String
-                
-                @Environment(\.dismiss) var dismiss
-                
-                var body: some View {
-                    NavigationView {
-                        AsyncImage(url: imageURL) { phase in
-                            switch phase {
-                            case .empty:
-                                ProgressView()
-                                    .scaleEffect(1.5)
-                            case .success(let image):
-                                image
-                                    .resizable()
-                                    .scaledToFit()
-                                    .background(Color.black)
-                                    .ignoresSafeArea(edges: .bottom)
-                            case .failure:
-                                Image(systemName: "exclamationmark.triangle.fill")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .foregroundColor(.red)
-                            @unknown default:
-                                EmptyView()
-                            }
-                        }
-                        .navigationTitle(title)
-                        .navigationBarTitleDisplayMode(.inline)
-                        .toolbar {
-                            ToolbarItem(placement: .navigationBarTrailing) {
-                                Button("Schließen") {
-                                    dismiss()
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+        }
+    }
+}

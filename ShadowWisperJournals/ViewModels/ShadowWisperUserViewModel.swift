@@ -3,7 +3,7 @@
 //  ShadowWisperJournals
 //
 //  Created by Stefanie Seeck on 02.01.25.
-// Test
+// 
 
 import Firebase
 import FirebaseAuth
@@ -11,50 +11,50 @@ import FirebaseFirestore
 import Foundation
 
 class ShadowWisperUserViewModel: ObservableObject {
-
+    
     @Published var user: FireUser?
     @Published var errorMessage: String?
     @Published var displayName: String?
     @Published var isAuthenticated: Bool = false
     @Published var isCheckingAuth: Bool = true
-
+    
     @Published var shouldShowRegistration: Bool = false
-
+    
     @Published var registrationSuccess: Bool = false
-
+    
     private let db = Firestore.firestore()
     private var journalViewModel: ShadowWisperJournalViewModel?
-
+    
     var userId: String? {
         user?.id
     }
-
+    
     init() {
         checkShadowWisperAuth()
     }
-
+    
     func setJournalViewModel(_ viewModel: ShadowWisperJournalViewModel) {
         self.journalViewModel = viewModel
     }
-
+    
     func loginShadowWisperUser(email: String, password: String) {
         guard !email.isEmpty, !password.isEmpty else {
             self.errorMessage = "Bitte E-Mail und Passwort eingeben."
             return
         }
-
+        
         Auth.auth().signIn(withEmail: email, password: password) {
             authResult, error in
             if let error = error {
                 self.errorMessage =
-                    "Anmeldung fehlgeschlagen: \(error.localizedDescription)"
+                "Anmeldung fehlgeschlagen: \(error.localizedDescription)"
                 return
             }
             guard let authResult = authResult else { return }
             self.fetchShadowWisperUser(id: authResult.user.uid)
         }
     }
-
+    
     func registerShadowWisperUser(
         email: String,
         password: String,
@@ -67,18 +67,18 @@ class ShadowWisperUserViewModel: ObservableObject {
             self.errorMessage = "Bitte alle Felder ausfüllen."
             return
         }
-
+        
         Auth.auth().createUser(withEmail: email, password: password) {
             authResult, error in
             if let error = error {
                 self.errorMessage =
-                    "Registrierung fehlgeschlagen: \(error.localizedDescription)"
+                "Registrierung fehlgeschlagen: \(error.localizedDescription)"
                 return
             }
             guard let authResult = authResult else { return }
-
+            
             self.registrationSuccess = true
-
+            
             self.createShadowWisperUser(
                 id: authResult.user.uid,
                 displayName: displayName,
@@ -86,11 +86,11 @@ class ShadowWisperUserViewModel: ObservableObject {
                 gender: gender,
                 profession: profession
             )
-
+            
             self.fetchShadowWisperUser(id: authResult.user.uid)
         }
     }
-
+    
     private func createShadowWisperUser(
         id: String,
         displayName: String,
@@ -106,44 +106,44 @@ class ShadowWisperUserViewModel: ObservableObject {
             gender: gender,
             profession: profession
         )
-
+        
         do {
             try db.collection("users").document(id).setData(from: fireUser)
         } catch {
             self.errorMessage =
-                "Fehler beim Speichern der Benutzerdaten: \(error.localizedDescription)"
+            "Fehler beim Speichern der Benutzerdaten: \(error.localizedDescription)"
         }
     }
-
+    
     func fetchShadowWisperUser(id: String) {
         db.collection("users").document(id).getDocument { document, error in
             if let error = error {
                 self.errorMessage =
-                    "Fehler beim Laden der Benutzerdaten: \(error.localizedDescription)"
+                "Fehler beim Laden der Benutzerdaten: \(error.localizedDescription)"
                 return
             }
             guard let document = document, document.exists else {
                 self.errorMessage =
-                    "Benutzer nicht gefunden, bitte registrieren."
+                "Benutzer nicht gefunden, bitte registrieren."
                 self.shouldShowRegistration = true
                 return
             }
-
+            
             do {
                 self.user = try document.data(as: FireUser.self)
                 self.displayName = self.user?.displayName
                 self.isAuthenticated = true
-
+                
                 if let userId = self.user?.id {
                     self.journalViewModel?.fetchJournalEntries(for: userId)
                 }
             } catch {
                 self.errorMessage =
-                    "Fehler beim Konvertieren der Benutzerdaten: \(error.localizedDescription)"
+                "Fehler beim Konvertieren der Benutzerdaten: \(error.localizedDescription)"
             }
         }
     }
-
+    
     func checkShadowWisperAuth() {
         self.isCheckingAuth = true
         if let currentUser = Auth.auth().currentUser {
@@ -154,7 +154,7 @@ class ShadowWisperUserViewModel: ObservableObject {
         }
         self.isCheckingAuth = false
     }
-
+    
     func logoutShadowWisperUser() {
         do {
             try Auth.auth().signOut()
@@ -162,12 +162,12 @@ class ShadowWisperUserViewModel: ObservableObject {
             self.displayName = nil
             self.isAuthenticated = false
             self.shouldShowRegistration = false
-
+            
             self.registrationSuccess = false
             journalViewModel?.removeListener()
         } catch {
             self.errorMessage =
-                "Abmeldung fehlgeschlagen: \(error.localizedDescription)"
+            "Abmeldung fehlgeschlagen: \(error.localizedDescription)"
         }
     }
 }

@@ -3,7 +3,7 @@
 //  ShadowWisperJournals
 //
 //  Created by Stefanie Seeck on 06.01.25.
-// Test
+//
 
 import FirebaseFirestore
 import Foundation
@@ -18,7 +18,7 @@ struct Character: Identifiable, Codable {
     var userId: String
     var createdAt: Date
     var updatedAt: Date
-
+    
     var streetName: String?
     var metaType: String?
     var specialization: String?
