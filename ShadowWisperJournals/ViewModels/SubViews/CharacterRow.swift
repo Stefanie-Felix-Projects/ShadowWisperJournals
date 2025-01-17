@@ -46,7 +46,7 @@ struct CharacterRow: View {
             
             VStack(alignment: .leading) {
                 Text(character.name)
-                if let metaType = character.metaType {
+                if let metaType = character.specialization {
                     Text(metaType)
                         .font(.subheadline)
                         .foregroundColor(.gray)

@@ -47,7 +47,7 @@ struct SelectableCharacterRow: View {
             VStack(alignment: .leading) {
                 Text(character.name)
                     .font(.headline)
-                if let metaType = character.metaType {
+                if let metaType = character.specialization {
                     Text(metaType)
                         .font(.subheadline)
                         .foregroundColor(.gray)

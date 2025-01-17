@@ -22,23 +22,26 @@ struct AssignCharactersView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Verfügbare Charaktere anderer Nutzer") {
-                    let otherUsersCharacters = characterVM.characters.filter {
-                        $0.userId != userViewModel.userId
-                    }
+                Section("Alle verfügbaren Charaktere") {
+                    let allCharacters = characterVM.characters
                     
-                    if otherUsersCharacters.isEmpty {
-                        Text("Keine Charaktere anderer Nutzer vorhanden.")
+                    if allCharacters.isEmpty {
+                        Text("Keine Charaktere vorhanden.")
                             .foregroundColor(.gray)
                     } else {
-                        List(otherUsersCharacters, id: \.id) { character in
-                            MultipleSelectionRow(
-                                title: character.name,
-                                isSelected: selectedCharacterIds.contains(
-                                    character.id ?? "")
-                            ) {
-                                toggleSelection(for: character.id ?? "")
-                            }
+                        List(allCharacters, id: \ .id) { character in
+                            let cId = character.id ?? ""
+                            CharacterRow(
+                                character: character,
+                                isSelected: selectedCharacterIds.contains(cId),
+                                toggleSelection: {
+                                    if selectedCharacterIds.contains(cId) {
+                                        selectedCharacterIds.removeAll { $0 == cId }
+                                    } else {
+                                        selectedCharacterIds.append(cId)
+                                    }
+                                }
+                            )
                         }
                     }
                 }
@@ -65,14 +68,6 @@ struct AssignCharactersView: View {
             .onAppear {
                 characterVM.fetchAllCharacters()
             }
-        }
-    }
-    
-    private func toggleSelection(for characterId: String) {
-        if selectedCharacterIds.contains(characterId) {
-            selectedCharacterIds.removeAll { $0 == characterId }
-        } else {
-            selectedCharacterIds.append(characterId)
         }
     }
 }

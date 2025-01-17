@@ -22,6 +22,8 @@ struct NewChatView: View {
     
     @State private var searchText: String = ""
     @State private var initialMessage: String = ""
+    @State private var showExistingChatAlert: Bool = false
+    @State private var existingChat: Chat? = nil
     
     private var myCharacters: [Character] {
         guard let userId = userViewModel.userId else { return [] }
@@ -37,7 +39,7 @@ struct NewChatView: View {
         NavigationStack {
             Form {
                 Section("Mit welchem meiner Charaktere schreibe ich?") {
-                    List(myCharacters, id: \.id) { ch in
+                    List(myCharacters, id: \ .id) { ch in
                         SelectableCharacterRow(
                             character: ch,
                             isSelected: mySelectedCharId == ch.id,
@@ -60,7 +62,7 @@ struct NewChatView: View {
                         return char.name.localizedCaseInsensitiveContains(searchText)
                     }
                     
-                    List(filteredOthers, id: \.id) { ch in
+                    List(filteredOthers, id: \ .id) { ch in
                         SelectableCharacterRow(
                             character: ch,
                             isSelected: otherSelectedCharId == ch.id,
@@ -94,6 +96,17 @@ struct NewChatView: View {
                     }
                 }
             }
+            .alert(isPresented: $showExistingChatAlert) {
+                Alert(
+                    title: Text("Chat existiert bereits"),
+                    message: Text("Ein Chat zwischen diesen Charakteren existiert bereits. Er wird geöffnet."),
+                    dismissButton: .default(Text("OK"), action: {
+                        if let existingChat = existingChat {
+                            navigateToChatDetail(chat: existingChat)
+                        }
+                    })
+                )
+            }
             .onAppear {
                 characterVM.fetchAllCharacters()
             }
@@ -111,12 +124,24 @@ struct NewChatView: View {
             initialMessage: initialMessage,
             senderCharId: myCharId
         ) { chat in
-            if chat != nil {
-                self.dismiss()
-                
+            if let existingChat = chat {
+                self.existingChat = existingChat
+                self.showExistingChatAlert = true
             } else {
-                self.dismiss()
+                dismiss()
+                onSuccess?()
             }
+        }
+    }
+    
+    private func navigateToChatDetail(chat: Chat) {
+        dismiss()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            chatVM.fetchMessages(for: chat.id ?? "")
+            if !initialMessage.isEmpty {
+                chatVM.sendMessage(to: chat, senderCharId: mySelectedCharId ?? "", text: initialMessage)
+            }
+            onSuccess?()
         }
     }
 }
