@@ -3,7 +3,7 @@
 //  ShadowWisperJournals
 //
 //  Created by Stefanie Seeck on 05.01.25.
-// 
+//
 
 import SwiftUI
 
@@ -30,6 +30,12 @@ struct AddQuestView: View {
     var body: some View {
         NavigationStack {
             Form {
+                Section("Quest-Details") {
+                    TextField("Titel der Quest", text: $title)
+                    TextField("Beschreibung", text: $description)
+                    TextField("Belohnung", text: $reward)
+                }
+                
                 Section("Charaktere zuweisen") {
                     let availableCharacters = characterVM.characters
                     
