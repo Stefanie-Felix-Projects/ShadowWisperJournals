@@ -27,6 +27,7 @@ extension Color {
 }
 
 struct AppColors {
+    // Standard Farben
     static let color1 = Color(hex: "#1c293b")
     static let color2 = Color(hex: "#02050f")
     static let color3 = Color(hex: "#01060f")
@@ -38,8 +39,16 @@ struct AppColors {
     static let color9 = Color(hex: "#1d2a3d")
     static let color10 = Color(hex: "#162030")
 
+    // Signalfarben
+    static let signalColor1 = Color(hex: "#e49399")
+    static let signalColor2 = Color(hex: "#fce3be")
+    static let signalColor3 = Color(hex: "#fbd0b6")
+    static let signalColor4 = Color(hex: "#ce87ad")
+    static let signalColor5 = Color(hex: "#f9be8d")
+
+    // Gradient-Farben
     static let gradientColors: [Color] = [
         color1, color2, color3, color4, color5,
-        color6, color7, color8, color9, color10
+        color6, color7, color8, color9, color10,
     ]
 }

@@ -2,6 +2,18 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>UIAppFonts</key>
+	<array>
+		<string>SmoochSans-Regular.ttf</string>
+		<string>SmoochSans-Thin.ttf</string>
+		<string>SmoochSans-ExtraLight.ttf</string>
+		<string>SmoochSans-Light.ttf</string>
+		<string>SmoochSans-Medium.ttf</string>
+		<string>SmoochSans-SemiBold.ttf</string>
+		<string>SmoochSans-Bold.ttf</string>
+		<string>SmoochSans-ExtraBold.ttf</string>
+		<string>SmoochSans-Black.ttf</string>
+	</array>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>audio</string>

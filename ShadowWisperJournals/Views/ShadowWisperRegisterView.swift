@@ -15,47 +15,52 @@ struct ShadowWisperRegisterView: View {
     @State private var displayName: String = ""
     
     var body: some View {
-        VStack {
-            Text("Registrieren (ShadowWisperJournals)")
-                .font(.largeTitle)
-                .bold()
+        ZStack {
+            AnimatedBackgroundView(colors: AppColors.gradientColors)
+                .ignoresSafeArea()
             
-            if let errorMessage = userViewModel.errorMessage {
-                Text(errorMessage)
-                    .foregroundColor(.red)
+            VStack(spacing: 20) {
+                Text("Registrieren (ShadowWisperJournals)")
+                    .font(.largeTitle)
+                    .bold()
+                
+                if let errorMessage = userViewModel.errorMessage {
+                    Text(errorMessage)
+                        .foregroundColor(.red)
+                        .padding()
+                }
+                
+                TextField("E-Mail", text: $email)
                     .padding()
-            }
-            
-            TextField("E-Mail", text: $email)
+                    .background(Color.gray.opacity(0.2))
+                    .cornerRadius(8)
+                    .keyboardType(.emailAddress)
+                
+                SecureField("Passwort", text: $password)
+                    .padding()
+                    .background(Color.gray.opacity(0.2))
+                    .cornerRadius(8)
+                
+                TextField("Anzeigename", text: $displayName)
+                    .padding()
+                    .background(Color.gray.opacity(0.2))
+                    .cornerRadius(8)
+                
+                Button("Registrieren") {
+                    userViewModel.registerShadowWisperUser(
+                        email: email,
+                        password: password,
+                        displayName: displayName
+                    )
+                }
                 .padding()
-                .background(Color.gray.opacity(0.2))
+                .background(Color.green)
+                .foregroundColor(.white)
                 .cornerRadius(8)
-                .keyboardType(.emailAddress)
-            
-            SecureField("Passwort", text: $password)
-                .padding()
-                .background(Color.gray.opacity(0.2))
-                .cornerRadius(8)
-            
-            TextField("Anzeigename", text: $displayName)
-                .padding()
-                .background(Color.gray.opacity(0.2))
-                .cornerRadius(8)
-            
-            Button("Registrieren") {
-                userViewModel.registerShadowWisperUser(
-                    email: email,
-                    password: password,
-                    displayName: displayName
-                )
             }
             .padding()
-            .background(Color.green)
-            .foregroundColor(.white)
-            .cornerRadius(8)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(Color.clear)
         }
-        .padding()
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color.clear)
     }
 }

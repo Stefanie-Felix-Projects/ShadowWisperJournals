@@ -11,7 +11,6 @@ import SwiftUI
 @main
 struct ShadowWisperJournalsApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
-
     @StateObject private var userViewModel = ShadowWisperUserViewModel()
 
     init() {
@@ -22,6 +21,10 @@ struct ShadowWisperJournalsApp: App {
         WindowGroup {
             RootView()
                 .environmentObject(userViewModel)
+                // Hier die "globale" Font setzen:
+                .environment(\.font,
+                             .custom("SmoochSans-Regular", size: 16)
+                )
         }
     }
 }

@@ -16,9 +16,9 @@ struct ShadowWisperLoginView: View {
     
     var body: some View {
         VStack(spacing: 20) {
-            Text("Anmelden (ShadowWisperJournals)")
-                .font(.largeTitle)
-                .bold()
+            Text("ShadowWisperJournals")
+                .font(.custom("SmoochSans-Bold", size: 40, relativeTo: .largeTitle))
+                .foregroundColor(AppColors.signalColor4) // Titel in knalliger Farbe
             
             if let errorMessage = userViewModel.errorMessage {
                 Text(errorMessage)
@@ -43,20 +43,34 @@ struct ShadowWisperLoginView: View {
             }) {
                 Text("Login")
                     .padding()
+                    .font(.custom("SmoochSans-Bold", size: 30, relativeTo: .largeTitle))
                     .frame(maxWidth: .infinity)
-                    .background(Color.blue)
-                    .foregroundColor(.white)
+                    .background(
+                        LinearGradient(
+                            gradient: Gradient(colors: [AppColors.signalColor1, AppColors.signalColor5]),
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .foregroundColor(.black) // Schwarzer Text für Kontrast
                     .cornerRadius(8)
+                    .shadow(color: AppColors.signalColor1.opacity(0.8), radius: 10, x: 0, y: 5) // Neon-Glow-Effekt
             }
             
             Button("Noch kein Konto? Hier registrieren") {
                 isRegisterViewActive = true
             }
-            .foregroundColor(.blue)
+            .foregroundColor(AppColors.signalColor2) // Knallige Farbe für den Link
         }
         .padding()
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color.clear)
+        .background(
+            LinearGradient(
+                gradient: Gradient(colors: [AppColors.color1, AppColors.color7]),
+                startPoint: .top,
+                endPoint: .bottom
+            )
+        )
         .sheet(isPresented: $isRegisterViewActive) {
             ShadowWisperRegisterView()
                 .environmentObject(userViewModel)
