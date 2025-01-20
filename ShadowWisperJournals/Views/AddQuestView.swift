@@ -147,6 +147,8 @@ struct AddQuestView: View {
                     }
                 }
             }
+            .scrollContentBackground(.hidden)
+            .background(Color.clear)
             .navigationTitle("Neue Quest")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -156,5 +158,6 @@ struct AddQuestView: View {
                 }
             }
         }
+        .background(Color.clear)
     }
 }

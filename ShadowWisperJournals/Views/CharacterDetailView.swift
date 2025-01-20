@@ -142,286 +142,294 @@ struct CharacterDetailView: View {
         _ueberreden = State(initialValue: skillVal("ueberreden"))
         
         // Ausrüstung & Backstory
-        _equipmentString = State(initialValue: (character.equipment ?? []).joined(separator: ", "))
+        _equipmentString = State(
+            initialValue: (character.equipment ?? []).joined(separator: ", ")
+        )
         _backstory = State(initialValue: character.backstory ?? "")
     }
     
     var body: some View {
-        Form {
-            Section("Profilbild") {
-                if let profileURL = character.profileImageURL, let url = URL(string: profileURL) {
-                    AsyncImage(url: url) { phase in
-                        switch phase {
-                        case .empty:
-                            ProgressView()
-                                .frame(width: 100, height: 100)
-                        case .success(let image):
-                            image
-                                .resizable()
-                                .scaledToFill()
-                                .frame(width: 100, height: 100)
-                                .clipped()
-                                .cornerRadius(8)
-                        case .failure:
+        NavigationStack {
+            ZStack {
+                AnimatedBackgroundView(colors: AppColors.gradientColors)
+                    .ignoresSafeArea()
+                Form {
+                    Section("Profilbild") {
+                        if let profileURL = character.profileImageURL,
+                           let url = URL(string: profileURL) {
+                            AsyncImage(url: url) { phase in
+                                switch phase {
+                                case .empty:
+                                    ProgressView()
+                                        .frame(width: 100, height: 100)
+                                case .success(let image):
+                                    image
+                                        .resizable()
+                                        .scaledToFill()
+                                        .frame(width: 100, height: 100)
+                                        .clipped()
+                                        .cornerRadius(8)
+                                case .failure:
+                                    Image(systemName: "person.crop.circle.fill")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 100, height: 100)
+                                        .foregroundColor(.gray)
+                                @unknown default:
+                                    EmptyView()
+                                }
+                            }
+                        } else {
                             Image(systemName: "person.crop.circle.fill")
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 100, height: 100)
                                 .foregroundColor(.gray)
-                        @unknown default:
-                            EmptyView()
                         }
-                    }
-                } else {
-                    Image(systemName: "person.crop.circle.fill")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 100, height: 100)
-                        .foregroundColor(.gray)
-                }
-                
-                Button("Neues Profilbild wählen") {
-                    showProfilePicker = true
-                }
-                .sheet(isPresented: $showProfilePicker) {
-                    ImagePicker { selectedImage in
-                        self.localProfileImage = selectedImage
-                    }
-                }
-                
-                if let localImage = localProfileImage {
-                    Text("Vorschau (noch nicht hochgeladen):")
-                        .font(.footnote)
-                        .foregroundColor(.secondary)
-                    
-                    Image(uiImage: localImage)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(height: 120)
-                        .cornerRadius(8)
-                    
-                    Button("Als Profilbild hochladen") {
-                        uploadProfileImageIfNeeded()
-                    }
-                    .buttonStyle(.bordered)
-                }
-            }
-            Section("Allgemeine Daten") {
-                TextField("Name (Realname)", text: $name)
-                TextField("Straßenname", text: $streetName)
-                TextField("Metatyp", text: $metaType)
-                TextField("Spezialisierung", text: $specialization)
-                TextField("Magie/Resonanz", text: $magicOrResonance)
-                TextField("Geschlecht", text: $gender)
-                
-                HStack {
-                    Text("Größe (cm)")
-                    Spacer()
-                    TextField("z.B. 180", value: $height, format: .number)
-                        .keyboardType(.numberPad)
-                        .frame(width: 80)
-                        .multilineTextAlignment(.trailing)
-                }
-                HStack {
-                    Text("Gewicht (kg)")
-                    Spacer()
-                    TextField("z.B. 80", value: $weight, format: .number)
-                        .keyboardType(.numberPad)
-                        .frame(width: 80)
-                        .multilineTextAlignment(.trailing)
-                }
-                HStack {
-                    Text("Alter")
-                    Spacer()
-                    TextField("z.B. 25", value: $age, format: .number)
-                        .keyboardType(.numberPad)
-                        .frame(width: 80)
-                        .multilineTextAlignment(.trailing)
-                }
-                HStack {
-                    Text("Ruf")
-                    Spacer()
-                    TextField("z.B. 3", value: $reputation, format: .number)
-                        .keyboardType(.numberPad)
-                        .frame(width: 80)
-                        .multilineTextAlignment(.trailing)
-                }
-                HStack {
-                    Text("Fahndungsstufe")
-                    Spacer()
-                    TextField("z.B. 2", value: $wantedLevel, format: .number)
-                        .keyboardType(.numberPad)
-                        .frame(width: 80)
-                        .multilineTextAlignment(.trailing)
-                }
-                HStack {
-                    Text("Karma")
-                    Spacer()
-                    TextField("z.B. 10", value: $karma, format: .number)
-                        .keyboardType(.numberPad)
-                        .frame(width: 80)
-                        .multilineTextAlignment(.trailing)
-                }
-                HStack {
-                    Text("Essenz")
-                    Spacer()
-                    TextField("z.B. 5.5", value: $essence, format: .number)
-                        .keyboardType(.decimalPad)
-                        .frame(width: 80)
-                        .multilineTextAlignment(.trailing)
-                }
-            }
-            
-            // Attribute
-            Section("Attribute") {
-                Stepper("Konstitution: \(konstitution)", value: $konstitution, in: 0...50)
-                Stepper("Geschicklichkeit: \(geschicklichkeit)", value: $geschicklichkeit, in: 0...50)
-                Stepper("Reaktion: \(reaktion)", value: $reaktion, in: 0...50)
-                Stepper("Stärke: \(staerke)", value: $staerke, in: 0...50)
-                Stepper("Willenskraft: \(willenskraft)", value: $willenskraft, in: 0...50)
-                Stepper("Logik: \(logik)", value: $logik, in: 0...50)
-                Stepper("Intuition: \(intuition)", value: $intuition, in: 0...50)
-                Stepper("Charisma: \(charisma)", value: $charisma, in: 0...50)
-                Stepper("Edge: \(edge)", value: $edge, in: 0...50)
-                Stepper("Nebenhandlungen: \(nebenhandlungen)", value: $nebenhandlungen, in: 0...50)
-                Stepper("Initiative Hot/Cold: \(iniHotCold)", value: $iniHotCold, in: 0...50)
-                Stepper("Initiative Matrix VR: \(iniMatrixVR)", value: $iniMatrixVR, in: 0...50)
-                Stepper("Initiative Astral: \(iniAstral)", value: $iniAstral, in: 0...50)
-                Stepper("Verteidigung: \(verteidigung)", value: $verteidigung, in: 0...50)
-                Stepper("Selbstbeherrschung: \(selbstbeherrschung)", value: $selbstbeherrschung, in: 0...50)
-                Stepper("Menschenkenntnis: \(menschenkenntnis)", value: $menschenkenntnis, in: 0...50)
-                Stepper("Erinnerungsvermögen: \(erinnerungsvermoegen)", value: $erinnerungsvermoegen, in: 0...50)
-                Stepper("Heben/Tragen: \(hebenTragen)", value: $hebenTragen, in: 0...50)
-            }
-            
-            // Skills
-            Section("Fertigkeiten") {
-                Stepper("Biotech: \(biotech)", value: $biotech, in: 0...50)
-                Stepper("Erste Hilfe: \(ersteHilfe)", value: $ersteHilfe, in: 0...50)
-                Stepper("Athletik: \(athletik)", value: $athletik, in: 0...50)
-                Stepper("Einfluss: \(einfluss)", value: $einfluss, in: 0...50)
-                Stepper("Elektronik: \(elektronik)", value: $elektronik, in: 0...50)
-                Stepper("Hardware: \(hardware)", value: $hardware, in: 0...50)
-                Stepper("Feuerwaffen: \(feuerwaffen)", value: $feuerwaffen, in: 0...50)
-                Stepper("Heimlichkeit: \(heimlichkeit)", value: $heimlichkeit, in: 0...50)
-                Stepper("Mechanik: \(mechanik)", value: $mechanik, in: 0...50)
-                Stepper("Nahkampf: \(nahkampf)", value: $nahkampf, in: 0...50)
-                Stepper("Natur: \(natur)", value: $natur, in: 0...50)
-                Stepper("Steuern: \(steuern)", value: $steuern, in: 0...50)
-                Stepper("Wahrnehmung: \(wahrnehmung)", value: $wahrnehmung, in: 0...50)
-                Stepper("Überreden: \(ueberreden)", value: $ueberreden, in: 0...50)
-            }
-            
-            // Ausrüstung
-            Section("Ausrüstung") {
-                TextField("Ausrüstung (Kommagetrennt)", text: $equipmentString)
-                    .textInputAutocapitalization(.never)
-                    .autocorrectionDisabled(true)
-            }
-            
-            // Hintergrundgeschichte
-            Section("Hintergrundgeschichte") {
-                TextEditor(text: $backstory)
-                    .frame(minHeight: 100)
-            }
-            
-            // Bilder anzeigen
-            Section("Hochgeladene Bilder") {
-                if let urls = character.imageURLs, !urls.isEmpty {
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack {
-                            ForEach(urls, id: \.self) { urlString in
-                                if let url = URL(string: urlString) {
-                                    Button {
-                                        selectedImageURL = url
-                                        showFullScreenImage = true
-                                    } label: {
-                                        AsyncImage(url: url) { phase in
-                                            switch phase {
-                                            case .empty:
-                                                ProgressView()
-                                                    .frame(width: 100, height: 100)
-                                            case .success(let image):
-                                                image
-                                                    .resizable()
-                                                    .scaledToFill()
-                                                    .frame(width: 100, height: 100)
-                                                    .clipped()
-                                                    .cornerRadius(8)
-                                            case .failure:
-                                                Image(systemName: "photo.fill")
-                                                    .resizable()
-                                                    .scaledToFit()
-                                                    .frame(width: 100, height: 100)
-                                                    .foregroundColor(.gray)
-                                            @unknown default:
-                                                EmptyView()
-                                            }
-                                        }
-                                    }
-                                    .buttonStyle(.plain)
-                                }
+                        
+                        Button("Neues Profilbild wählen") {
+                            showProfilePicker = true
+                        }
+                        .sheet(isPresented: $showProfilePicker) {
+                            ImagePicker { selectedImage in
+                                self.localProfileImage = selectedImage
                             }
                         }
+                        
+                        if let localImage = localProfileImage {
+                            Text("Vorschau (noch nicht hochgeladen):")
+                                .font(.footnote)
+                                .foregroundColor(.secondary)
+                            
+                            Image(uiImage: localImage)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(height: 120)
+                                .cornerRadius(8)
+                            
+                            Button("Als Profilbild hochladen") {
+                                uploadProfileImageIfNeeded()
+                            }
+                            .buttonStyle(.bordered)
+                        }
                     }
-                    .frame(height: 120)
-                } else {
-                    Text("Keine Bilder vorhanden.")
-                        .foregroundColor(.gray)
-                }
-            }
-            
-            // Neues Bild hinzufügen
-            Section("Neues Bild hinzufügen") {
-                Button("Bild aus Fotobibliothek") {
-                    showImagePicker = true
-                }
-                .sheet(isPresented: $showImagePicker) {
-                    ImagePicker { selectedImage in
-                        self.localSelectedImage = selectedImage
-                    }
-                }
-                
-                if let localImage = localSelectedImage {
-                    Text("Vorschau (noch nicht hochgeladen):")
-                        .font(.footnote)
-                        .foregroundColor(.secondary)
                     
-                    Image(uiImage: localImage)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(height: 120)
-                        .cornerRadius(8)
+                    Section("Allgemeine Daten") {
+                        TextField("Name (Realname)", text: $name)
+                        TextField("Straßenname", text: $streetName)
+                        TextField("Metatyp", text: $metaType)
+                        TextField("Spezialisierung", text: $specialization)
+                        TextField("Magie/Resonanz", text: $magicOrResonance)
+                        TextField("Geschlecht", text: $gender)
+                        
+                        HStack {
+                            Text("Größe (cm)")
+                            Spacer()
+                            TextField("z.B. 180", value: $height, format: .number)
+                                .keyboardType(.numberPad)
+                                .frame(width: 80)
+                                .multilineTextAlignment(.trailing)
+                        }
+                        HStack {
+                            Text("Gewicht (kg)")
+                            Spacer()
+                            TextField("z.B. 80", value: $weight, format: .number)
+                                .keyboardType(.numberPad)
+                                .frame(width: 80)
+                                .multilineTextAlignment(.trailing)
+                        }
+                        HStack {
+                            Text("Alter")
+                            Spacer()
+                            TextField("z.B. 25", value: $age, format: .number)
+                                .keyboardType(.numberPad)
+                                .frame(width: 80)
+                                .multilineTextAlignment(.trailing)
+                        }
+                        HStack {
+                            Text("Ruf")
+                            Spacer()
+                            TextField("z.B. 3", value: $reputation, format: .number)
+                                .keyboardType(.numberPad)
+                                .frame(width: 80)
+                                .multilineTextAlignment(.trailing)
+                        }
+                        HStack {
+                            Text("Fahndungsstufe")
+                            Spacer()
+                            TextField("z.B. 2", value: $wantedLevel, format: .number)
+                                .keyboardType(.numberPad)
+                                .frame(width: 80)
+                                .multilineTextAlignment(.trailing)
+                        }
+                        HStack {
+                            Text("Karma")
+                            Spacer()
+                            TextField("z.B. 10", value: $karma, format: .number)
+                                .keyboardType(.numberPad)
+                                .frame(width: 80)
+                                .multilineTextAlignment(.trailing)
+                        }
+                        HStack {
+                            Text("Essenz")
+                            Spacer()
+                            TextField("z.B. 5.5", value: $essence, format: .number)
+                                .keyboardType(.decimalPad)
+                                .frame(width: 80)
+                                .multilineTextAlignment(.trailing)
+                        }
+                    }
+                    
+                    // Attribute
+                    Section("Attribute") {
+                        Stepper("Konstitution: \(konstitution)", value: $konstitution, in: 0...50)
+                        Stepper("Geschicklichkeit: \(geschicklichkeit)", value: $geschicklichkeit, in: 0...50)
+                        Stepper("Reaktion: \(reaktion)", value: $reaktion, in: 0...50)
+                        Stepper("Stärke: \(staerke)", value: $staerke, in: 0...50)
+                        Stepper("Willenskraft: \(willenskraft)", value: $willenskraft, in: 0...50)
+                        Stepper("Logik: \(logik)", value: $logik, in: 0...50)
+                        Stepper("Intuition: \(intuition)", value: $intuition, in: 0...50)
+                        Stepper("Charisma: \(charisma)", value: $charisma, in: 0...50)
+                        Stepper("Edge: \(edge)", value: $edge, in: 0...50)
+                        Stepper("Nebenhandlungen: \(nebenhandlungen)", value: $nebenhandlungen, in: 0...50)
+                        Stepper("Initiative Hot/Cold: \(iniHotCold)", value: $iniHotCold, in: 0...50)
+                        Stepper("Initiative Matrix VR: \(iniMatrixVR)", value: $iniMatrixVR, in: 0...50)
+                        Stepper("Initiative Astral: \(iniAstral)", value: $iniAstral, in: 0...50)
+                        Stepper("Verteidigung: \(verteidigung)", value: $verteidigung, in: 0...50)
+                        Stepper("Selbstbeherrschung: \(selbstbeherrschung)", value: $selbstbeherrschung, in: 0...50)
+                        Stepper("Menschenkenntnis: \(menschenkenntnis)", value: $menschenkenntnis, in: 0...50)
+                        Stepper("Erinnerungsvermögen: \(erinnerungsvermoegen)", value: $erinnerungsvermoegen, in: 0...50)
+                        Stepper("Heben/Tragen: \(hebenTragen)", value: $hebenTragen, in: 0...50)
+                    }
+                    
+                    // Skills
+                    Section("Fertigkeiten") {
+                        Stepper("Biotech: \(biotech)", value: $biotech, in: 0...50)
+                        Stepper("Erste Hilfe: \(ersteHilfe)", value: $ersteHilfe, in: 0...50)
+                        Stepper("Athletik: \(athletik)", value: $athletik, in: 0...50)
+                        Stepper("Einfluss: \(einfluss)", value: $einfluss, in: 0...50)
+                        Stepper("Elektronik: \(elektronik)", value: $elektronik, in: 0...50)
+                        Stepper("Hardware: \(hardware)", value: $hardware, in: 0...50)
+                        Stepper("Feuerwaffen: \(feuerwaffen)", value: $feuerwaffen, in: 0...50)
+                        Stepper("Heimlichkeit: \(heimlichkeit)", value: $heimlichkeit, in: 0...50)
+                        Stepper("Mechanik: \(mechanik)", value: $mechanik, in: 0...50)
+                        Stepper("Nahkampf: \(nahkampf)", value: $nahkampf, in: 0...50)
+                        Stepper("Natur: \(natur)", value: $natur, in: 0...50)
+                        Stepper("Steuern: \(steuern)", value: $steuern, in: 0...50)
+                        Stepper("Wahrnehmung: \(wahrnehmung)", value: $wahrnehmung, in: 0...50)
+                        Stepper("Überreden: \(ueberreden)", value: $ueberreden, in: 0...50)
+                    }
+                    
+                    // Ausrüstung
+                    Section("Ausrüstung") {
+                        TextField("Ausrüstung (Kommagetrennt)", text: $equipmentString)
+                            .textInputAutocapitalization(.never)
+                            .autocorrectionDisabled(true)
+                    }
+                    
+                    // Hintergrundgeschichte
+                    Section("Hintergrundgeschichte") {
+                        TextEditor(text: $backstory)
+                            .frame(minHeight: 100)
+                    }
+                    
+                    // Bilder anzeigen
+                    Section("Hochgeladene Bilder") {
+                        if let urls = character.imageURLs, !urls.isEmpty {
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                HStack {
+                                    ForEach(urls, id: \.self) { urlString in
+                                        if let url = URL(string: urlString) {
+                                            Button {
+                                                selectedImageURL = url
+                                                showFullScreenImage = true
+                                            } label: {
+                                                AsyncImage(url: url) { phase in
+                                                    switch phase {
+                                                    case .empty:
+                                                        ProgressView()
+                                                            .frame(width: 100, height: 100)
+                                                    case .success(let image):
+                                                        image
+                                                            .resizable()
+                                                            .scaledToFill()
+                                                            .frame(width: 100, height: 100)
+                                                            .clipped()
+                                                            .cornerRadius(8)
+                                                    case .failure:
+                                                        Image(systemName: "photo.fill")
+                                                            .resizable()
+                                                            .scaledToFit()
+                                                            .frame(width: 100, height: 100)
+                                                            .foregroundColor(.gray)
+                                                    @unknown default:
+                                                        EmptyView()
+                                                    }
+                                                }
+                                            }
+                                            .buttonStyle(.plain)
+                                        }
+                                    }
+                                }
+                            }
+                            .frame(height: 120)
+                        } else {
+                            Text("Keine Bilder vorhanden.")
+                                .foregroundColor(.gray)
+                        }
+                    }
+                    
+                    // Neues Bild hinzufügen
+                    Section("Neues Bild hinzufügen") {
+                        Button("Bild aus Fotobibliothek") {
+                            showImagePicker = true
+                        }
+                        .sheet(isPresented: $showImagePicker) {
+                            ImagePicker { selectedImage in
+                                self.localSelectedImage = selectedImage
+                            }
+                        }
+                        
+                        if let localImage = localSelectedImage {
+                            Text("Vorschau (noch nicht hochgeladen):")
+                                .font(.footnote)
+                                .foregroundColor(.secondary)
+                            
+                            Image(uiImage: localImage)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(height: 120)
+                                .cornerRadius(8)
+                        }
+                        
+                        if let errorMessage = errorMessage {
+                            Text(errorMessage)
+                                .foregroundColor(.red)
+                        }
+                        
+                        Button("Hochladen") {
+                            uploadImageIfNeeded()
+                        }
+                        .disabled(localSelectedImage == nil)
+                    }
+                    
+                    Section {
+                        Button("Speichern") {
+                            saveCharacterData()
+                        }
+                        .buttonStyle(.borderedProminent)
+                        
+                        Button("Löschen", role: .destructive) {
+                            characterVM.deleteCharacter(character)
+                            dismiss()
+                        }
+                    }
                 }
-                
-                if let errorMessage = errorMessage {
-                    Text(errorMessage)
-                        .foregroundColor(.red)
-                }
-                
-                Button("Hochladen") {
-                    uploadImageIfNeeded()
-                }
-                .disabled(localSelectedImage == nil)
+                .scrollContentBackground(.hidden)
+                .background(Color.clear)
+                .navigationTitle("Charakter bearbeiten")
             }
-            
-            Section {
-                Button("Speichern") {
-                    saveCharacterData()
-                }
-                .buttonStyle(.borderedProminent)
-                
-                Button("Löschen", role: .destructive) {
-                    characterVM.deleteCharacter(character)
-                    dismiss()
-                }
-            }
-        }
-        .navigationTitle("Charakter bearbeiten")
-        .sheet(isPresented: $showFullScreenImage) {
-            if let url = selectedImageURL {
-                LargeImageView(imageURL: url, title: character.name)
-            }
+            .background(Color.clear)
         }
         .onAppear {
             if !character.userId.isEmpty {
@@ -429,6 +437,8 @@ struct CharacterDetailView: View {
             }
         }
     }
+    
+    // MARK: - Hilfsfunktionen
     
     private func uploadProfileImageIfNeeded() {
         guard let localProfileImage = localProfileImage else { return }
@@ -524,6 +534,8 @@ struct CharacterDetailView: View {
         }
     }
 }
+
+// MARK: - Vollbild‐Ansicht für ein Bild (optional)
 
 struct CharacterLargeImageView: View {
     let imageURL: URL

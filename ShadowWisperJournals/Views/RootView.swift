@@ -11,13 +11,18 @@ struct RootView: View {
     @EnvironmentObject var userViewModel: ShadowWisperUserViewModel
     
     var body: some View {
-        VStack {
-            if userViewModel.shouldShowRegistration {
-                ShadowWisperRegisterView()
-            } else if userViewModel.isAuthenticated {
-                ShadowWisperHomeView()
-            } else {
-                ShadowWisperLoginView()
+        ZStack {
+            AnimatedBackgroundView(colors: AppColors.gradientColors)
+                .ignoresSafeArea()
+            
+            VStack {
+                if userViewModel.shouldShowRegistration {
+                    ShadowWisperRegisterView()
+                } else if userViewModel.isAuthenticated {
+                    ShadowWisperHomeView()
+                } else {
+                    ShadowWisperLoginView()
+                }
             }
         }
         .onAppear {

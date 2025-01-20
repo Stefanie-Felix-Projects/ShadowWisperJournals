@@ -88,6 +88,8 @@ struct NewChatView: View {
                     .disabled(mySelectedCharId == nil || otherSelectedCharId == nil)
                 }
             }
+            .scrollContentBackground(.hidden)
+            .background(Color.clear)
             .navigationTitle("Neuen Chat starten")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -111,6 +113,7 @@ struct NewChatView: View {
                 characterVM.fetchAllCharacters()
             }
         }
+        .background(Color.clear)
     }
     
     private func createChatOrOpenExisting() {

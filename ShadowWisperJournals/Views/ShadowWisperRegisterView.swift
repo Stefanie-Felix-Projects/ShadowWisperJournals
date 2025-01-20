@@ -55,6 +55,7 @@ struct ShadowWisperRegisterView: View {
             .cornerRadius(8)
         }
         .padding()
-        
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color.clear)
     }
 }

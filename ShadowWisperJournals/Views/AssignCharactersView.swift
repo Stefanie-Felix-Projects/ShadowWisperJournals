@@ -57,6 +57,8 @@ struct AssignCharactersView: View {
                     .disabled(selectedCharacterIds.isEmpty)
                 }
             }
+            .scrollContentBackground(.hidden)
+            .background(Color.clear)
             .navigationTitle("Charaktere zuweisen")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -69,5 +71,6 @@ struct AssignCharactersView: View {
                 characterVM.fetchAllCharacters()
             }
         }
+        .background(Color.clear)
     }
 }

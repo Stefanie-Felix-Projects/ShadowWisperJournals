@@ -55,6 +55,8 @@ struct ShadowWisperLoginView: View {
             .foregroundColor(.blue)
         }
         .padding()
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color.clear)
         .sheet(isPresented: $isRegisterViewActive) {
             ShadowWisperRegisterView()
                 .environmentObject(userViewModel)

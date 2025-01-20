@@ -78,203 +78,218 @@ struct AddCharacterView: View {
     @State private var localProfileImage: UIImage?
     
     var body: some View {
-        NavigationStack {
-            Form {
-                Section("Profilbild") {
-                    Button("Profilbild auswählen") {
-                        showProfileImagePicker = true
-                    }
-                    .sheet(isPresented: $showProfileImagePicker) {
-                        ImagePicker { selectedImage in
-                            self.localProfileImage = selectedImage
+        ZStack {
+            AnimatedBackgroundView(colors: AppColors.gradientColors)
+                .ignoresSafeArea()
+            
+            NavigationStack {
+                Form {
+                    // MARK: - Profilbild
+                    Section("Profilbild") {
+                        Button("Profilbild auswählen") {
+                            showProfileImagePicker = true
+                        }
+                        .sheet(isPresented: $showProfileImagePicker) {
+                            ImagePicker { selectedImage in
+                                self.localProfileImage = selectedImage
+                            }
+                        }
+                        
+                        if let localProfile = localProfileImage {
+                            Text("Profilbild-Vorschau (noch nicht hochgeladen):")
+                                .font(.footnote)
+                                .foregroundColor(.secondary)
+                            
+                            Image(uiImage: localProfile)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(height: 120)
+                                .cornerRadius(8)
+                        } else {
+                            Text("Kein Profilbild ausgewählt")
+                                .font(.footnote)
+                                .foregroundColor(.gray)
                         }
                     }
                     
-                    if let localProfile = localProfileImage {
-                        Text("Profilbild-Vorschau (noch nicht hochgeladen):")
-                            .font(.footnote)
-                            .foregroundColor(.secondary)
+                    // MARK: - Allgemeine Daten
+                    Section("Allgemeine Daten") {
+                        TextField("Name (Realname)", text: $name)
+                        TextField("Straßenname", text: $streetName)
+                        TextField("Metatyp", text: $metaType)
+                        TextField("Spezialisierung", text: $specialization)
+                        TextField("Magie/Resonanz", text: $magicOrResonance)
+                        TextField("Geschlecht", text: $gender)
                         
-                        Image(uiImage: localProfile)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(height: 120)
-                            .cornerRadius(8)
-                    } else {
-                        Text("Kein Profilbild ausgewählt")
-                            .font(.footnote)
-                            .foregroundColor(.gray)
-                    }
-                }
-                
-                Section("Allgemeine Daten") {
-                    TextField("Name (Realname)", text: $name)
-                    TextField("Straßenname", text: $streetName)
-                    TextField("Metatyp", text: $metaType)
-                    TextField("Spezialisierung", text: $specialization)
-                    TextField("Magie/Resonanz", text: $magicOrResonance)
-                    TextField("Geschlecht", text: $gender)
-                    
-                    HStack {
-                        Text("Größe (cm)")
-                        Spacer()
-                        TextField("z.B. 180", value: $height, format: .number)
-                            .keyboardType(.numberPad)
-                            .frame(width: 80)
-                            .multilineTextAlignment(.trailing)
-                    }
-                    
-                    HStack {
-                        Text("Gewicht (kg)")
-                        Spacer()
-                        TextField("z.B. 80", value: $weight, format: .number)
-                            .keyboardType(.numberPad)
-                            .frame(width: 80)
-                            .multilineTextAlignment(.trailing)
-                    }
-                    
-                    HStack {
-                        Text("Alter")
-                        Spacer()
-                        TextField("z.B. 25", value: $age, format: .number)
-                            .keyboardType(.numberPad)
-                            .frame(width: 80)
-                            .multilineTextAlignment(.trailing)
-                    }
-                    
-                    HStack {
-                        Text("Ruf")
-                        Spacer()
-                        TextField("z.B. 3", value: $reputation, format: .number)
-                            .keyboardType(.numberPad)
-                            .frame(width: 80)
-                            .multilineTextAlignment(.trailing)
-                    }
-                    
-                    HStack {
-                        Text("Fahndungsstufe")
-                        Spacer()
-                        TextField("z.B. 2", value: $wantedLevel, format: .number)
-                            .keyboardType(.numberPad)
-                            .frame(width: 80)
-                            .multilineTextAlignment(.trailing)
-                    }
-                    
-                    HStack {
-                        Text("Karma")
-                        Spacer()
-                        TextField("z.B. 10", value: $karma, format: .number)
-                            .keyboardType(.numberPad)
-                            .frame(width: 80)
-                            .multilineTextAlignment(.trailing)
-                    }
-                    
-                    HStack {
-                        Text("Essenz")
-                        Spacer()
-                        TextField("z.B. 5.5", value: $essence, format: .number)
-                            .keyboardType(.decimalPad)
-                            .frame(width: 80)
-                            .multilineTextAlignment(.trailing)
-                    }
-                }
-                
-                // Attribute
-                Section("Attribute") {
-                    Stepper("Konstitution: \(konstitution)", value: $konstitution, in: 0...50)
-                    Stepper("Geschicklichkeit: \(geschicklichkeit)", value: $geschicklichkeit, in: 0...50)
-                    Stepper("Reaktion: \(reaktion)", value: $reaktion, in: 0...50)
-                    Stepper("Stärke: \(staerke)", value: $staerke, in: 0...50)
-                    Stepper("Willenskraft: \(willenskraft)", value: $willenskraft, in: 0...50)
-                    Stepper("Logik: \(logik)", value: $logik, in: 0...50)
-                    Stepper("Intuition: \(intuition)", value: $intuition, in: 0...50)
-                    Stepper("Charisma: \(charisma)", value: $charisma, in: 0...50)
-                    Stepper("Edge: \(edge)", value: $edge, in: 0...50)
-                    Stepper("Nebenhandlungen: \(nebenhandlungen)", value: $nebenhandlungen, in: 0...50)
-                    Stepper("Initiative Hot/Cold: \(iniHotCold)", value: $iniHotCold, in: 0...50)
-                    Stepper("Initiative Matrix VR: \(iniMatrixVR)", value: $iniMatrixVR, in: 0...50)
-                    Stepper("Initiative Astral: \(iniAstral)", value: $iniAstral, in: 0...50)
-                    Stepper("Verteidigung: \(verteidigung)", value: $verteidigung, in: 0...50)
-                    Stepper("Selbstbeherrschung: \(selbstbeherrschung)", value: $selbstbeherrschung, in: 0...50)
-                    Stepper("Menschenkenntnis: \(menschenkenntnis)", value: $menschenkenntnis, in: 0...50)
-                    Stepper("Erinnerungsvermögen: \(erinnerungsvermoegen)", value: $erinnerungsvermoegen, in: 0...50)
-                    Stepper("Heben/Tragen: \(hebenTragen)", value: $hebenTragen, in: 0...50)
-                }
-                
-                // Skills
-                Section("Fertigkeiten") {
-                    Stepper("Biotech: \(biotech)", value: $biotech, in: 0...50)
-                    Stepper("Erste Hilfe: \(ersteHilfe)", value: $ersteHilfe, in: 0...50)
-                    Stepper("Athletik: \(athletik)", value: $athletik, in: 0...50)
-                    Stepper("Einfluss: \(einfluss)", value: $einfluss, in: 0...50)
-                    Stepper("Elektronik: \(elektronik)", value: $elektronik, in: 0...50)
-                    Stepper("Hardware: \(hardware)", value: $hardware, in: 0...50)
-                    Stepper("Feuerwaffen: \(feuerwaffen)", value: $feuerwaffen, in: 0...50)
-                    Stepper("Heimlichkeit: \(heimlichkeit)", value: $heimlichkeit, in: 0...50)
-                    Stepper("Mechanik: \(mechanik)", value: $mechanik, in: 0...50)
-                    Stepper("Nahkampf: \(nahkampf)", value: $nahkampf, in: 0...50)
-                    Stepper("Natur: \(natur)", value: $natur, in: 0...50)
-                    Stepper("Steuern: \(steuern)", value: $steuern, in: 0...50)
-                    Stepper("Wahrnehmung: \(wahrnehmung)", value: $wahrnehmung, in: 0...50)
-                    Stepper("Überreden: \(ueberreden)", value: $ueberreden, in: 0...50)
-                }
-                
-                Section("Ausrüstung") {
-                    TextField("Ausrüstung (Kommagetrennt)", text: $equipmentString)
-                }
-                
-                Section("Hintergrundgeschichte") {
-                    TextEditor(text: $backstory)
-                        .frame(minHeight: 100)
-                }
-                
-                // Galerie-Bilder
-                Section("Neues Bild hinzufügen") {
-                    Button("Bild aus Fotobibliothek") {
-                        showImagePicker = true
-                    }
-                    .sheet(isPresented: $showImagePicker) {
-                        ImagePicker { selectedImage in
-                            self.localSelectedImage = selectedImage
+                        HStack {
+                            Text("Größe (cm)")
+                            Spacer()
+                            TextField("z.B. 180", value: $height, format: .number)
+                                .keyboardType(.numberPad)
+                                .frame(width: 80)
+                                .multilineTextAlignment(.trailing)
+                        }
+                        
+                        HStack {
+                            Text("Gewicht (kg)")
+                            Spacer()
+                            TextField("z.B. 80", value: $weight, format: .number)
+                                .keyboardType(.numberPad)
+                                .frame(width: 80)
+                                .multilineTextAlignment(.trailing)
+                        }
+                        
+                        HStack {
+                            Text("Alter")
+                            Spacer()
+                            TextField("z.B. 25", value: $age, format: .number)
+                                .keyboardType(.numberPad)
+                                .frame(width: 80)
+                                .multilineTextAlignment(.trailing)
+                        }
+                        
+                        HStack {
+                            Text("Ruf")
+                            Spacer()
+                            TextField("z.B. 3", value: $reputation, format: .number)
+                                .keyboardType(.numberPad)
+                                .frame(width: 80)
+                                .multilineTextAlignment(.trailing)
+                        }
+                        
+                        HStack {
+                            Text("Fahndungsstufe")
+                            Spacer()
+                            TextField("z.B. 2", value: $wantedLevel, format: .number)
+                                .keyboardType(.numberPad)
+                                .frame(width: 80)
+                                .multilineTextAlignment(.trailing)
+                        }
+                        
+                        HStack {
+                            Text("Karma")
+                            Spacer()
+                            TextField("z.B. 10", value: $karma, format: .number)
+                                .keyboardType(.numberPad)
+                                .frame(width: 80)
+                                .multilineTextAlignment(.trailing)
+                        }
+                        
+                        HStack {
+                            Text("Essenz")
+                            Spacer()
+                            TextField("z.B. 5.5", value: $essence, format: .number)
+                                .keyboardType(.decimalPad)
+                                .frame(width: 80)
+                                .multilineTextAlignment(.trailing)
                         }
                     }
                     
-                    if let localImage = localSelectedImage {
-                        Text("Vorschau (noch nicht hochgeladen):")
-                            .font(.footnote)
-                            .foregroundColor(.secondary)
+                    // MARK: - Attribute
+                    Section("Attribute") {
+                        Stepper("Konstitution: \(konstitution)", value: $konstitution, in: 0...50)
+                        Stepper("Geschicklichkeit: \(geschicklichkeit)", value: $geschicklichkeit, in: 0...50)
+                        Stepper("Reaktion: \(reaktion)", value: $reaktion, in: 0...50)
+                        Stepper("Stärke: \(staerke)", value: $staerke, in: 0...50)
+                        Stepper("Willenskraft: \(willenskraft)", value: $willenskraft, in: 0...50)
+                        Stepper("Logik: \(logik)", value: $logik, in: 0...50)
+                        Stepper("Intuition: \(intuition)", value: $intuition, in: 0...50)
+                        Stepper("Charisma: \(charisma)", value: $charisma, in: 0...50)
+                        Stepper("Edge: \(edge)", value: $edge, in: 0...50)
+                        Stepper("Nebenhandlungen: \(nebenhandlungen)", value: $nebenhandlungen, in: 0...50)
+                        Stepper("Initiative Hot/Cold: \(iniHotCold)", value: $iniHotCold, in: 0...50)
+                        Stepper("Initiative Matrix VR: \(iniMatrixVR)", value: $iniMatrixVR, in: 0...50)
+                        Stepper("Initiative Astral: \(iniAstral)", value: $iniAstral, in: 0...50)
+                        Stepper("Verteidigung: \(verteidigung)", value: $verteidigung, in: 0...50)
+                        Stepper("Selbstbeherrschung: \(selbstbeherrschung)", value: $selbstbeherrschung, in: 0...50)
+                        Stepper("Menschenkenntnis: \(menschenkenntnis)", value: $menschenkenntnis, in: 0...50)
+                        Stepper("Erinnerungsvermögen: \(erinnerungsvermoegen)", value: $erinnerungsvermoegen, in: 0...50)
+                        Stepper("Heben/Tragen: \(hebenTragen)", value: $hebenTragen, in: 0...50)
+                    }
+                    
+                    // MARK: - Skills
+                    Section("Fertigkeiten") {
+                        Stepper("Biotech: \(biotech)", value: $biotech, in: 0...50)
+                        Stepper("Erste Hilfe: \(ersteHilfe)", value: $ersteHilfe, in: 0...50)
+                        Stepper("Athletik: \(athletik)", value: $athletik, in: 0...50)
+                        Stepper("Einfluss: \(einfluss)", value: $einfluss, in: 0...50)
+                        Stepper("Elektronik: \(elektronik)", value: $elektronik, in: 0...50)
+                        Stepper("Hardware: \(hardware)", value: $hardware, in: 0...50)
+                        Stepper("Feuerwaffen: \(feuerwaffen)", value: $feuerwaffen, in: 0...50)
+                        Stepper("Heimlichkeit: \(heimlichkeit)", value: $heimlichkeit, in: 0...50)
+                        Stepper("Mechanik: \(mechanik)", value: $mechanik, in: 0...50)
+                        Stepper("Nahkampf: \(nahkampf)", value: $nahkampf, in: 0...50)
+                        Stepper("Natur: \(natur)", value: $natur, in: 0...50)
+                        Stepper("Steuern: \(steuern)", value: $steuern, in: 0...50)
+                        Stepper("Wahrnehmung: \(wahrnehmung)", value: $wahrnehmung, in: 0...50)
+                        Stepper("Überreden: \(ueberreden)", value: $ueberreden, in: 0...50)
+                    }
+                    
+                    // MARK: - Ausrüstung
+                    Section("Ausrüstung") {
+                        TextField("Ausrüstung (Kommagetrennt)", text: $equipmentString)
+                    }
+                    
+                    // MARK: - Hintergrund
+                    Section("Hintergrundgeschichte") {
+                        TextEditor(text: $backstory)
+                            .frame(minHeight: 100)
+                    }
+                    
+                    // MARK: - Neues Bild
+                    Section("Neues Bild hinzufügen") {
+                        Button("Bild aus Fotobibliothek") {
+                            showImagePicker = true
+                        }
+                        .sheet(isPresented: $showImagePicker) {
+                            ImagePicker { selectedImage in
+                                self.localSelectedImage = selectedImage
+                            }
+                        }
                         
-                        Image(uiImage: localImage)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(height: 120)
-                            .cornerRadius(8)
-                    } else {
-                        Text("Kein lokales Bild ausgewählt")
-                            .font(.footnote)
-                            .foregroundColor(.gray)
+                        if let localImage = localSelectedImage {
+                            Text("Vorschau (noch nicht hochgeladen):")
+                                .font(.footnote)
+                                .foregroundColor(.secondary)
+                            
+                            Image(uiImage: localImage)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(height: 120)
+                                .cornerRadius(8)
+                        } else {
+                            Text("Kein lokales Bild ausgewählt")
+                                .font(.footnote)
+                                .foregroundColor(.gray)
+                        }
+                        
+                        if let errorMessage = errorMessage {
+                            Text(errorMessage)
+                                .foregroundColor(.red)
+                        }
                     }
                     
-                    if let errorMessage = errorMessage {
-                        Text(errorMessage)
-                            .foregroundColor(.red)
+                    // MARK: - Aktionen
+                    Section {
+                        Button("Charakter hinzufügen") {
+                            addCharacterAndUploadImage()
+                        }
+                        .buttonStyle(.borderedProminent)
+                        
+                        Button("Abbrechen", role: .cancel) {
+                            dismiss()
+                        }
                     }
                 }
-                
-                Section {
-                    Button("Charakter hinzufügen") {
-                        addCharacterAndUploadImage()
-                    }
-                    .buttonStyle(.borderedProminent)
-                    
-                    Button("Abbrechen", role: .cancel) {
-                        dismiss()
-                    }
-                }
+                .scrollContentBackground(.hidden)
+                .background(Color.clear)
+                .navigationTitle("Neuer Charakter")
             }
-            .navigationTitle("Neuer Charakter")
+            .background(Color.clear)
         }
     }
+    
+    // MARK: - Funktionen
     
     private func addCharacterAndUploadImage() {
         let attributes: [String: Int] = [

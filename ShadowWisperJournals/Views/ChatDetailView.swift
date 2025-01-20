@@ -45,29 +45,33 @@ struct ChatDetailView: View {
     }
     
     var body: some View {
-        VStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 8) {
-                    // Wir durchlaufen die Indizes
-                    ForEach(messageViews.indices, id: \.self) { i in
-                        messageViews[i]
+        ZStack {
+            AnimatedBackgroundView(colors: AppColors.gradientColors)
+                .ignoresSafeArea()
+            
+            VStack {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 8) {
+                        ForEach(messageViews.indices, id: \.self) { i in
+                            messageViews[i]
+                        }
                     }
+                    .padding()
+                }
+                
+                HStack {
+                    TextField("Nachricht eingeben", text: $newMessageText)
+                        .textFieldStyle(.roundedBorder)
+                    
+                    Button {
+                        sendMessage()
+                    } label: {
+                        Image(systemName: "paperplane.fill")
+                    }
+                    .disabled(newMessageText.isEmpty || myCharIdInThisChat == nil)
                 }
                 .padding()
             }
-            
-            HStack {
-                TextField("Nachricht eingeben", text: $newMessageText)
-                    .textFieldStyle(.roundedBorder)
-                
-                Button {
-                    sendMessage()
-                } label: {
-                    Image(systemName: "paperplane.fill")
-                }
-                .disabled(newMessageText.isEmpty || myCharIdInThisChat == nil)
-            }
-            .padding()
         }
         .navigationTitle("Chat Details")
         .onAppear {
@@ -80,6 +84,8 @@ struct ChatDetailView: View {
             chatVM.removeMessagesListener()
         }
     }
+    
+    // MARK: - Hilfsfunktionen
     
     private func sendMessage() {
         guard let myCharId = myCharIdInThisChat else { return }

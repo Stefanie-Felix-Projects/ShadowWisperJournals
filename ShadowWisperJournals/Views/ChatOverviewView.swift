@@ -17,59 +17,68 @@ struct ChatOverviewView: View {
     
     var body: some View {
         NavigationStack {
-            VStack {
-                TextField("Chats suchen...", text: $chatVM.searchText)
-                    .textFieldStyle(.roundedBorder)
-                    .padding(.horizontal)
+            ZStack {
+                AnimatedBackgroundView(colors: AppColors.gradientColors)
+                    .ignoresSafeArea()
                 
-                List {
-                    ForEach(chatVM.filteredChats) { chat in
-                        NavigationLink(
-                            destination: ChatDetailView(chatVM: chatVM, chat: chat)
-                                .environmentObject(userViewModel)
-                        ) {
-                            let participantData = participantProfiles(chat.participants)
-                            
-                            HStack(spacing: 12) {
-                                HStack(spacing: -10) {
-                                    ForEach(Array(participantData.prefix(2).enumerated()), id: \.offset) { _, data in
-                                        profileImageView(urlString: data.1)
+                VStack {
+                    TextField("Chats suchen...", text: $chatVM.searchText)
+                        .textFieldStyle(.roundedBorder)
+                        .padding(.horizontal)
+                    
+                    List {
+                        ForEach(chatVM.filteredChats) { chat in
+                            NavigationLink(
+                                destination: ChatDetailView(chatVM: chatVM, chat: chat)
+                                    .environmentObject(userViewModel)
+                            ) {
+                                let participantData = participantProfiles(chat.participants)
+                                
+                                HStack(spacing: 12) {
+                                    HStack(spacing: -10) {
+                                        ForEach(Array(participantData.prefix(2).enumerated()), id: \.offset) { _, data in
+                                            profileImageView(urlString: data.1)
+                                        }
+                                    }
+                                    .padding(.trailing, 8)
+                                    
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        let joinedNames = participantData.map { $0.0 }.joined(separator: ", ")
+                                        Text("Teilnehmer: \(joinedNames)")
+                                            .font(.headline)
+                                        
+                                        Text(chat.lastMessage ?? "Keine Nachrichten")
+                                            .font(.subheadline)
+                                            .foregroundColor(.gray)
+                                        
+                                        Text("Aktualisiert am \(chat.updatedAt.formatted())")
+                                            .font(.footnote)
+                                            .foregroundColor(.gray)
                                     }
                                 }
-                                .padding(.trailing, 8)
-                                
-                                VStack(alignment: .leading, spacing: 4) {
-                                    let joinedNames = participantData.map { $0.0 }.joined(separator: ", ")
-                                    Text("Teilnehmer: \(joinedNames)")
-                                        .font(.headline)
-                                    
-                                    Text(chat.lastMessage ?? "Keine Nachrichten")
-                                        .font(.subheadline)
-                                        .foregroundColor(.gray)
-                                    
-                                    Text("Aktualisiert am \(chat.updatedAt.formatted())")
-                                        .font(.footnote)
-                                        .foregroundColor(.gray)
-                                }
                             }
-                        }
-                        .swipeActions(edge: .trailing) {
-                            Button(role: .destructive) {
-                                chatVM.deleteChat(chat)
-                            } label: {
-                                Text("Löschen")
+                            .swipeActions(edge: .trailing) {
+                                Button(role: .destructive) {
+                                    chatVM.deleteChat(chat)
+                                } label: {
+                                    Text("Löschen")
+                                }
                             }
                         }
                     }
+                    .listStyle(.plain)
+                    .scrollContentBackground(.hidden)
+                    .background(Color.clear)
+                    
+                    Button("Neuen Chat starten") {
+                        showNewChatSheet = true
+                    }
+                    .padding(.vertical, 8)
                 }
-                .listStyle(.plain)
-                
-                Button("Neuen Chat starten") {
-                    showNewChatSheet = true
-                }
-                .padding(.bottom, 8)
+                .background(Color.clear)
             }
             .navigationTitle("Chat-Übersicht")
+            .background(Color.clear)
             .onAppear {
                 characterVM.fetchAllCharacters()
                 
@@ -85,11 +94,17 @@ struct ChatOverviewView: View {
             .onDisappear {
                 chatVM.removeChatsListener()
             }
-            // ← Sheet
             .sheet(isPresented: $showNewChatSheet) {
-                NewChatView(chatVM: chatVM) {
+                ZStack {
+                    AnimatedBackgroundView(colors: AppColors.gradientColors)
+                        .ignoresSafeArea()
+                    
+                    NewChatView(chatVM: chatVM) {
+                    }
+                    .environmentObject(userViewModel)
+                    .background(Color.clear)
                 }
-                .environmentObject(userViewModel)
+                .presentationBackground(.clear)
             }
         }
     }

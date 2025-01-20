@@ -16,59 +16,76 @@ struct QuestLogDashboardView: View {
     @State private var showNewQuestSheet = false
     
     var body: some View {
-        VStack {
-            filterSection
-            
-            List {
-                Section("Erstellt von mir") {
-                    ForEach(filteredMine) { quest in
-                        NavigationLink(
-                            destination: QuestDetailView(
-                                quest: quest, questLogVM: questLogVM
-                            )
-                            .environmentObject(userViewModel)
-                            .environmentObject(characterVM)
-                        ) {
-                            questRow(quest)
-                        }
-                    }
-                }
+        NavigationStack {
+            ZStack {
+                AnimatedBackgroundView(colors: AppColors.gradientColors)
+                    .ignoresSafeArea()
                 
-                Section("Zugewiesen") {
-                    ForEach(filteredAssigned) { quest in
-                        NavigationLink(
-                            destination: QuestDetailView(
-                                quest: quest, questLogVM: questLogVM
-                            )
-                            .environmentObject(userViewModel)
-                            .environmentObject(characterVM)
-                        ) {
-                            questRow(quest)
+                VStack {
+                    filterSection
+                    
+                    List {
+                        Section("Erstellt von mir") {
+                            ForEach(filteredMine) { quest in
+                                NavigationLink(
+                                    destination: QuestDetailView(
+                                        quest: quest, questLogVM: questLogVM
+                                    )
+                                    .environmentObject(userViewModel)
+                                    .environmentObject(characterVM)
+                                ) {
+                                    questRow(quest)
+                                }
+                            }
+                        }
+                        
+                        Section("Zugewiesen") {
+                            ForEach(filteredAssigned) { quest in
+                                NavigationLink(
+                                    destination: QuestDetailView(
+                                        quest: quest, questLogVM: questLogVM
+                                    )
+                                    .environmentObject(userViewModel)
+                                    .environmentObject(characterVM)
+                                ) {
+                                    questRow(quest)
+                                }
+                            }
                         }
                     }
+                    .scrollContentBackground(.hidden)
+                    .background(Color.clear)
+                }
+                .background(Color.clear)
+            }
+            .navigationTitle("QuestLog Dashboard")
+            .toolbar {
+                Button {
+                    showNewQuestSheet = true
+                } label: {
+                    Image(systemName: "plus")
                 }
             }
-            .listStyle(.plain)
-        }
-        .navigationTitle("QuestLog Dashboard")
-        .toolbar {
-            Button {
-                showNewQuestSheet = true
-            } label: {
-                Image(systemName: "plus")
+            .onAppear {
+                characterVM.fetchAllCharacters()
+                questLogVM.fetchAllQuests()
             }
-        }
-        .onAppear {
-            characterVM.fetchAllCharacters()
-            questLogVM.fetchAllQuests()
-        }
-        .sheet(isPresented: $showNewQuestSheet) {
-            AddQuestView(
-                questLogVM: questLogVM,
-                userId: userViewModel.userId ?? ""
-            )
-            .environmentObject(userViewModel)
-            .environmentObject(characterVM)
+            .sheet(isPresented: $showNewQuestSheet) {
+                ZStack {
+                    AnimatedBackgroundView(colors: AppColors.gradientColors)
+                        .ignoresSafeArea()
+                    
+                    AddQuestView(
+                        questLogVM: questLogVM,
+                        userId: userViewModel.userId ?? ""
+                    )
+                    .environmentObject(userViewModel)
+                    .environmentObject(characterVM)
+                    .background(Color.clear)
+                }
+                .presentationBackground(.clear)
+            }
+            .background(Color.clear)
         }
     }
     
