@@ -16,16 +16,14 @@ struct ShadowWisperLoginView: View {
     
     var body: some View {
         ZStack {
-            // => Animierter Hintergrund
             AnimatedBackgroundView(colors: AppColors.gradientColors)
                 .ignoresSafeArea()
             
-            // Hauptinhalt
             VStack(spacing: 20) {
                 
                 Text("ShadowWisperJournals")
                     .font(.custom("SmoochSans-Bold", size: 40, relativeTo: .largeTitle))
-                    .foregroundColor(AppColors.signalColor4) // Titel in knalliger Farbe
+                    .foregroundColor(AppColors.signalColor4)
                 
                 if let errorMessage = userViewModel.errorMessage {
                     Text(errorMessage)
@@ -34,17 +32,18 @@ struct ShadowWisperLoginView: View {
                 }
                 
                 TextField("E-Mail", text: $email)
+                    .font(.system(size: 16))
                     .padding()
                     .background(Color.gray.opacity(0.2))
                     .cornerRadius(8)
                     .keyboardType(.emailAddress)
                 
                 SecureField("Passwort", text: $password)
+                    .font(.system(size: 16))
                     .padding()
                     .background(Color.gray.opacity(0.2))
                     .cornerRadius(8)
                 
-                // Neon-Glow Button
                 Button {
                     userViewModel.loginShadowWisperUser(email: email, password: password)
                 } label: {
@@ -62,26 +61,25 @@ struct ShadowWisperLoginView: View {
                                 endPoint: .trailing
                             )
                         )
-                        .foregroundColor(.black) // Schwarzer Text für Kontrast
+                        .foregroundColor(.black)
                         .cornerRadius(8)
                         .shadow(
                             color: AppColors.signalColor1.opacity(0.8),
                             radius: 10,
                             x: 0,
                             y: 5
-                        ) // Neon-Glow-Effekt
+                        )
                 }
                 
-                // Registrieren-Link
                 Button("Noch kein Konto? Hier registrieren") {
                     isRegisterViewActive = true
                 }
                 .foregroundColor(AppColors.signalColor2)
+                .font(.system(size: 16))
             }
             .padding()
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color.clear)
-            // => Sheet für die Registrierung
             .sheet(isPresented: $isRegisterViewActive) {
                 ShadowWisperRegisterView()
                     .environmentObject(userViewModel)

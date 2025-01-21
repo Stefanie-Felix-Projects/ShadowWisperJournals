@@ -153,6 +153,8 @@ class QuestLogViewModel: ObservableObject {
         db.collection("quests").document(questId).delete { error in
             if let error = error {
                 print("Fehler beim Löschen der Quest: \(error.localizedDescription)")
+            } else {
+                print("DEBUG: Quest erfolgreich gelöscht.")
             }
         }
     }
@@ -180,13 +182,14 @@ class QuestLogViewModel: ObservableObject {
         }
     }
     
+    // Angepasste uploadImage-Funktion ohne Firestore-Aktualisierung
     func uploadImage(
         _ image: UIImage,
         for quest: Quest,
         completion: @escaping (Result<String, Error>) -> Void
     ) {
         guard let questId = quest.id else {
-            completion(.failure(NSError(domain: "Quest hat keine ID", code: 0)))
+            completion(.failure(NSError(domain: "Quest hat keine ID", code: 0, userInfo: [NSLocalizedDescriptionKey: "Die Quest hat keine ID."])))
             return
         }
         
@@ -195,7 +198,7 @@ class QuestLogViewModel: ObservableObject {
         let storageRef = storage.reference().child(fileName)
         
         guard let imageData = image.jpegData(compressionQuality: 0.8) else {
-            completion(.failure(NSError(domain: "Bild-Konvertierung fehlgeschlagen", code: 0)))
+            completion(.failure(NSError(domain: "Bild-Konvertierung fehlgeschlagen", code: 0, userInfo: [NSLocalizedDescriptionKey: "Das Bild konnte nicht konvertiert werden."])))
             return
         }
         
@@ -215,20 +218,12 @@ class QuestLogViewModel: ObservableObject {
                 }
                 
                 guard let downloadURL = url else {
-                    completion(.failure(NSError(domain: "Keine URL zurückgegeben", code: 0)))
+                    completion(.failure(NSError(domain: "Keine URL zurückgegeben", code: 0, userInfo: [NSLocalizedDescriptionKey: "Die Download-URL konnte nicht abgerufen werden."])))
                     return
                 }
                 
-                self.db.collection("quests").document(questId).updateData([
-                    "imageURLs": FieldValue.arrayUnion([downloadURL.absoluteString])
-                ]) { error in
-                    if let error = error {
-                        completion(.failure(error))
-                        return
-                    }
-                    
-                    completion(.success(downloadURL.absoluteString))
-                }
+                // Firestore-Aktualisierung entfernen
+                completion(.success(downloadURL.absoluteString))
             }
         }
     }

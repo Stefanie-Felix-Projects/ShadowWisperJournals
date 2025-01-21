@@ -21,54 +21,94 @@ struct QuestLogDashboardView: View {
                 AnimatedBackgroundView(colors: AppColors.gradientColors)
                     .ignoresSafeArea()
                 
-                VStack {
-                    filterSection
+                VStack(spacing: 16) {
                     
-                    List {
-                        Section("Erstellt von mir") {
-                            ForEach(filteredMine) { quest in
-                                NavigationLink(
-                                    destination: QuestDetailView(
-                                        quest: quest, questLogVM: questLogVM
-                                    )
-                                    .environmentObject(userViewModel)
-                                    .environmentObject(characterVM)
-                                ) {
-                                    questRow(quest)
+                    headerSection
+                    
+                    ScrollView(showsIndicators: false) {
+                        VStack(alignment: .leading, spacing: 12) {
+                            
+                            if filteredMine.isEmpty && filteredAssigned.isEmpty {
+                                // Keine Quests
+                                Text("Keine Quests vorhanden")
+                                    .foregroundColor(.white)
+                                    .padding(.top, 10)
+                            } else {
+                                if !filteredMine.isEmpty {
+                                    VStack(alignment: .leading, spacing: 0) {
+                                        Text("Erstellt von mir")
+                                            .font(.custom("SmoochSans-Bold", size: 22))
+                                            .foregroundColor(.white)
+                                            .padding(.bottom, 4)
+                                        
+                                        TabView {
+                                            ForEach(filteredMine) { quest in
+                                                NavigationLink(
+                                                    destination: QuestDetailView(
+                                                        quest: quest,
+                                                        questLogVM: questLogVM
+                                                    )
+                                                    .environmentObject(userViewModel)
+                                                    .environmentObject(characterVM)
+                                                ) {
+                                                    questCard(quest)
+                                                }
+                                            }
+                                        }
+                                        .tabViewStyle(.page(indexDisplayMode: .automatic))
+                                        .frame(height: 320)
+                                        .padding(.horizontal, 4)
+                                        .padding(.top, 0)
+                                    }
+                                    .padding(.horizontal, 4)
+                                }
+                                
+                                if !filteredAssigned.isEmpty {
+                                    VStack(alignment: .leading, spacing: 0) {
+                                        Text("Zugewiesen")
+                                            .font(.custom("SmoochSans-Bold", size: 22))
+                                            .foregroundColor(.white)
+                                            .padding(.bottom, 4)
+                                        
+                                        TabView {
+                                            ForEach(filteredAssigned) { quest in
+                                                NavigationLink(
+                                                    destination: QuestDetailView(
+                                                        quest: quest,
+                                                        questLogVM: questLogVM
+                                                    )
+                                                    .environmentObject(userViewModel)
+                                                    .environmentObject(characterVM)
+                                                ) {
+                                                    questCard(quest)
+                                                }
+                                            }
+                                        }
+                                        .tabViewStyle(.page(indexDisplayMode: .automatic))
+                                        .frame(height: 320)
+                                        .padding(.horizontal, 4)
+                                        .padding(.top, 0)
+                                    }
+                                    .padding(.horizontal, 4)
                                 }
                             }
+                            
+                            Spacer(minLength: 16)
                         }
-                        
-                        Section("Zugewiesen") {
-                            ForEach(filteredAssigned) { quest in
-                                NavigationLink(
-                                    destination: QuestDetailView(
-                                        quest: quest, questLogVM: questLogVM
-                                    )
-                                    .environmentObject(userViewModel)
-                                    .environmentObject(characterVM)
-                                ) {
-                                    questRow(quest)
-                                }
-                            }
-                        }
+                        .padding(.horizontal, 12)
+                        .scrollContentBackground(.hidden)
                     }
-                    .scrollContentBackground(.hidden)
-                    .background(Color.clear)
                 }
-                .background(Color.clear)
             }
-            .navigationTitle("QuestLog Dashboard")
             .toolbar {
-                Button {
-                    showNewQuestSheet = true
-                } label: {
-                    Image(systemName: "plus")
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button {
+                        showNewQuestSheet = true
+                    } label: {
+                        Image(systemName: "plus")
+                            .foregroundColor(.white)
+                    }
                 }
-            }
-            .onAppear {
-                characterVM.fetchAllCharacters()
-                questLogVM.fetchAllQuests()
             }
             .sheet(isPresented: $showNewQuestSheet) {
                 ZStack {
@@ -81,33 +121,56 @@ struct QuestLogDashboardView: View {
                     )
                     .environmentObject(userViewModel)
                     .environmentObject(characterVM)
-                    .background(Color.clear)
                 }
                 .presentationBackground(.clear)
             }
-            .background(Color.clear)
-        }
-    }
-    
-    @ViewBuilder
-    private func questRow(_ quest: Quest) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(quest.title)
-                .font(.headline)
-            
-            if let creatorName = quest.creatorDisplayName {
-                Text("Erstellt von: \(creatorName)")
-                    .font(.subheadline)
+            .onAppear {
+                characterVM.fetchAllCharacters()
+                questLogVM.fetchAllQuests()
             }
-            
-            Text(
-                "Status: \(quest.status), Erstellt am \(quest.createdAt.formatted(.dateTime.day().month().year()))"
-            )
-            .font(.subheadline)
-            .foregroundColor(.gray)
+            .navigationTitle("")
+            .navigationBarTitleDisplayMode(.inline)
         }
     }
+}
+
+extension QuestLogDashboardView {
+    private var headerSection: some View {
+        VStack(spacing: 10) {
+            Text("ShadowWisperJournals")
+                .font(.custom("SmoochSans-Bold", size: 40, relativeTo: .largeTitle))
+                .foregroundColor(AppColors.signalColor4)
+                .padding(.top, 10)
+            
+            Text("QuestLog Dashboard")
+                .font(.custom("SmoochSans-Bold", size: 25, relativeTo: .title))
+                .foregroundColor(.white)
+            
+            filterSection
+        }
+        .padding(.horizontal, 16)
+    }
     
+    private var filterSection: some View {
+        VStack(spacing: 8) {
+            Picker("Status", selection: $questLogVM.selectedStatus) {
+                Text("Alle").tag("alle")
+                Text("Aktiv").tag("aktiv")
+                Text("Abgeschlossen").tag("abgeschlossen")
+            }
+            .pickerStyle(.segmented)
+            
+            HStack {
+                DatePicker("Von:", selection: $questLogVM.startDate, displayedComponents: .date)
+                DatePicker("Bis:", selection: $questLogVM.endDate, displayedComponents: .date)
+            }
+            .font(.system(size: 14))
+            .foregroundColor(.white)
+        }
+    }
+}
+
+extension QuestLogDashboardView {
     private var filteredMine: [Quest] {
         let uid = userViewModel.userId ?? ""
         return filteredQuestsForCurrentUser.filter { $0.userId == uid }
@@ -125,7 +188,7 @@ struct QuestLogDashboardView: View {
         let allQuests = questLogVM.quests
         
         let visibleQuests = allQuests.filter { quest in
-            let isOwner = (quest.userId == uid)
+            let isOwner = quest.userId == uid
             let assignedIds = quest.assignedCharacterIds ?? []
             let isAssignedToMe = !assignedIds.isEmpty && assignedIds.contains(where: myCharacterIDs.contains)
             return isOwner || isAssignedToMe
@@ -145,29 +208,51 @@ struct QuestLogDashboardView: View {
             }
         }
     }
-    
-    private var filterSection: some View {
-        VStack(spacing: 12) {
-            Picker("Status", selection: $questLogVM.selectedStatus) {
-                Text("Alle").tag("alle")
-                Text("Aktiv").tag("aktiv")
-                Text("Abgeschlossen").tag("abgeschlossen")
-            }
-            .pickerStyle(.segmented)
+}
+
+extension QuestLogDashboardView {
+    private func questCard(_ quest: Quest) -> some View {
+        ZStack(alignment: .bottomLeading) {
+            RoundedRectangle(cornerRadius: 12)
+                .fill(
+                    LinearGradient(
+                        gradient: Gradient(colors: [
+                            AppColors.signalColor1,
+                            AppColors.signalColor5
+                        ]),
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
+                .shadow(
+                    color: AppColors.signalColor1.opacity(0.8),
+                    radius: 10,
+                    x: 0,
+                    y: 5
+                )
             
-            HStack {
-                DatePicker(
-                    "Von:", selection: $questLogVM.startDate,
-                    displayedComponents: .date
-                )
-                DatePicker(
-                    "Bis:", selection: $questLogVM.endDate,
-                    displayedComponents: .date
-                )
+            VStack(alignment: .leading, spacing: 6) {
+                Text(quest.title)
+                    .font(.custom("SmoochSans-Bold", size: 22))
+                    .foregroundColor(.black)
+                
+                if let creatorName = quest.creatorDisplayName {
+                    Text("Erstellt von: \(creatorName)")
+                        .font(.system(size: 16))
+                        .foregroundColor(.black.opacity(0.8))
+                }
+                
+                Text("Status: \(quest.status)")
+                    .font(.system(size: 16))
+                    .foregroundColor(.black.opacity(0.8))
+                
+                Text("Erstellt am \(quest.createdAt.formatted(.dateTime.day().month().year()))")
+                    .font(.system(size: 16))
+                    .foregroundColor(.black.opacity(0.8))
             }
-            .font(.footnote)
-            .padding(.top, 4)
+            .padding(8)
         }
-        .padding(.horizontal)
+        .frame(height: 240)
+        .padding(.vertical, 4)
     }
 }

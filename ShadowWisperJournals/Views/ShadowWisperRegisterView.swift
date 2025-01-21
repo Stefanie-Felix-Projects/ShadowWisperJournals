@@ -16,47 +16,40 @@ struct ShadowWisperRegisterView: View {
     
     var body: some View {
         ZStack {
-            // Animierter Hintergrund wie im Login
             AnimatedBackgroundView(colors: AppColors.gradientColors)
                 .ignoresSafeArea()
             
             VStack(spacing: 20) {
                 
-                // Titel analog zum Login
                 Text("ShadowWisperJournals")
                     .font(.custom("SmoochSans-Bold", size: 40, relativeTo: .largeTitle))
                     .foregroundColor(AppColors.signalColor4)
                 
-                // Optionaler "Registrieren"-Untertitel (falls gewünscht)
-                Text("Registrieren")
-                    .font(.custom("SmoochSans-Bold", size: 25, relativeTo: .title))
-                    .foregroundColor(.white)
-                
-                // Fehlernachricht falls vorhanden
                 if let errorMessage = userViewModel.errorMessage {
                     Text(errorMessage)
                         .foregroundColor(.red)
                         .padding()
                 }
                 
-                // Eingabefelder
                 TextField("E-Mail", text: $email)
+                    .font(.system(size: 16))
                     .padding()
                     .background(Color.gray.opacity(0.2))
                     .cornerRadius(8)
                     .keyboardType(.emailAddress)
                 
                 SecureField("Passwort", text: $password)
+                    .font(.system(size: 16))
                     .padding()
                     .background(Color.gray.opacity(0.2))
                     .cornerRadius(8)
                 
-                TextField("Anzeigename", text: $displayName)
+                TextField("Name", text: $displayName)
+                    .font(.system(size: 16))
                     .padding()
                     .background(Color.gray.opacity(0.2))
                     .cornerRadius(8)
                 
-                // Neon-Glow-Button analog zum Login
                 Button {
                     userViewModel.registerShadowWisperUser(
                         email: email,
@@ -78,14 +71,14 @@ struct ShadowWisperRegisterView: View {
                                 endPoint: .trailing
                             )
                         )
-                        .foregroundColor(.black) // Schwarzer Text für den Kontrast
+                        .foregroundColor(.black)
                         .cornerRadius(8)
                         .shadow(
                             color: AppColors.signalColor1.opacity(0.8),
                             radius: 10,
                             x: 0,
                             y: 5
-                        ) // Neon-Glow-Effekt
+                        )
                 }
             }
             .padding()
