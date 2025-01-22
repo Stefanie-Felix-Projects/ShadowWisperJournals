@@ -22,10 +22,11 @@ struct AddNewImageSection: View {
             }) {
                 HStack {
                     Image(systemName: "photo")
+                        .foregroundColor(.black)
                     Text("Bild aus Fotobibliothek")
+                        .font(.custom("SmoochSans-Bold", size: 22))
+                        .foregroundColor(.black)
                 }
-                .font(.system(size: 18, weight: .bold))
-                .foregroundColor(.black)
                 .padding()
                 .frame(maxWidth: .infinity)
                 .background(
@@ -54,7 +55,7 @@ struct AddNewImageSection: View {
             
             if let localImage = localSelectedImage {
                 Text("Vorschau (noch nicht hochgeladen):")
-                    .font(.footnote)
+                    .font(.custom("SmoochSans-Regular", size: 16))
                     .foregroundColor(.secondary)
                 
                 Image(uiImage: localImage)
@@ -64,7 +65,7 @@ struct AddNewImageSection: View {
                     .cornerRadius(8)
             } else {
                 Text("Kein lokales Bild ausgewählt")
-                    .font(.footnote)
+                    .font(.custom("SmoochSans-Regular", size: 16))
                     .foregroundColor(.gray)
             }
         }

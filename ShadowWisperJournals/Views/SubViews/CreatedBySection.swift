@@ -17,7 +17,7 @@ struct CreatedBySection: View {
                 .foregroundColor(AppColors.signalColor4)
             
             Text(creatorName)
-                .font(.system(size: 18))
+                .font(.custom("SmoochSans-Regular", size: 20))
                 .foregroundColor(.white)
         }
         .padding()

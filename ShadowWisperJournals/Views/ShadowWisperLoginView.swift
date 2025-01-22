@@ -75,7 +75,7 @@ struct ShadowWisperLoginView: View {
                     isRegisterViewActive = true
                 }
                 .foregroundColor(AppColors.signalColor2)
-                .font(.system(size: 16))
+                .font(.custom("SmoochSans-Regular", size: 18))
             }
             .padding()
             .frame(maxWidth: .infinity, maxHeight: .infinity)

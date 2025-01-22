@@ -9,6 +9,7 @@ import SwiftUI
 
 struct NotesSection: View {
     @Binding var personalNotes: String
+    @State private var showToast: Bool = false
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -17,7 +18,7 @@ struct NotesSection: View {
                 .foregroundColor(AppColors.signalColor4)
             
             TextEditor(text: $personalNotes)
-                .font(.system(size: 16))
+                .font(.custom("SmoochSans-Regular", size: 20))
                 .padding()
                 .background(Color.white.opacity(0.1))
                 .cornerRadius(8)
@@ -26,9 +27,15 @@ struct NotesSection: View {
             
             Button(action: {
                 UIPasteboard.general.string = personalNotes
+                showToast = true
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                    withAnimation {
+                        showToast = false
+                    }
+                }
             }) {
                 Text("Notizen kopieren")
-                    .font(.footnote)
+                    .font(.custom("SmoochSans-Regular", size: 18))
                     .foregroundColor(AppColors.signalColor2)
             }
             .buttonStyle(PlainButtonStyle())
@@ -36,5 +43,25 @@ struct NotesSection: View {
         .padding()
         .background(Color.black.opacity(0.3))
         .cornerRadius(12)
+        .overlay(
+            VStack {
+                if showToast {
+                    Spacer()
+                    HStack {
+                        Spacer()
+                        Text("Notizen kopiert!")
+                            .font(.custom("SmoochSans-Regular", size: 16))
+                            .foregroundColor(.white)
+                            .padding()
+                            .background(Color.black.opacity(0.7))
+                            .cornerRadius(8)
+                        Spacer()
+                    }
+                    .padding(.bottom, 20)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                    .animation(.easeInOut, value: showToast)
+                }
+            }
+        )
     }
 }

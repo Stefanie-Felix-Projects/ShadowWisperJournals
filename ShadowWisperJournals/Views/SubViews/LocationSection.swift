@@ -17,7 +17,7 @@ struct LocationSection: View {
                 .foregroundColor(AppColors.signalColor4)
             
             TextField("Standort-Adresse", text: $localLocationString)
-                .font(.system(size: 18))
+                .font(.custom("SmoochSans-Regular", size: 20))
                 .padding()
                 .background(Color.white.opacity(0.1))
                 .cornerRadius(8)

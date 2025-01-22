@@ -164,7 +164,7 @@ extension QuestLogDashboardView {
                 DatePicker("Von:", selection: $questLogVM.startDate, displayedComponents: .date)
                 DatePicker("Bis:", selection: $questLogVM.endDate, displayedComponents: .date)
             }
-            .font(.system(size: 14))
+            .font(.custom("SmoochSans-Regular", size: 20))
             .foregroundColor(.white)
         }
     }
@@ -231,26 +231,26 @@ extension QuestLogDashboardView {
                     y: 5
                 )
             
-            VStack(alignment: .leading, spacing: 6) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text(quest.title)
                     .font(.custom("SmoochSans-Bold", size: 22))
                     .foregroundColor(.black)
                 
                 if let creatorName = quest.creatorDisplayName {
                     Text("Erstellt von: \(creatorName)")
-                        .font(.system(size: 16))
+                        .font(.custom("SmoochSans-Regular", size: 20))
                         .foregroundColor(.black.opacity(0.8))
                 }
                 
                 Text("Status: \(quest.status)")
-                    .font(.system(size: 16))
+                    .font(.custom("SmoochSans-Regular", size: 20))
                     .foregroundColor(.black.opacity(0.8))
                 
                 Text("Erstellt am \(quest.createdAt.formatted(.dateTime.day().month().year()))")
-                    .font(.system(size: 16))
+                    .font(.custom("SmoochSans-Regular", size: 20))
                     .foregroundColor(.black.opacity(0.8))
             }
-            .padding(8)
+            .padding()
         }
         .frame(height: 240)
         .padding(.vertical, 4)

@@ -59,7 +59,7 @@ struct UploadedImagesSection: View {
             } else {
                 Text("Keine Bilder vorhanden.")
                     .foregroundColor(.gray)
-                    .font(.system(size: 16))
+                    .font(.custom("SmoochSans-Bold", size: 18))
             }
         }
         .padding()

@@ -13,7 +13,7 @@ struct ErrorMessageView: View {
     var body: some View {
         Text(errorMessage)
             .foregroundColor(.red)
-            .font(.system(size: 16))
+            .font(.custom("SmoochSans-Bold", size: 16))
             .padding()
     }
 }

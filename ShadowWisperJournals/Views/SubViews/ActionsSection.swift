@@ -15,7 +15,7 @@ struct ActionsSection: View {
         VStack(spacing: 12) {
             Button(action: saveAction) {
                 Text("Speichern")
-                    .font(.system(size: 18, weight: .bold))
+                    .font(.custom("SmoochSans-Bold", size: 22))
                     .foregroundColor(.black)
                     .padding()
                     .frame(maxWidth: .infinity)
@@ -40,7 +40,7 @@ struct ActionsSection: View {
             
             Button(action: deleteAction) {
                 Text("Löschen")
-                    .font(.system(size: 18, weight: .bold))
+                    .font(.custom("SmoochSans-Bold", size: 22))
                     .foregroundColor(.white)
                     .padding()
                     .frame(maxWidth: .infinity)

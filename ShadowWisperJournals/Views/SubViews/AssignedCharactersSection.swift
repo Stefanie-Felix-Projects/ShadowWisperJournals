@@ -66,11 +66,11 @@ struct AssignedCharactersSection: View {
                             
                             VStack(alignment: .leading) {
                                 Text(foundChar.name)
-                                    .font(.custom("SmoochSans-Bold", size: 16))
+                                    .font(.custom("SmoochSans-Bold", size: 20))
                                     .foregroundColor(.white)
                                 if let metaType = foundChar.metaType {
                                     Text(metaType)
-                                        .font(.system(size: 14))
+                                        .font(.custom("SmoochSans-Regular", size: 18))
                                         .foregroundColor(.gray)
                                 }
                             }
@@ -79,13 +79,13 @@ struct AssignedCharactersSection: View {
                     } else {
                         Text("Unbekannter Charakter (ID: \(charId))")
                             .foregroundColor(.gray)
-                            .font(.system(size: 16))
+                            .font(.custom("SmoochSans-Regular", size: 18))
                     }
                 }
             } else {
                 Text("Keine Charaktere zugewiesen.")
                     .foregroundColor(.gray)
-                    .font(.system(size: 16))
+                    .font(.custom("SmoochSans-Regular", size: 18))
             }
         }
         .padding()
