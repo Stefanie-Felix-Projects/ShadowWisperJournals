@@ -201,6 +201,14 @@ struct QuestDetailView: View {
                         .foregroundColor(AppColors.signalColor2)
                     }
                 }
+                // >>> NEU HINZUGEFÜGT <<<
+                // Hier wird das Sheet tatsächlich angezeigt, wenn showAssignCharactersSheet true ist.
+                .sheet(isPresented: $showAssignCharactersSheet) {
+                    AssignCharactersSheetView(quest: quest)
+                        .environmentObject(questLogVM)    // >>> NEU HINZUGEFÜGT <<<
+                        .environmentObject(characterVM)   // >>> NEU HINZUGEFÜGT <<<
+                        .environmentObject(userViewModel) // >>> NEU HINZUGEFÜGT <<<
+                }
             }
             
             // MARK: Toast bei Erfolg
