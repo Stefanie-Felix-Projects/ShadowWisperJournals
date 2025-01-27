@@ -7,28 +7,76 @@
 
 import SwiftUI
 
+/**
+ `CharacterDetailView` bietet eine detaillierte Ansicht und Bearbeitungsoptionen
+ für einen bestehenden Charakter. Hier können sowohl generelle Informationen
+ (z.B. Name, Metatyp, Geschlecht etc.) als auch Attribute, Skills, Ausrüstung
+ und Hintergrundgeschichte editiert werden.
+ 
+ Zusätzlich lassen sich Profilbilder und weitere Bilder hochladen oder anzeigen.
+ */
 struct CharacterDetailView: View {
+    
+    // MARK: - Environment & ObservedObject
+    
+    /// Ermöglicht das Dismiss (Schließen) der aktuellen View.
     @Environment(\.dismiss) var dismiss
+    
+    /// Das Character-ViewModel zum Verwalten, Aktualisieren und Hochladen von Charakter-Daten.
     @StateObject private var characterVM = CharacterViewModel()
     
+    // MARK: - Übergebener Charakter
+    
+    /// Der zu bearbeitende Charakter. Dieser Wert wird via init in die View injiziert.
     var character: Character
     
-    // Allgemeine Daten
+    // MARK: - Allgemeine Daten
+    
+    /// Name (Realname) des Charakters.
     @State private var name: String
+    
+    /// Straßenname (Alias) des Charakters.
     @State private var streetName: String
+    
+    /// Metatyp des Charakters (z.B. Mensch, Elf, Ork, etc.).
     @State private var metaType: String
+    
+    /// Spezialisierung (z.B. Hacker, Schamane, Rigger ...).
     @State private var specialization: String
+    
+    /// Magie oder Resonanz (falls vorhanden).
     @State private var magicOrResonance: String
+    
+    /// Geschlecht des Charakters.
     @State private var gender: String
+    
+    /// Körpergröße in Zentimetern.
     @State private var height: Int?
+    
+    /// Gewicht in Kilogramm.
     @State private var weight: Int?
+    
+    /// Alter des Charakters.
     @State private var age: Int?
+    
+    /// Rufstufe (z.B. für Bekanntheit).
     @State private var reputation: Int?
+    
+    /// Fahndungsstufe bei Behörden.
     @State private var wantedLevel: Int?
+    
+    /// Aktueller Karmawert.
     @State private var karma: Int?
+    
+    /// Essenzwert (relevant bei Cyberware/Magie).
     @State private var essence: Double?
     
-    // Attribute
+    // MARK: - Attribute
+    
+    /**
+     Nachfolgend alle Attribute, die über einen `Stepper` angepasst werden können.
+     Sie sind in einem Bereich von 0 bis 50 begrenzt.
+     */
     @State private var konstitution: Int
     @State private var geschicklichkeit: Int
     @State private var reaktion: Int
@@ -48,7 +96,9 @@ struct CharacterDetailView: View {
     @State private var erinnerungsvermoegen: Int
     @State private var hebenTragen: Int
     
-    // Skills
+    // MARK: - Skills
+    
+    /// Fertigkeitenbereiche, ebenfalls konfiguriert über `Stepper`.
     @State private var biotech: Int
     @State private var ersteHilfe: Int
     @State private var athletik: Int
@@ -64,25 +114,51 @@ struct CharacterDetailView: View {
     @State private var wahrnehmung: Int
     @State private var ueberreden: Int
     
-    // Ausrüstung, Backstory
+    // MARK: - Ausrüstung & Backstory
+    
+    /// Kommaseparierte Liste an Ausrüstungsgegenständen.
     @State private var equipmentString: String
+    
+    /// Hintergrundgeschichte des Charakters.
     @State private var backstory: String
     
-    // Profilbild
+    // MARK: - Profilbild
+    
+    /// Steuert die Anzeige des Image-Pickers für das Profilbild.
     @State private var showProfilePicker = false
+    
+    /// Lokal ausgewähltes Profilbild, das ggf. hochgeladen wird.
     @State private var localProfileImage: UIImage?
     
-    // Bild-Upload
+    // MARK: - Bild-Upload (Galerie)
+    
+    /// Lokal ausgewähltes Bild aus der Fotobibliothek (nicht das Profilbild).
     @State private var localSelectedImage: UIImage?
+    
+    /// Steuert die Anzeige des Image-Pickers für Galerie-Bilder.
     @State private var showImagePicker = false
+    
+    /// Fehlermeldung, z.B. bei fehlgeschlagenem Bild-Upload.
     @State private var errorMessage: String?
     
+    /// URL für ein ausgewähltes Bild, um es in voller Größe anzuzeigen.
     @State private var selectedImageURL: URL?
+    
+    /// Steuert, ob ein Bild in voller Größe angezeigt wird (Vollbild).
     @State private var showFullScreenImage: Bool = false
     
+    // MARK: - Initializer
+    
+    /**
+     Der Initializer sorgt dafür, dass alle `@State`-Variablen
+     korrekt mit den Daten des übergebenen `Character` befüllt werden.
+     
+     - Parameter character: Der zu bearbeitende Charakter.
+     */
     init(character: Character) {
         self.character = character
         
+        // Hilfsfunktionen zum Laden von Attributen und Skills
         func val(_ key: String) -> Int {
             character.attributes?[key] ?? 0
         }
@@ -141,20 +217,39 @@ struct CharacterDetailView: View {
         _wahrnehmung = State(initialValue: skillVal("wahrnehmung"))
         _ueberreden = State(initialValue: skillVal("ueberreden"))
         
-        // Ausrüstung & Backstory
+        // Ausrüstung & Hintergrundgeschichte
         _equipmentString = State(
-            initialValue: (character.equipment ?? []).joined(separator: ", ")
+            initialValue: (character.equipment ?? [])
+                .joined(separator: ", ")
         )
         _backstory = State(initialValue: character.backstory ?? "")
     }
     
+    // MARK: - Body
+    
+    /**
+     Der UI-Aufbau erfolgt mit einem `NavigationStack`, in dem ein `Form`-Layout eingebettet ist:
+     - **Profilbild-Sektion**: Anzeige und ggf. Hochladen eines Profilbildes
+     - **Allgemeine Daten**: Standardattribute wie Name, Geschlecht, Größe usw.
+     - **Attribute**: Stepper für Konstitution, Reaktion, etc.
+     - **Fertigkeiten**: Stepper für diverse Skills (Biotech, Erste Hilfe, etc.)
+     - **Ausrüstung**: Kommaseparierte Eingabe
+     - **Hintergrundgeschichte**: Freitext
+     - **Hochgeladene Bilder**: Anzeige bereits hochgeladener Bilder, inkl. Fullscreen-Vorschau
+     - **Neues Bild hinzufügen**: Möglichkeit zum Auswählen und Hochladen
+     - **Aktionen**: Speichern und Löschen
+     */
     var body: some View {
         NavigationStack {
             ZStack {
+                // Animierter Hintergrund
                 AnimatedBackgroundView(colors: AppColors.gradientColors)
                     .ignoresSafeArea()
+                
                 Form {
+                    // MARK: Profilbild
                     Section("Profilbild") {
+                        /// Zeigt das aktuelle Profilbild oder ein Standard-Symbol
                         if let profileURL = character.profileImageURL,
                            let url = URL(string: profileURL) {
                             AsyncImage(url: url) { phase in
@@ -187,6 +282,7 @@ struct CharacterDetailView: View {
                                 .foregroundColor(.gray)
                         }
                         
+                        /// Button für das Auswählen eines neuen Profilbilds
                         Button("Neues Profilbild wählen") {
                             showProfilePicker = true
                         }
@@ -196,6 +292,7 @@ struct CharacterDetailView: View {
                             }
                         }
                         
+                        /// Zeigt ein Vorschaubild und einen Upload-Button, falls ein neues Profilbild ausgewählt wurde
                         if let localImage = localProfileImage {
                             Text("Vorschau (noch nicht hochgeladen):")
                                 .font(.footnote)
@@ -214,6 +311,7 @@ struct CharacterDetailView: View {
                         }
                     }
                     
+                    // MARK: Allgemeine Daten
                     Section("Allgemeine Daten") {
                         TextField("Name (Realname)", text: $name)
                         TextField("Straßenname", text: $streetName)
@@ -280,7 +378,7 @@ struct CharacterDetailView: View {
                         }
                     }
                     
-                    // Attribute
+                    // MARK: Attribute
                     Section("Attribute") {
                         Stepper("Konstitution: \(konstitution)", value: $konstitution, in: 0...50)
                         Stepper("Geschicklichkeit: \(geschicklichkeit)", value: $geschicklichkeit, in: 0...50)
@@ -302,7 +400,7 @@ struct CharacterDetailView: View {
                         Stepper("Heben/Tragen: \(hebenTragen)", value: $hebenTragen, in: 0...50)
                     }
                     
-                    // Skills
+                    // MARK: Skills
                     Section("Fertigkeiten") {
                         Stepper("Biotech: \(biotech)", value: $biotech, in: 0...50)
                         Stepper("Erste Hilfe: \(ersteHilfe)", value: $ersteHilfe, in: 0...50)
@@ -320,20 +418,20 @@ struct CharacterDetailView: View {
                         Stepper("Überreden: \(ueberreden)", value: $ueberreden, in: 0...50)
                     }
                     
-                    // Ausrüstung
+                    // MARK: Ausrüstung
                     Section("Ausrüstung") {
                         TextField("Ausrüstung (Kommagetrennt)", text: $equipmentString)
                             .textInputAutocapitalization(.never)
                             .autocorrectionDisabled(true)
                     }
                     
-                    // Hintergrundgeschichte
+                    // MARK: Hintergrundgeschichte
                     Section("Hintergrundgeschichte") {
                         TextEditor(text: $backstory)
                             .frame(minHeight: 100)
                     }
                     
-                    // Bilder anzeigen
+                    // MARK: Hochgeladene Bilder
                     Section("Hochgeladene Bilder") {
                         if let urls = character.imageURLs, !urls.isEmpty {
                             ScrollView(.horizontal, showsIndicators: false) {
@@ -379,7 +477,7 @@ struct CharacterDetailView: View {
                         }
                     }
                     
-                    // Neues Bild hinzufügen
+                    // MARK: Neues Bild hinzufügen
                     Section("Neues Bild hinzufügen") {
                         Button("Bild aus Fotobibliothek") {
                             showImagePicker = true
@@ -390,6 +488,7 @@ struct CharacterDetailView: View {
                             }
                         }
                         
+                        // Vorschau des lokal ausgewählten Bildes
                         if let localImage = localSelectedImage {
                             Text("Vorschau (noch nicht hochgeladen):")
                                 .font(.footnote)
@@ -402,29 +501,35 @@ struct CharacterDetailView: View {
                                 .cornerRadius(8)
                         }
                         
+                        // Fehlermeldung falls vorhanden
                         if let errorMessage = errorMessage {
                             Text(errorMessage)
                                 .foregroundColor(.red)
                         }
                         
+                        // Button zum Hochladen des ausgewählten Bildes
                         Button("Hochladen") {
                             uploadImageIfNeeded()
                         }
                         .disabled(localSelectedImage == nil)
                     }
                     
+                    // MARK: Aktionen
                     Section {
+                        /// Button zum Speichern der geänderten Charakterdaten.
                         Button("Speichern") {
                             saveCharacterData()
                         }
                         .buttonStyle(.borderedProminent)
                         
+                        /// Button zum Löschen des Charakters aus der Datenbank.
                         Button("Löschen", role: .destructive) {
                             characterVM.deleteCharacter(character)
                             dismiss()
                         }
                     }
                 }
+                // Entfernt oder ändert den Hintergrund des Forms
                 .scrollContentBackground(.hidden)
                 .background(Color.clear)
                 .navigationTitle("Charakter bearbeiten")
@@ -432,6 +537,7 @@ struct CharacterDetailView: View {
             .background(Color.clear)
         }
         .onAppear {
+            // Bei Erscheinen der View werden (falls userId existiert) alle Charaktere neu geladen
             if !character.userId.isEmpty {
                 characterVM.fetchCharacters(for: character.userId)
             }
@@ -440,6 +546,10 @@ struct CharacterDetailView: View {
     
     // MARK: - Hilfsfunktionen
     
+    /**
+     Lädt das lokal ausgewählte Profilbild hoch, falls vorhanden,
+     und setzt den lokalen State zurück bei Erfolg.
+     */
     private func uploadProfileImageIfNeeded() {
         guard let localProfileImage = localProfileImage else { return }
         
@@ -453,8 +563,14 @@ struct CharacterDetailView: View {
         }
     }
     
+    /**
+     Validiert und speichert alle aktuell eingegebenen Daten in einem
+     aktualisierten `Character`-Objekt. Anschließend wird das ViewModel
+     angewiesen, den Charakter zu aktualisieren.
+     */
     private func saveCharacterData() {
         var updatedCharacter = character
+        
         // Allgemeine Daten
         updatedCharacter.name = name
         updatedCharacter.streetName = streetName.isEmpty ? nil : streetName
@@ -510,17 +626,22 @@ struct CharacterDetailView: View {
             "ueberreden": ueberreden
         ]
         
-        // Ausrüstung + Backstory
+        // Ausrüstung & Hintergrundgeschichte
         let equipmentArray = equipmentString
             .split(separator: ",")
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
         updatedCharacter.equipment = equipmentArray.isEmpty ? nil : equipmentArray
         updatedCharacter.backstory = backstory
         
+        // Update via ViewModel
         characterVM.updateCharacter(updatedCharacter)
         dismiss()
     }
     
+    /**
+     Lädt ein neu ausgewähltes Bild in die Galerie-Bilder des Charakters hoch,
+     sofern ein Bild vorhanden ist. Andernfalls wird eine Fehlermeldung gesetzt.
+     */
     private func uploadImageIfNeeded() {
         guard let image = localSelectedImage else { return }
         
@@ -537,10 +658,18 @@ struct CharacterDetailView: View {
 
 // MARK: - Vollbild‐Ansicht für ein Bild (optional)
 
+/**
+ `CharacterLargeImageView` stellt ein ausgewähltes Bild in voller Größe dar.
+ Es kann via Navigation geschlossen werden.
+ */
 struct CharacterLargeImageView: View {
+    /// URL des anzuzeigenden Bildes.
     let imageURL: URL
+    
+    /// Titel, der in der Navigationsleiste angezeigt wird.
     let title: String
     
+    /// Ermöglicht das Dismiss der Vollbild-Ansicht.
     @Environment(\.dismiss) var dismiss
     
     var body: some View {

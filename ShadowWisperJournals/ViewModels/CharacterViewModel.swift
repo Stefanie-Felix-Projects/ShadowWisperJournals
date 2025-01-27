@@ -10,12 +10,21 @@ import FirebaseStorage
 import Foundation
 import UIKit
 
+/// `CharacterViewModel` ist eine ViewModel-Klasse, die die Logik für die Verwaltung und Verarbeitung
+/// von Charakterdaten in der ShadowWisperJournals-App bereitstellt.
+/// Sie implementiert Firebase Firestore und Storage für Datenbankoperationen und Bildverwaltung.
 class CharacterViewModel: ObservableObject {
+    /// Eine Liste von Charakteren, die als Observable bereitgestellt wird, um Änderungen in der UI zu reflektieren.
     @Published var characters: [Character] = []
     
+    /// Instanz von Firestore für die Datenbankinteraktion.
     let db = Firestore.firestore()
+    
+    /// Listener-Registrierung für Firestore-Datenabfragen.
     private var listenerRegistration: ListenerRegistration?
     
+    // MARK: - Datenabruf
+    /// Ruft alle Charaktere aus der Firestore-Datenbank ab, sortiert nach Erstellungsdatum in absteigender Reihenfolge.
     func fetchAllCharacters() {
         removeListener()
         
@@ -36,6 +45,8 @@ class CharacterViewModel: ObservableObject {
             }
     }
     
+    /// Ruft Charaktere ab, die zu einem bestimmten Benutzer gehören.
+    /// - Parameter userId: Die ID des Benutzers, für den Charaktere abgerufen werden sollen.
     func fetchCharacters(for userId: String) {
         removeListener()
         
@@ -58,11 +69,16 @@ class CharacterViewModel: ObservableObject {
             }
     }
     
+    /// Entfernt den aktuellen Firestore-Listener.
     func removeListener() {
         listenerRegistration?.remove()
         listenerRegistration = nil
     }
     
+    // MARK: - Datenmanipulation
+    /// Fügt einen neuen Charakter in die Firestore-Datenbank ein.
+    /// - Parameter name: Der Name des Charakters.
+    /// - Weitere Parameter: Eigenschaften des Charakters wie Attribute, Skill-Punkte und Hintergrundgeschichte.
     func addCharacter(
         name: String,
         attributes: [String: Int]?,
@@ -116,6 +132,8 @@ class CharacterViewModel: ObservableObject {
         }
     }
     
+    /// Aktualisiert die Daten eines bestehenden Charakters.
+    /// - Parameter character: Der zu aktualisierende Charakter.
     func updateCharacter(_ character: Character) {
         guard let characterId = character.id else { return }
         
@@ -129,6 +147,8 @@ class CharacterViewModel: ObservableObject {
         }
     }
     
+    /// Löscht einen Charakter aus der Firestore-Datenbank.
+    /// - Parameter character: Der zu löschende Charakter.
     func deleteCharacter(_ character: Character) {
         guard let characterId = character.id else { return }
         
@@ -139,6 +159,8 @@ class CharacterViewModel: ObservableObject {
         }
     }
     
+    // MARK: - Bildverwaltung
+    /// Lädt ein Bild für einen Charakter hoch und speichert die Bild-URL in der Datenbank.
     func uploadImage(
         _ image: UIImage,
         for character: Character,
@@ -192,6 +214,7 @@ class CharacterViewModel: ObservableObject {
         }
     }
     
+    /// Lädt ein Profilbild für einen Charakter hoch und speichert die Bild-URL in der Datenbank.
     func uploadProfileImage(
         _ image: UIImage,
         for character: Character,

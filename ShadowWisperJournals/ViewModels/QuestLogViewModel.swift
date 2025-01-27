@@ -10,17 +10,39 @@ import FirebaseStorage
 import Foundation
 import UIKit
 
+/// `QuestLogViewModel` ist eine ViewModel-Klasse zur Verwaltung und Bearbeitung von Quests
+/// in der ShadowWisperJournals-App. Sie nutzt Firebase Firestore und Firebase Storage,
+/// um Datenbanken und Bilder effizient zu verwalten.
+///
+/// Funktionen umfassen:
+/// - Abrufen, Hinzufügen, Aktualisieren und Löschen von Quests
+/// - Zuweisen von Charakteren zu Quests
+/// - Hochladen von Bildern zu Firebase Storage
 class QuestLogViewModel: ObservableObject {
     
+    // MARK: - Published Properties
+    /// Eine Liste aller Quests, die in der UI angezeigt werden.
     @Published var quests: [Quest] = []
     
+    /// Der aktuell ausgewählte Statusfilter (z. B. "offen", "abgeschlossen", "alle").
     @Published var selectedStatus: String = "alle"
+    
+    /// Das Startdatum des Filterzeitraums.
     @Published var startDate: Date = Calendar.current.date(byAdding: .month, value: -1, to: Date()) ?? Date()
+    
+    /// Das Enddatum des Filterzeitraums.
     @Published var endDate: Date = Calendar.current.date(byAdding: .day, value: 1, to: Date()) ?? Date()
     
+    // MARK: - Private Properties
+    /// Firestore-Instanz für Datenbankoperationen.
     private let db = Firestore.firestore()
+    
+    /// Listener für Datenänderungen in der Firestore-Datenbank.
     private var listener: ListenerRegistration?
     
+    // MARK: - Datenabruf
+    /// Ruft alle Quests aus der Firestore-Datenbank ab und aktualisiert die `quests`-Liste.
+    /// - Die Daten werden nach dem Erstellungsdatum sortiert (neueste zuerst).
     func fetchAllQuests() {
         listener = db.collection("quests")
             .order(by: "createdAt", descending: true)
@@ -36,6 +58,7 @@ class QuestLogViewModel: ObservableObject {
                     self.quests = documents.compactMap {
                         do {
                             var quest = try $0.data(as: Quest.self)
+                            // Sicherstellen, dass imageURLs nicht nil ist
                             if quest.imageURLs == nil {
                                 quest.imageURLs = []
                             }
@@ -50,11 +73,26 @@ class QuestLogViewModel: ObservableObject {
             }
     }
     
+    /// Entfernt den Firestore-Listener, um Ressourcen zu sparen.
     func removeListener() {
         listener?.remove()
         listener = nil
     }
     
+    // MARK: - Datenmanipulation
+    /// Fügt eine neue Quest zur Firestore-Datenbank hinzu und speichert sie lokal.
+    ///
+    /// - Parameters:
+    ///   - title: Der Titel der Quest.
+    ///   - description: Die Beschreibung der Quest.
+    ///   - status: Der Status der Quest (z. B. "offen", "abgeschlossen").
+    ///   - reward: Die Belohnung der Quest (optional).
+    ///   - userId: Die ID des Benutzers, der die Quest erstellt hat.
+    ///   - creatorDisplayName: Der Anzeigename des Erstellers (optional).
+    ///   - assignedCharacterIds: IDs der Charaktere, die der Quest zugewiesen sind (optional).
+    ///   - locationString: Der Ort der Quest (optional).
+    ///   - personalNotes: Persönliche Notizen zur Quest (optional).
+    ///   - completion: Ein Callback, das entweder die ID der neuen Quest oder einen Fehler zurückgibt.
     func addQuest(
         title: String,
         description: String,
@@ -103,6 +141,8 @@ class QuestLogViewModel: ObservableObject {
         }
     }
     
+    /// Aktualisiert eine bestehende Quest in der Firestore-Datenbank.
+    /// - Parameter quest: Die zu aktualisierende Quest.
     func updateQuest(_ quest: Quest) {
         guard let questId = quest.id else {
             print("UPDATE ERROR: Quest hat keine ID")
@@ -132,7 +172,6 @@ class QuestLogViewModel: ObservableObject {
         if let locationStr = quest.locationString {
             updateData["locationString"] = locationStr
         }
-        
         if let notes = quest.personalNotes {
             updateData["personalNotes"] = notes
         } else {
@@ -148,6 +187,8 @@ class QuestLogViewModel: ObservableObject {
         }
     }
     
+    /// Löscht eine Quest aus der Firestore-Datenbank.
+    /// - Parameter quest: Die zu löschende Quest.
     func deleteQuest(_ quest: Quest) {
         guard let questId = quest.id else { return }
         db.collection("quests").document(questId).delete { error in
@@ -159,6 +200,10 @@ class QuestLogViewModel: ObservableObject {
         }
     }
     
+    /// Weist einer Quest neue Charaktere zu.
+    /// - Parameters:
+    ///   - quest: Die Quest, die aktualisiert werden soll.
+    ///   - characterIds: Eine Liste von Charakter-IDs, die der Quest zugewiesen werden sollen.
     func assignCharactersToQuest(quest: Quest, characterIds: [String]) {
         guard let questId = quest.id else { return }
         
@@ -182,7 +227,12 @@ class QuestLogViewModel: ObservableObject {
         }
     }
     
-    // Angepasste uploadImage-Funktion ohne Firestore-Aktualisierung
+    // MARK: - Bildverwaltung
+    /// Lädt ein Bild für eine Quest in Firebase Storage hoch und gibt die Bild-URL zurück.
+    /// - Parameters:
+    ///   - image: Das Bild, das hochgeladen werden soll.
+    ///   - quest: Die Quest, zu der das Bild gehört.
+    ///   - completion: Ein Callback, das entweder die Bild-URL oder einen Fehler zurückgibt.
     func uploadImage(
         _ image: UIImage,
         for quest: Quest,
@@ -222,7 +272,6 @@ class QuestLogViewModel: ObservableObject {
                     return
                 }
                 
-                // Firestore-Aktualisierung entfernen
                 completion(.success(downloadURL.absoluteString))
             }
         }

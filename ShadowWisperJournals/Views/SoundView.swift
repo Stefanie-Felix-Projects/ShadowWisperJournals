@@ -8,17 +8,67 @@
 import SwiftUI
 import UniformTypeIdentifiers
 
+/**
+ `SoundView` stellt eine zentrale Ansicht für das Abspielen und Verwalten von
+ Audioinhalten bereit. Nutzer:innen können:
+ - Nach YouTube-Videos (z. B. Musik oder Sounds) suchen und sie direkt abspielen
+ - Gefundene Videos zu Favoriten hinzufügen, abspielen und löschen
+ - Eigene lokale Sound-Dateien importieren und abspielen (Pause, Stop, Loop)
+ 
+ Die Suchergebnisse werden nach Erfolg einer YouTube-Suche in einer Liste angezeigt,
+ Favoriten horizontal scrollbar, und eigene Sounds in einer vertikalen Liste.
+ */
 struct SoundView: View {
+    
+    // MARK: - StateObject
+    
+    /// `SoundViewModel` steuert die gesamte Logik: YouTube-Suche, Favoritenverwaltung,
+    /// Audio-Abspielkontrolle und das Hinzufügen eigener Sounds.
     @StateObject private var viewModel = SoundViewModel()
+    
+    // MARK: - State
+    
+    /// Steuert, ob die Suchergebnisse in der Liste ein- oder ausgeklappt sind.
     @State private var isSearchResultsExpanded: Bool = false
     
+    // MARK: - Body
+    
+    /**
+     Die Hauptansicht besteht aus einem `ZStack` mit animiertem Farbverlauf
+     und einem `NavigationStack`, in dem eine `List` verschiedene Abschnitte
+     für die Suchfunktionen, Favoriten und eigene Sounds darstellt:
+     
+     1. **Suche** (YouTube)
+     - TextField für Suchbegriffe + Button, der `viewModel.searchOnYouTube()` aufruft
+     - Ladeindikator bei laufender Suche (`viewModel.isLoading`)
+     
+     2. **Suchergebnisse**
+     - Ein- / Ausklappbar per Button (Chevron)
+     - Zeigt gefundene Videos an, die ausgewählt und abgespielt werden können
+     - Swipe-Action, um ein Video zu den Favoriten hinzuzufügen
+     
+     3. **Aktuelles Video**
+     - `YouTubePlayerView` mit `viewModel.videoID`, das die derzeit
+     ausgewählte YouTube-Video-ID abspielt.
+     
+     4. **Favoriten**
+     - Horizontal scrollbare Liste der Favoriten-Videos, die abspielbar
+     oder löschbar sind
+     
+     5. **Eigene Sounds**
+     - Ermöglicht den Import lokaler Audiodateien via `DocumentPickerView`
+     - Zeigt alle bereits importierten Dateien mit Play/Pause/Stop/Loop-Buttons
+     */
     var body: some View {
         ZStack {
+            // Hintergrund mit animiertem Farbverlauf
             AnimatedBackgroundView(colors: AppColors.gradientColors)
                 .ignoresSafeArea()
             
             NavigationStack {
                 List {
+                    
+                    // MARK: Suche
                     Section(header: Text("Suche")) {
                         HStack {
                             TextField("Nach Schlagworten suchen...", text: $viewModel.searchQuery)
@@ -26,6 +76,7 @@ struct SoundView: View {
                                 .disableAutocorrection(true)
                                 .autocapitalization(.none)
                             
+                            // Button zum Starten der YouTube-Suche
                             Button("Suchen") {
                                 Task {
                                     await viewModel.searchOnYouTube()
@@ -35,6 +86,7 @@ struct SoundView: View {
                             .disabled(viewModel.searchQuery.isEmpty)
                         }
                         
+                        // Ladeindikator
                         if viewModel.isLoading {
                             HStack {
                                 Spacer()
@@ -45,12 +97,14 @@ struct SoundView: View {
                         }
                     }
                     
+                    // MARK: Suchergebnisse
                     if !viewModel.searchResults.isEmpty {
                         Section {
                             HStack {
                                 Text("Suchergebnisse")
                                     .font(.headline)
                                 Spacer()
+                                // Button zum Aus- oder Einklappen der Ergebnisse
                                 Button {
                                     withAnimation {
                                         isSearchResultsExpanded.toggle()
@@ -67,12 +121,15 @@ struct SoundView: View {
                             
                             if isSearchResultsExpanded {
                                 ForEach(viewModel.searchResults) { item in
+                                    // Auswahl eines Videos => Wechsle `videoID`
                                     Button {
                                         viewModel.videoID = item.idInfo.videoId
                                     } label: {
                                         HStack(alignment: .top, spacing: 10) {
-                                            AsyncImage(url: URL(string: item.snippet.thumbnails.defaultThumbnail.url)) {
-                                                image in
+                                            // Vorschaubild
+                                            AsyncImage(
+                                                url: URL(string: item.snippet.thumbnails.defaultThumbnail.url)
+                                            ) { image in
                                                 image.resizable()
                                             } placeholder: {
                                                 ProgressView()
@@ -91,6 +148,7 @@ struct SoundView: View {
                                             }
                                         }
                                     }
+                                    // Swipe-Action zum Hinzufügen in Favoriten
                                     .swipeActions(edge: .trailing) {
                                         Button {
                                             viewModel.addToFavorites(video: item)
@@ -104,6 +162,7 @@ struct SoundView: View {
                         }
                     }
                     
+                    // MARK: Aktuelles Video
                     Section(header: Text("Aktuelles Video")) {
                         YouTubePlayerView(videoID: viewModel.videoID)
                             .frame(height: 200)
@@ -111,12 +170,15 @@ struct SoundView: View {
                             .padding(.vertical, 5)
                     }
                     
+                    // MARK: Favoriten
                     if !viewModel.favoriteVideos.isEmpty {
                         Section(header: Text("Deine Favoriten")) {
+                            // Horizontal scrollbare Liste
                             ScrollView(.horizontal, showsIndicators: false) {
                                 HStack(spacing: 10) {
                                     ForEach(viewModel.favoriteVideos) { favorite in
                                         VStack {
+                                            // Abspielen eines Favoriten
                                             Button {
                                                 viewModel.playFavoriteVideo(videoId: favorite.id)
                                             } label: {
@@ -133,6 +195,7 @@ struct SoundView: View {
                                                         .multilineTextAlignment(.center)
                                                 }
                                             }
+                                            // Löschen eines Favoriten
                                             Button(role: .destructive) {
                                                 viewModel.removeFromFavorites(videoId: favorite.id)
                                             } label: {
@@ -148,8 +211,10 @@ struct SoundView: View {
                         }
                     }
                     
+                    // MARK: Eigene Sounds
                     Section(header: Text("Eigene Sounds")) {
                         VStack(alignment: .leading, spacing: 8) {
+                            // Button zum Öffnen des DocumentPickers
                             Button {
                                 viewModel.showingDocumentPicker = true
                             } label: {
@@ -158,6 +223,7 @@ struct SoundView: View {
                             }
                             .buttonStyle(.bordered)
                             
+                            // Liste der eigenen Sounds
                             if viewModel.ownSounds.isEmpty {
                                 Text("Noch keine eigenen Sounds hinzugefügt.")
                                     .font(.footnote)
@@ -175,6 +241,7 @@ struct SoundView: View {
                                                 .cornerRadius(6)
                                             
                                             HStack(spacing: 20) {
+                                                // Abspiel-Steuerung
                                                 Button {
                                                     viewModel.playOwnSound(url: soundURL)
                                                 } label: {
@@ -220,11 +287,16 @@ struct SoundView: View {
                         }
                     }
                 }
+                // Style und Hintergrund der Liste
                 .scrollContentBackground(.hidden)
                 .background(Color.clear)
                 .listStyle(InsetGroupedListStyle())
+                
+                // Navigation Title
                 .navigationTitle("Soundbereich")
                 .navigationBarTitleDisplayMode(.inline)
+                
+                // MARK: Dokumenten-Picker Sheet
                 .sheet(isPresented: $viewModel.showingDocumentPicker) {
                     DocumentPickerView { url in
                         viewModel.addOwnSound(url: url)
@@ -236,6 +308,7 @@ struct SoundView: View {
     }
 }
 
+// MARK: - Preview
 struct SoundView_Previews: PreviewProvider {
     static var previews: some View {
         SoundView()

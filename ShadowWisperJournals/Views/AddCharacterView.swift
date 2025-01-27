@@ -7,28 +7,87 @@
 
 import SwiftUI
 
+/**
+ Die `AddCharacterView` dient als Formularansicht, in der Benutzer:innen
+ einen neuen Charakter erstellen und optional Profil- und/oder zusätzliche
+ Bilder hochladen können.
+ 
+ Sie beinhaltet mehrere Sektionen:
+ - Profilbild auswählen
+ - Allgemeine Daten (Name, Metatyp, Geschlecht etc.)
+ - Attribute
+ - Fertigkeiten
+ - Ausrüstung & Hintergrundgeschichte
+ - Ein Bild hochladen (Galerie)
+ - Aktionen (Speichern und Abbrechen)
+ 
+ Nach Eingabe aller Werte kann der Charakter inklusive der Bilder in Firestore
+ (bzw. in deinem ViewModel) gespeichert werden.
+ */
 struct AddCharacterView: View {
+    
+    // MARK: - Environment & ObservedObject
+    
+    /// Ermöglicht das Schließen bzw. Dismissen der aktuellen View.
     @Environment(\.dismiss) var dismiss
+    
+    /// Das ViewModel zum Verwalten der Charaktere. Hierüber erfolgt das Hinzufügen und Uploaden.
     @ObservedObject var characterVM: CharacterViewModel
+    
+    /// Die ID des aktuell eingeloggten Nutzers, zu dem der neue Charakter hinzugefügt werden soll.
     let userId: String
     
+    // MARK: - Allgemeine Charakterdaten
+    
+    /// Der Realname des Charakters.
     @State private var name: String = ""
     
-    // Allgemeine Daten
+    /// Der Straßenname (Alias) des Charakters.
     @State private var streetName: String = ""
+    
+    /// Der Metatyp des Charakters (z.B. Mensch, Elf, Ork, Zwerg etc.).
     @State private var metaType: String = ""
+    
+    /// Freies Textfeld für die Spezialisierung (z.B. Hacker, Rigger, Decker, Schamane).
     @State private var specialization: String = ""
+    
+    /// Freies Textfeld für die Angabe, ob der Charakter Magie oder Resonanz besitzt.
     @State private var magicOrResonance: String = ""
+    
+    /// Geschlecht des Charakters.
     @State private var gender: String = ""
+    
+    /// Körpergröße in Zentimetern.
     @State private var height: Int? = nil
+    
+    /// Körpergewicht in Kilogramm.
     @State private var weight: Int? = nil
+    
+    /// Alter des Charakters.
     @State private var age: Int? = nil
+    
+    /// Ruf des Charakters (z.B. bei Shadowrun relevant für Kontakte und Reputation).
     @State private var reputation: Int? = nil
+    
+    /// Fahndungsstufe bei Behörden (je höher, desto gefährlicher für den Charakter).
     @State private var wantedLevel: Int? = nil
+    
+    /// Aktueller Karma-Stand (zur Steigerung von Attributen, Skills etc.).
     @State private var karma: Int? = nil
+    
+    /// Essenzwert des Charakters (bei Cyberware/Magie relevant).
     @State private var essence: Double? = nil
     
-    // Attribute
+    // MARK: - Attribute
+    
+    /**
+     Nachfolgend die Grundattribute und weitere Werte, die sich auf verschiedene
+     Spielemechaniken auswirken können (z.B. in Shadowrun).
+     
+     Alle Attribute werden hier über ein `Stepper` angepasst und sind standardmäßig
+     zwischen 0 und 50 limitiert.
+     */
+    
     @State private var konstitution: Int = 0
     @State private var geschicklichkeit: Int = 0
     @State private var reaktion: Int = 0
@@ -48,7 +107,13 @@ struct AddCharacterView: View {
     @State private var erinnerungsvermoegen: Int = 0
     @State private var hebenTragen: Int = 0
     
-    // Skill-Punkte
+    // MARK: - Skills
+    
+    /**
+     Auflistung von Fertigkeiten (Skills), die im Spiel verwendet werden.
+     Alle Skills sind ebenfalls über `Stepper` editierbar.
+     */
+    
     @State private var biotech: Int = 0
     @State private var ersteHilfe: Int = 0
     @State private var athletik: Int = 0
@@ -64,31 +129,59 @@ struct AddCharacterView: View {
     @State private var wahrnehmung: Int = 0
     @State private var ueberreden: Int = 0
     
-    // Ausrüstung, Hintergrund
+    // MARK: - Ausrüstung & Hintergrund
+    
+    /// String, in dem Ausrüstung kommasepariert eingegeben werden kann.
     @State private var equipmentString: String = ""
+    
+    /// Hintergrundgeschichte des Charakters.
     @State private var backstory: String = ""
     
-    // Bild-Upload
+    // MARK: - Bild-Upload States
+    
+    /**
+     Zustände für das Anzeigen des Image Pickers (Fotobibliothek).
+     - `showImagePicker`: Steuert, ob der Sheet für den Bildpicker angezeigt wird.
+     - `localSelectedImage`: Das lokal ausgewählte Bild für die Bilder-Galerie.
+     - `errorMessage`: Fehlermeldung beim Upload.
+     */
+    
     @State private var showImagePicker = false
     @State private var localSelectedImage: UIImage?
     @State private var errorMessage: String?
     
-    // Profilbild
+    /**
+     Zustände für das Profilbild:
+     - `showProfileImagePicker`: Steuert, ob der Sheet für den Profilbild-Picker angezeigt wird.
+     - `localProfileImage`: Das lokal ausgewählte Profilbild.
+     */
     @State private var showProfileImagePicker = false
     @State private var localProfileImage: UIImage?
     
+    // MARK: - Body
+    
+    /**
+     Der eigentliche View-Aufbau mit einem animierten Hintergrund und einer
+     NavigationStack-basierten `Form`. Enthält mehrere `Section`s für die
+     Eingabe der Charakterdaten, das Hochladen von Bildern und die
+     abschließenden Aktionen (Speichern/Abbrechen).
+     */
     var body: some View {
         ZStack {
+            // Hintergrund-View mit animiertem Farbverlauf
             AnimatedBackgroundView(colors: AppColors.gradientColors)
                 .ignoresSafeArea()
             
             NavigationStack {
                 Form {
+                    
                     // MARK: - Profilbild
                     Section("Profilbild") {
+                        /// Button zum Öffnen des Profilbild-Pickers
                         Button("Profilbild auswählen") {
                             showProfileImagePicker = true
                         }
+                        // Sheet zum Auswählen des Profilbilds
                         .sheet(isPresented: $showProfileImagePicker) {
                             ImagePicker { selectedImage in
                                 self.localProfileImage = selectedImage
@@ -114,6 +207,7 @@ struct AddCharacterView: View {
                     
                     // MARK: - Allgemeine Daten
                     Section("Allgemeine Daten") {
+                        // Name & weitere Felder
                         TextField("Name (Realname)", text: $name)
                         TextField("Straßenname", text: $streetName)
                         TextField("Metatyp", text: $metaType)
@@ -121,6 +215,7 @@ struct AddCharacterView: View {
                         TextField("Magie/Resonanz", text: $magicOrResonance)
                         TextField("Geschlecht", text: $gender)
                         
+                        // Größe
                         HStack {
                             Text("Größe (cm)")
                             Spacer()
@@ -130,6 +225,7 @@ struct AddCharacterView: View {
                                 .multilineTextAlignment(.trailing)
                         }
                         
+                        // Gewicht
                         HStack {
                             Text("Gewicht (kg)")
                             Spacer()
@@ -139,6 +235,7 @@ struct AddCharacterView: View {
                                 .multilineTextAlignment(.trailing)
                         }
                         
+                        // Alter
                         HStack {
                             Text("Alter")
                             Spacer()
@@ -148,6 +245,7 @@ struct AddCharacterView: View {
                                 .multilineTextAlignment(.trailing)
                         }
                         
+                        // Ruf
                         HStack {
                             Text("Ruf")
                             Spacer()
@@ -157,6 +255,7 @@ struct AddCharacterView: View {
                                 .multilineTextAlignment(.trailing)
                         }
                         
+                        // Fahndungsstufe
                         HStack {
                             Text("Fahndungsstufe")
                             Spacer()
@@ -166,6 +265,7 @@ struct AddCharacterView: View {
                                 .multilineTextAlignment(.trailing)
                         }
                         
+                        // Karma
                         HStack {
                             Text("Karma")
                             Spacer()
@@ -175,6 +275,7 @@ struct AddCharacterView: View {
                                 .multilineTextAlignment(.trailing)
                         }
                         
+                        // Essenz
                         HStack {
                             Text("Essenz")
                             Spacer()
@@ -238,9 +339,11 @@ struct AddCharacterView: View {
                     
                     // MARK: - Neues Bild
                     Section("Neues Bild hinzufügen") {
+                        /// Button zum Öffnen des Bild-Pickers für zusätzliche Bilder
                         Button("Bild aus Fotobibliothek") {
                             showImagePicker = true
                         }
+                        // Sheet zum Auswählen eines Bildes
                         .sheet(isPresented: $showImagePicker) {
                             ImagePicker { selectedImage in
                                 self.localSelectedImage = selectedImage
@@ -271,16 +374,19 @@ struct AddCharacterView: View {
                     
                     // MARK: - Aktionen
                     Section {
+                        /// Erstellt einen neuen Charakter und lädt gegebenenfalls Bilder hoch.
                         Button("Charakter hinzufügen") {
                             addCharacterAndUploadImage()
                         }
                         .buttonStyle(.borderedProminent)
                         
+                        /// Bricht den Vorgang ab und schließt die View.
                         Button("Abbrechen", role: .cancel) {
                             dismiss()
                         }
                     }
                 }
+                // Entfernt den Hintergrund der Form-Abschnitte und setzt diesen auf transparent.
                 .scrollContentBackground(.hidden)
                 .background(Color.clear)
                 .navigationTitle("Neuer Charakter")
@@ -291,7 +397,22 @@ struct AddCharacterView: View {
     
     // MARK: - Funktionen
     
+    /**
+     Fügt dem ViewModel (`characterVM`) einen neuen Charakter hinzu und lädt
+     anschließend (asynchron) das Profilbild und/oder weitere Bilder hoch, sofern
+     sie ausgewählt wurden.
+     
+     Ablauf:
+     1. Erstellen eines `attributes`-Dictionaries mit allen Attributen.
+     2. Erstellen eines `skillPoints`-Dictionaries mit allen Fertigkeiten.
+     3. Aufruf von `characterVM.addCharacter(...)` zum Speichern der Charakterdaten.
+     4. Verzögerung, um sicherzustellen, dass der neue Charakter vom Server gelesen werden kann.
+     5. Aktualisierung der Charakterliste (`fetchCharacters`).
+     6. Bild-Uploads (Profilbild und/oder zusätzliches Bild), sofern vorhanden.
+     7. Schließt die View (dismiss), wenn alles abgeschlossen ist.
+     */
     private func addCharacterAndUploadImage() {
+        // Dictionary für die Attribute
         let attributes: [String: Int] = [
             "konstitution": konstitution,
             "geschicklichkeit": geschicklichkeit,
@@ -313,6 +434,7 @@ struct AddCharacterView: View {
             "hebenTragen": hebenTragen
         ]
         
+        // Dictionary für die Skills
         let skillPoints: [String: Int] = [
             "biotech": biotech,
             "ersteHilfe": ersteHilfe,
@@ -330,6 +452,7 @@ struct AddCharacterView: View {
             "ueberreden": ueberreden
         ]
         
+        // Charakter zum ViewModel hinzufügen
         characterVM.addCharacter(
             name: name,
             attributes: attributes,
@@ -350,17 +473,21 @@ struct AddCharacterView: View {
             essence: essence
         )
         
+        // Asynchrone Warteschleife, damit der Charakter auch in der Liste erscheint
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
             characterVM.fetchCharacters(for: userId)
             
             DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                // Versuchen, den soeben erstellten Charakter in der aktualisierten Liste zu finden
                 if let newChar = characterVM.characters.first(where: {
                     $0.name == self.name && $0.userId == self.userId
                 }) {
+                    // Falls ein Profilbild ausgewählt wurde, wird es hochgeladen
                     if let localProfileImage = localProfileImage {
                         characterVM.uploadProfileImage(localProfileImage, for: newChar) { result in
                             switch result {
                             case .success:
+                                // Profilbild erfolgreich hochgeladen, kein weiteres Handling nötig
                                 break
                             case .failure(let error):
                                 errorMessage = "Fehler beim Profilbild-Upload: \(error.localizedDescription)"
@@ -368,20 +495,25 @@ struct AddCharacterView: View {
                         }
                     }
                     
+                    // Falls ein weiteres Bild aus der Galerie ausgewählt wurde, wird es hochgeladen
                     if let image = localSelectedImage {
                         characterVM.uploadImage(image, for: newChar) { result in
                             switch result {
                             case .success:
+                                // Upload erfolgreich
                                 break
                             case .failure(let error):
                                 errorMessage = "Fehler beim Hochladen (Galerie): \(error.localizedDescription)"
                             }
+                            // Nach Abschluss schließt sich die View
                             dismiss()
                         }
                     } else {
+                        // Kein zusätzliches Bild, also nur schließen
                         dismiss()
                     }
                 } else {
+                    // Wenn kein passender Charakter gefunden wurde, die View schließen
                     dismiss()
                 }
             }
