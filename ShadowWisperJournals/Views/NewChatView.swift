@@ -8,83 +8,96 @@
 import SwiftUI
 
 /**
- `NewChatView` ermöglicht das Erstellen eines neuen Chats zwischen
- zwei Charakteren. Dabei wählt der/die Benutzer:in einen eigenen
- Charakter und einen fremden Charakter aus. Optionale erste
- Nachricht kann hinzugefügt werden.
+ `NewChatView` ist eine `View`, welche den Benutzer in die Lage versetzt, einen neuen Chat zwischen zwei Charakteren zu erstellen.
  
- - Erlaubt das Filtern fremder Charaktere über eine Suchleiste.
- - Überprüft, ob ein Chat zwischen den beiden Charakteren bereits existiert.
- - Falls ja, wird statt eines neuen Chats ein Alert angezeigt und
- der bereits existierende Chat geöffnet.
- - Falls nicht, wird ein neuer Chat angelegt und ggf. eine
- erste Nachricht versendet.
- */
+ - Der Nutzer kann aus einer Liste seiner eigenen Charaktere einen auswählen.
+ - Anschließend kann er einen fremden Charakter (von anderen Benutzern) auswählen.
+ - Optional kann eine initiale Nachricht verfasst werden, die nach dem Erstellen des Chats direkt gesendet wird.
+ 
+ Diese View behandelt außerdem den Fall, dass für die beiden gewählten Charaktere bereits ein Chat existiert: In diesem Fall wird statt eines neuen Chats einfach der bestehende Chat geöffnet.
+*/
 struct NewChatView: View {
     
-    // MARK: - Environment und ObservedObject
+    // MARK: - Environment- und ObservedObject-Variablen
     
-    /// Ermöglicht das Schließen (Dismiss) der aktuellen View.
+    /// Ermöglicht das automatische Schließen der View (z. B. per "Abbrechen"-Button).
     @Environment(\.dismiss) var dismiss
     
     /**
-     Das ViewModel für Chats. Zuständig für:
-     - Erstellen/Überprüfen neuer Chats
-     - Senden der ersten Nachricht
-     */
+     `chatVM` ist das ViewModel, das für die Verwaltung sämtlicher Chat-bezogener Daten und Vorgänge
+     (Erstellen, Abrufen und Senden von Nachrichten) verantwortlich ist.
+    */
     @ObservedObject var chatVM: ChatViewModel
     
     /**
-     Callback, der aufgerufen wird, wenn das Anlegen
-     (oder Öffnen) eines Chats erfolgreich abgeschlossen wurde.
-     */
+     Ein optionaler Callback, der nach erfolgreicher Chaterstellung aufgerufen werden kann,
+     um beispielsweise die übergeordnete View zu informieren.
+    */
     let onSuccess: (() -> Void)?
     
-    /// Liefert Informationen zum aktuell eingeloggten Benutzer (z.B. userId).
+    /**
+     `userViewModel` stellt Informationen über den aktuell eingeloggten Nutzer bereit,
+     insbesondere dessen `userId`. Über `@EnvironmentObject` wird das ViewModel
+     zentral zur Verfügung gestellt.
+    */
     @EnvironmentObject var userViewModel: ShadowWisperUserViewModel
     
-    /// Das Character-ViewModel zum Laden aller Charaktere.
+    /**
+     `characterVM` ist ein eigener State-Object, das Charaktere (sowohl eigene als auch fremde) verwaltet.
+     Sobald die View erscheint, wird die Liste aller Charaktere geladen.
+    */
     @StateObject private var characterVM = CharacterViewModel()
     
-    // MARK: - Auswahlzustände
+    // MARK: - Ausgewählte Charakter-IDs
     
-    /// Der ID des ausgewählten, eigenen Charakters.
+    /// Speichert die ID des vom User gewählten eigenen Charakters (falls ausgewählt).
     @State private var mySelectedCharId: String? = nil
     
-    /// Die ID des ausgewählten, fremden Charakters.
+    /// Speichert die ID des vom User gewählten fremden Charakters (falls ausgewählt).
     @State private var otherSelectedCharId: String? = nil
     
-    // MARK: - Weitere Eingaben
-    
-    /// Suchtext für das Filtern fremder Charaktere in der Liste.
-    @State private var searchText: String = ""
-    
-    /// Text der optionalen, ersten Nachricht.
-    @State private var initialMessage: String = ""
-    
-    // MARK: - UI-Zustände
-    
-    /// Steuert, ob ein Alert angezeigt wird, falls es schon einen existierenden Chat gibt.
-    @State private var showExistingChatAlert: Bool = false
-    
-    /// Hält den eventuell bereits existierenden Chat, falls einer gefunden wird.
-    @State private var existingChat: Chat? = nil
-    
-    // MARK: - Abgeleitete Listen
+    // MARK: - Suchtext und initiale Nachricht
     
     /**
-     Liste der Charaktere, die zum aktuell eingeloggten Nutzer gehören
-     (d. h. "meine" Charaktere).
-     */
+     Suchtext, um in der Liste der fremden Charaktere zu filtern.
+     Sobald der Nutzer hier tippt, wird die Liste der Charaktere gefiltert.
+    */
+    @State private var searchText: String = ""
+    
+    /**
+     Text für die initiale Nachricht, die direkt beim Erstellen des Chats gesendet werden kann
+     (Feld ist optional; kann auch leer bleiben).
+    */
+    @State private var initialMessage: String = ""
+    
+    // MARK: - State für Alert bei bereits bestehendem Chat
+    
+    /// Steuert das Anzeigen eines Alerts, falls ein Chat zwischen den beiden Charakteren bereits existiert.
+    @State private var showExistingChatAlert: Bool = false
+    
+    /// Falls ein bereits existierender Chat gefunden wird, wird dieser hier zwischengespeichert, um ihn dann zu öffnen.
+    @State private var existingChat: Chat? = nil
+    
+    // MARK: - Computed Properties für Listen der Charaktere
+    
+    /**
+     Liefert eine gefilterte Liste der eigenen Charaktere zurück, basierend auf der `userId`.
+     Falls keine `userId` vorhanden ist, wird ein leeres Array zurückgegeben.
+    */
     private var myCharacters: [Character] {
         guard let userId = userViewModel.userId else { return [] }
         return characterVM.characters.filter { $0.userId == userId }
     }
     
     /**
-     Liste aller Charaktere, die nicht zum aktuell eingeloggten Nutzer gehören
-     (d. h. "fremde" Charaktere).
-     */
+     Liefert eine gefilterte Liste der fremden Charaktere zurück, d. h. solche,
+     deren `userId` sich von der `userId` des aktuellen Nutzers unterscheidet.
+     Falls keine `userId` vorhanden ist, werden alle Charaktere zurückgegeben.
+     
+     **Achtung**: Hier könnte man sich überlegen, ob man bei fehlender `userId`
+     nicht besser ein leeres Array zurückgibt. Aktuell wird stattdessen das gesamte
+     Character-Array genutzt, um wenigstens ein Verhalten zu bieten, falls `userId` = nil.
+    */
     private var otherCharacters: [Character] {
         guard let userId = userViewModel.userId else { return characterVM.characters }
         return characterVM.characters.filter { $0.userId != userId }
@@ -93,17 +106,25 @@ struct NewChatView: View {
     // MARK: - Body
     
     /**
-     Der View-Aufbau erfolgt mit einem `NavigationStack` und einem `Form`:
-     1. Auswahl des eigenen Charakters
-     2. Auswahl eines fremden Charakters (mit Suchfeld)
-     3. Optional: Erste Nachricht
-     4. Button zum Erstellen des Chats, inkl. Prüfung auf bereits existierenden Chat
-     */
+     Der Hauptinhalt der View, bestehend aus einem `NavigationStack` mit einem `Form`.
+     
+     - **Form**:
+       - Eine Sektion zur Auswahl des eigenen Charakters.
+       - Eine Sektion zur Auswahl des fremden Charakters mit Suchfeld.
+       - Eine Sektion zur Eingabe einer ersten Nachricht.
+       - Ein Button, um den Chat zu erstellen (oder den bestehenden zu öffnen).
+    */
     var body: some View {
         NavigationStack {
             Form {
                 // MARK: Eigener Charakter
                 Section("Mit welchem meiner Charaktere schreibe ich?") {
+                    /**
+                     Listet alle eigenen Charaktere des Users auf.
+                     Für jeden Charakter wird eine Custom-Row `SelectableCharacterRow` genutzt,
+                     die anzeigt, ob der Charakter ausgewählt ist und optional ein Bild bzw. Text darstellt.
+                     Durch Antippen kann der Charakter ausgewählt oder wieder abgewählt werden.
+                    */
                     List(myCharacters, id: \.id) { ch in
                         SelectableCharacterRow(
                             character: ch,
@@ -121,13 +142,25 @@ struct NewChatView: View {
                 
                 // MARK: Fremder Charakter
                 Section("Wen möchtest du kontaktieren?") {
+                    /**
+                     `TextField` zum Eingeben des Suchtexts, um die fremden Charaktere zu filtern.
+                    */
                     TextField("Suche nach fremden Charakter...", text: $searchText)
                     
+                    /**
+                     Liste der anderen Charaktere, gefiltert anhand des `searchText`.
+                     - Ist das Suchfeld leer, werden alle fremden Charaktere angezeigt.
+                     - Enthält es einen Wert, wird nach dem Namen gefiltert (case-insensitive).
+                    */
                     let filteredOthers = otherCharacters.filter { char in
                         if searchText.isEmpty { return true }
                         return char.name.localizedCaseInsensitiveContains(searchText)
                     }
                     
+                    /**
+                     Listet die gefilterten fremden Charaktere auf.
+                     Ebenfalls als `SelectableCharacterRow`.
+                    */
                     List(filteredOthers, id: \.id) { ch in
                         SelectableCharacterRow(
                             character: ch,
@@ -145,23 +178,41 @@ struct NewChatView: View {
                 
                 // MARK: Erste Nachricht
                 Section("Erste Nachricht (optional)") {
+                    /**
+                     `TextField` für eine optionale Nachricht, die direkt nach Erstellung des Chats gesendet wird.
+                    */
                     TextField("Hey, wie geht's?", text: $initialMessage)
                 }
                 
                 // MARK: Button "Chat erstellen"
                 Section {
+                    /**
+                     Button zum Erstellen des Chats. Er ruft `createChatOrOpenExisting()` auf.
+                     Ist deaktiviert, solange kein eigener und kein fremder Charakter ausgewählt sind.
+                    */
                     Button("Chat erstellen") {
                         createChatOrOpenExisting()
                     }
-                    // Button deaktivieren, wenn keine Auswahl getroffen wurde
                     .disabled(mySelectedCharId == nil || otherSelectedCharId == nil)
                 }
             }
-            // Layout-Anpassungen
+            /**
+             `scrollContentBackground(.hidden)` und `background(Color.clear)` werden genutzt,
+             um eventuell das Hintergrund-Layout anzupassen.
+             Kann z. B. bei speziellen Designs oder Farbverläufen sinnvoll sein.
+            */
             .scrollContentBackground(.hidden)
             .background(Color.clear)
+            
+            /**
+             Setzt den Titel der Navigationsleiste.
+            */
             .navigationTitle("Neuen Chat starten")
-            // Toolbar: Abbrechen-Button
+            
+            /**
+             Fügt der Navigationsleiste einen `Abbrechen`-Button hinzu.
+             Dieser nutzt das `dismiss()`-Environment, um die aktuelle View zu schließen.
+            */
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Abbrechen") {
@@ -169,7 +220,12 @@ struct NewChatView: View {
                     }
                 }
             }
-            // Alert, falls Chat bereits existiert
+            
+            /**
+             Alert, der erscheint, wenn `showExistingChatAlert == true`.
+             - Zeigt an, dass bereits ein Chat existiert.
+             - Klickt man auf "OK", wird direkt zum bestehenden Chat navigiert.
+            */
             .alert(isPresented: $showExistingChatAlert) {
                 Alert(
                     title: Text("Chat existiert bereits"),
@@ -181,8 +237,12 @@ struct NewChatView: View {
                     })
                 )
             }
+            
+            /**
+             Lädt beim Erscheinen der View (z. B. nach dem Navigieren auf diese Seite) alle Charaktere.
+             Dieser Aufruf sorgt dafür, dass `characterVM.characters` gefüllt wird.
+            */
             .onAppear {
-                // Beim Erscheinen alle Charaktere laden
                 characterVM.fetchAllCharacters()
             }
         }
@@ -192,52 +252,80 @@ struct NewChatView: View {
     // MARK: - Logikfunktionen
     
     /**
-     Versucht, einen neuen Chat zwischen den ausgewählten Charakteren zu erstellen.
-     Wenn bereits ein Chat existiert, wird dieser stattdessen geöffnet.
-     */
+     Prüft, ob ein Chat zwischen den ausgewählten Charakteren bereits existiert. Falls nicht,
+     wird ein neuer Chat erstellt. Sobald der Server (bzw. das Firestore/Backend)
+     zurückmeldet, ob der Chat existiert oder neu angelegt wurde, wird entsprechend reagiert:
+     
+     - **Bereits existierender Chat**:
+       - Speichere den Chat in `existingChat`.
+       - Setze `showExistingChatAlert = true`, damit der Alert angezeigt wird.
+     
+     - **Neuer Chat**:
+       - Chat wurde erfolgreich erstellt.
+       - Schließe die View mit `dismiss()`.
+       - Rufe den optionalen Callback `onSuccess?()` auf.
+     
+     - **Fehlerfall**:
+       - Falls kein Chat-Objekt zurückkommt, gib eine Fehlermeldung aus.
+    */
     private func createChatOrOpenExisting() {
         guard let myCharId = mySelectedCharId else { return }
         guard let otherCharId = otherSelectedCharId else { return }
         
         let participants = [myCharId, otherCharId]
         
+        /**
+         Ruft die Funktion `createNewChat` aus `chatVM` auf, welche sich um die
+         Chat-Erzeugung (oder -Überprüfung) kümmert.
+         - `participants`: Array mit beiden CharIDs.
+         - `initialMessage`: bei Bedarf zu sendender Eingangs-Text.
+         - `senderCharId`: Der Char, von dem die Nachricht abgeschickt werden soll.
+         - Completion: liefert `(chat, didExist)` zurück.
+           * `chat`: kann entweder der neue oder der bereits existierende Chat sein
+           * `didExist`: `true`, wenn der Chat schon existierte, sonst `false`.
+        */
         chatVM.createNewChat(
             participants: participants,
             initialMessage: initialMessage,
             senderCharId: myCharId
-        ) { chat in
-            if let existingChat = chat {
+        ) { chat, didExist in
+            if didExist, let existingChat = chat {
                 // Chat existiert bereits
                 self.existingChat = existingChat
                 self.showExistingChatAlert = true
-            } else {
+            } else if let newChat = chat {
                 // Neuer Chat wurde erfolgreich angelegt
                 dismiss()
                 onSuccess?()
+            } else {
+                // Fehlerfall: Chat konnte nicht erstellt werden
+                print("Fehler: Chat konnte nicht erstellt werden.")
             }
         }
     }
     
     /**
-     Öffnet den bereits existierenden Chat und sendet ggf.
-     die initiale Nachricht, falls diese gesetzt ist.
+     Wird aufgerufen, wenn bereits ein Chat existiert und über den Alert bestätigt wurde,
+     dass man diesen öffnen möchte.
      
-     - Parameter chat: Der bereits existierende Chat, der geöffnet werden soll.
-     */
+     - Schließt zunächst die aktuelle View (zurück zur übergeordneten View).
+     - Ruft nach einer kurzen Verzögerung `chatVM.fetchMessages(for:)` auf, um Nachrichten nachzuladen.
+     - Falls eine `initialMessage` vorhanden ist, wird diese bei dem existierenden Chat gesendet.
+     - Abschließend wird der `onSuccess?()`-Callback getriggert.
+    */
     private func navigateToChatDetail(chat: Chat) {
         dismiss()
         
-        // Kleiner Delay, um das Dismiss sauber abzuschließen,
-        // bevor weitere Aktionen erfolgen
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            // Nachrichten für diesen Chat laden
             chatVM.fetchMessages(for: chat.id ?? "")
             
-            // Falls der Nutzer bereits einen Text eingegeben hat, sende ihn nun
+            // Falls der Nutzer eine Nachricht eingetippt hat, senden wir sie jetzt
             if !initialMessage.isEmpty {
                 chatVM.sendMessage(to: chat, senderCharId: mySelectedCharId ?? "", text: initialMessage)
             }
             
-            // Rufe den Erfolgs-Callback auf
+            // Benachrichtige ggf. übergeordnete Ebene
             onSuccess?()
         }
     }

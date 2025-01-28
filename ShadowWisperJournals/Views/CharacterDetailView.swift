@@ -313,8 +313,8 @@ struct CharacterDetailView: View {
                     
                     // MARK: Allgemeine Daten
                     Section("Allgemeine Daten") {
-                        TextField("Name (Realname)", text: $name)
-                        TextField("Straßenname", text: $streetName)
+                        TextField("Name (Straßenname)", text: $name)
+                        TextField("Realname", text: $streetName)
                         TextField("Metatyp", text: $metaType)
                         TextField("Spezialisierung", text: $specialization)
                         TextField("Magie/Resonanz", text: $magicOrResonance)

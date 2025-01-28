@@ -201,14 +201,16 @@ class ChatViewModel: ObservableObject {
         participants: [String],
         initialMessage: String?,
         senderCharId: String,
-        completion: @escaping (Chat?) -> Void
+        completion: @escaping (Chat?, Bool) -> Void  // <-- Neues Bool
     ) {
         checkIfChatExists(participants: participants) { existingChat in
             if let existing = existingChat {
-                completion(existing)
+                // Chat existierte bereits
+                completion(existing, true)
                 return
             }
             
+            // Chat existiert noch nicht -> wir erstellen ihn
             let now = Date()
             let sortedKey = self.sortedKey(for: participants)
             
@@ -223,6 +225,7 @@ class ChatViewModel: ObservableObject {
             do {
                 let ref = try self.db.collection("chats").addDocument(from: chat)
                 
+                // Falls eine erste Nachricht eingegeben wurde, direkt anlegen
                 if let msg = initialMessage, !msg.isEmpty {
                     let message = ChatMessage(
                         id: nil,
@@ -234,17 +237,18 @@ class ChatViewModel: ObservableObject {
                     try ref.collection("messages").addDocument(from: message)
                 }
                 
+                // Das frisch angelegte Chat-Dokument abrufen, um es als Objekt zurückzugeben
                 ref.getDocument { docSnap, error in
                     if let doc = docSnap, doc.exists {
                         let newChat = try? doc.data(as: Chat.self)
-                        completion(newChat)
+                        completion(newChat, false)  // Chat wurde neu erstellt
                     } else {
-                        completion(nil)
+                        completion(nil, false)
                     }
                 }
             } catch {
                 print("Fehler beim Erstellen des Chats: \(error.localizedDescription)")
-                completion(nil)
+                completion(nil, false)
             }
         }
     }
